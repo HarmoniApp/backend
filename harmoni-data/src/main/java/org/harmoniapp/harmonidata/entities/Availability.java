@@ -5,11 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "\"availability\"")
+@Table(name = "availability")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,5 +29,10 @@ public class Availability {
 
     @Column(name = "\"end\"", columnDefinition = "TIMESTAMP")
     private LocalDateTime end;
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }
 

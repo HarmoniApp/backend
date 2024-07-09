@@ -5,9 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.proxy.HibernateProxy;
 
 @Entity
-@Table(name = "\"address\"")
+@Table(name = "address")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,4 +28,9 @@ public class Address {
     private String buildingNumber;
 
     private String apartment;
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }

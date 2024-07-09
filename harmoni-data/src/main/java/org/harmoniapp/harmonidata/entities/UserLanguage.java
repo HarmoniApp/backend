@@ -6,9 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.harmoniapp.harmonidata.enums.Language;
+import org.hibernate.proxy.HibernateProxy;
 
 @Entity
-@Table(name = "\"user_language\"")
+@Table(name = "user_language")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,4 +26,9 @@ public class UserLanguage {
     @Enumerated(EnumType.STRING)
     @Column(name = "language")
     private Language language;
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }
