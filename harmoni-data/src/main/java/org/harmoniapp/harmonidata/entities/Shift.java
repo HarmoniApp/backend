@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.harmoniapp.harmonidata.enums.Role;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "\"shift\"")
