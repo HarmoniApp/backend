@@ -14,4 +14,6 @@ public class BasicRepositoryCollector implements RepositoryCollector {
     private final ShiftRepository shifts;
     private final UserRepository users;
     private final VacationRepository vacations;
+    private final UserLanguageRepository userLanguages;
+    private final UserRoleRepository userRoles;
 }

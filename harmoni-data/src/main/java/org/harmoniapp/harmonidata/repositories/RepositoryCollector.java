@@ -15,4 +15,8 @@ public interface RepositoryCollector {
     UserRepository getUsers();
 
     VacationRepository getVacations();
+
+    UserLanguageRepository getUserLanguages();
+
+    UserRoleRepository getUserRoles();
 }
