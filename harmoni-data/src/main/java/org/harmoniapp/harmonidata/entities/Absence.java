@@ -7,12 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.harmoniapp.harmonidata.enums.AbsenceType;
 import org.harmoniapp.harmonidata.enums.Status;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
-@Table(name = "\"absence\"")
+@Table(name = "absence")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -45,4 +46,9 @@ public class Absence {
 
     @Temporal(TemporalType.DATE)
     private Date updated;
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }

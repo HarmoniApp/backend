@@ -6,12 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.harmoniapp.harmonidata.enums.Role;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "\"shift\"")
+@Table(name = "shift")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -33,4 +34,9 @@ public class Shift {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }

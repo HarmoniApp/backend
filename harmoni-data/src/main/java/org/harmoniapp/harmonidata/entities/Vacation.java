@@ -7,9 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.harmoniapp.harmonidata.enums.AbsenceType;
 import org.harmoniapp.harmonidata.enums.ContractType;
+import org.hibernate.proxy.HibernateProxy;
 
 @Entity
-@Table(name = "\"vacation\"")
+@Table(name = "vacation")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,4 +30,9 @@ public class Vacation {
 
     @Column(name = "max_available")
     private Integer maxAvailable;
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }
