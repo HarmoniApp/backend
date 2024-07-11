@@ -54,6 +54,9 @@ public class User {
     @Column(name="phone_number")
     private String phoneNumber;
 
+    @Column(name = "employee_id")
+    private String employeeId;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRole> roles;
 
