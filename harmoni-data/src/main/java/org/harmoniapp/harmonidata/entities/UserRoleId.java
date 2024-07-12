@@ -1,15 +1,11 @@
 package org.harmoniapp.harmonidata.entities;
 
-import lombok.*;
+import lombok.Data;
 import org.harmoniapp.harmonidata.enums.Role;
 
 import java.io.Serializable;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
+@Data
 public class UserRoleId implements Serializable {
     private User user;
     private Role role;
