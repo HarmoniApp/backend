@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.harmoniapp.harmonidata.enums.Role;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "user_role")
 @Getter
@@ -25,6 +27,19 @@ public class UserRole {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ?
+                ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ?
+                ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        UserRole userRole = (UserRole) o;
+        return getId() != null && Objects.equals(getId(), userRole.getId());
+    }
 
     @Override
     public final int hashCode() {
