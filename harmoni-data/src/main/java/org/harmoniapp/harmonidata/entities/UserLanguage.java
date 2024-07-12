@@ -12,19 +12,19 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "user_language")
+@IdClass(UserLanguageId.class)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserLanguage {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Id
     @Enumerated(EnumType.STRING)
     @Column(name = "language")
     private Language language;
@@ -39,7 +39,7 @@ public class UserLanguage {
                 ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
         UserLanguage userLanguage = (UserLanguage) o;
-        return getId() != null && Objects.equals(getId(), userLanguage.getId());
+        return Objects.equals(user, userLanguage.user) && language == userLanguage.language;
     }
 
     @Override
