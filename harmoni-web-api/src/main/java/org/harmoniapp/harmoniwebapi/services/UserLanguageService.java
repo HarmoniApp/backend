@@ -1,15 +1,14 @@
 package org.harmoniapp.harmoniwebapi.services;
 
+import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.entities.UserLanguage;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
-import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.harmoniapp.harmoniwebapi.contracts.UserLanguageDto;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +17,7 @@ import java.util.stream.Collectors;
 @ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class UserLanguageService {
     private final RepositoryCollector repositoryCollector;
+    private final int page_size = 20;
 
     public UserLanguageDto getUser(long id) {
         var userOptional = repositoryCollector.getUsers().findById(id);
@@ -32,10 +32,15 @@ public class UserLanguageService {
                 user.getLanguages().stream().map(UserLanguage::getLanguage).collect(Collectors.toSet()));
     }
 
-    public List<UserLanguageDto> getUsers() {
+    public List<UserLanguageDto> getUsersPage(int page) {
         List<User> users = repositoryCollector.getUsers().findAll();
+        List<List<User>> pagedUsers = Lists.partition(users, page_size);
 
-        return users.stream()
+        if (users.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
+        return pagedUsers.get(page).stream()
                 .map(p -> new UserLanguageDto(
                         p.getId(),
                         p.getFirstname(),
