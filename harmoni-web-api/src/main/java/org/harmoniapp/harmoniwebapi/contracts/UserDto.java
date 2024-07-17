@@ -1,21 +1,19 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.harmoniapp.harmonidata.entities.UserLanguage;
-import org.harmoniapp.harmonidata.entities.UserRole;
 import org.harmoniapp.harmonidata.enums.ContractType;
 import org.harmoniapp.harmonidata.enums.Language;
 import org.harmoniapp.harmonidata.enums.Role;
 
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.Set;
 
 public record UserDto(
         long id,
-        @JsonProperty("first_name") String firstname,
+        String firstname,
         String surname,
         String email,
+        String password,
         @JsonProperty("contract_type") ContractType contractType,
         @JsonProperty("contract_signature") Date contractSignature,
         @JsonProperty("contract_expiration") Date contractExpiration,
