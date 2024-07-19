@@ -75,21 +75,28 @@ public class PredefineShiftService {
     }
 
     /**
-     * Updates an existing predefined shift in the database.
+     * Updates an existing predefined shift in the database or creates a new one if the ID does not exist.
      *
-     * @param predefineShiftDto the DTO containing the details of the predefined shift to update
-     * @return the updated PredefineShiftDto
+     * @param id the ID of the predefined shift to update or create
+     * @param predefineShiftDto the DTO containing the details of the predefined shift to update or create
+     * @return the updated or newly created PredefineShiftDto
      * @throws RuntimeException if there is an error accessing the database or the provided data is invalid
      */
-    public PredefineShiftDto updatePredefineShift(PredefineShiftDto predefineShiftDto) {
+    public PredefineShiftDto updatePredefineShift(long id, PredefineShiftDto predefineShiftDto) {
         try {
-            if (repositoryCollector.getPredefineShifts().existsById(predefineShiftDto.id())) {
-                PredefineShift predefineShift = predefineShiftDto.toEntity();
-                PredefineShift updatedPredefineShift = repositoryCollector.getPredefineShifts().save(predefineShift);
-                return PredefineShiftDto.fromEntity(updatedPredefineShift);
-            } else {
-                throw new RuntimeException("PredefineShift with ID " + predefineShiftDto.id() + " does not exist.");
-            }
+            PredefineShift newPredefineShift = predefineShiftDto.toEntity();
+            return repositoryCollector.getPredefineShifts().findById(id)
+              .map(predefineShift -> {
+                  predefineShift.setName(newPredefineShift.getName());
+                  predefineShift.setStart(newPredefineShift.getStart());
+                  predefineShift.setEnd(newPredefineShift.getEnd());
+                  PredefineShift updatedPredefineShift = repositoryCollector.getPredefineShifts().save(predefineShift);
+                  return PredefineShiftDto.fromEntity(updatedPredefineShift);
+              })
+              .orElseGet(() -> {
+                  PredefineShift createdPredefineShift = repositoryCollector.getPredefineShifts().save(newPredefineShift);
+                  return PredefineShiftDto.fromEntity(createdPredefineShift);
+              });
         } catch (Exception e) {
             throw new RuntimeException("An error occurred: " + e.getMessage(), e);
         }

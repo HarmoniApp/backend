@@ -55,9 +55,9 @@ public class PredefineShiftController {
      * @param predefineShiftDto the DTO containing the details of the predefined shift to update
      * @return the updated PredefineShiftDto
      */
-    @PutMapping
-    public PredefineShiftDto updatePredefineShift(@RequestBody PredefineShiftDto predefineShiftDto) {
-        return predefineShiftService.updatePredefineShift(predefineShiftDto);
+    @PutMapping("/{id}")
+    public PredefineShiftDto updatePredefineShift(@PathVariable long id, @RequestBody PredefineShiftDto predefineShiftDto) {
+        return predefineShiftService.updatePredefineShift(id, predefineShiftDto);
     }
 
     /**
