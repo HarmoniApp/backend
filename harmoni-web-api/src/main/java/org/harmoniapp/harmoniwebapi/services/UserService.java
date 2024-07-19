@@ -4,13 +4,17 @@ import com.google.common.collect.Lists;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.User;
+import org.harmoniapp.harmonidata.entities.UserLanguage;
+import org.harmoniapp.harmonidata.entities.UserRole;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.harmoniapp.harmoniwebapi.mappers.MapEntityDto;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,5 +43,47 @@ public class UserService {
         var user = userOptional.get();
 
         return mapper.toDto(user);
+    }
+
+    public void add(UserDto userDto) {
+        //TODO
+    }
+
+    @Transactional
+    public long update(long id, UserDto userDto) {
+        //TODO
+        var existingUser = repositoryCollector.getUsers().findById(id);
+
+        User user = existingUser.orElseGet(() -> mapper.toEntity(userDto));
+
+        var supervisor = repositoryCollector.getUsers().findById(userDto.supervisorId());
+        if (supervisor.isEmpty()) {
+            user.setSupervisor(null);
+        } else {
+            user.setSupervisor(supervisor.get());
+        }
+
+        System.out.println(userDto.contractType());
+        user.setLanguages(
+                userDto.languages().stream()
+                        .map(p -> new UserLanguage(user, p))
+                        .collect(Collectors.toSet()));
+
+        user.setRoles(
+                userDto.roles().stream()
+                        .map(p -> new UserRole(user, p))
+                        .collect(Collectors.toSet())
+        );
+
+        var x = repositoryCollector.getUsers().saveAndFlush(user);
+        return userDto.id();
+    }
+
+    public void delete(long id) {
+        var userOptional = repositoryCollector.getUsers().findById(id);
+        if (userOptional.isEmpty()) {
+            throw new EntityNotFoundException();
+        }
+        repositoryCollector.getUsers().deleteById(id);
     }
 }
