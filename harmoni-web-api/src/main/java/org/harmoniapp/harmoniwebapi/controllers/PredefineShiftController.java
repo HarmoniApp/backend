@@ -2,18 +2,14 @@ package org.harmoniapp.harmoniwebapi.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.PredefineShiftDto;
-import org.harmoniapp.harmoniwebapi.contracts.ShiftDto;
 import org.harmoniapp.harmoniwebapi.services.PredefineShiftService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
  * REST controller for managing predefineShift.
- * Provides endpoints to retrieve predefineShift information.
+ * Provides endpoints to retrieve, create, update, and delete predefineShift information.
  */
 @RestController
 @RequiredArgsConstructor
@@ -40,5 +36,37 @@ public class PredefineShiftController {
     @GetMapping("/all")
     public List<PredefineShiftDto> getAllPredefineShifts() {
         return predefineShiftService.getAllPredefineShifts();
+    }
+
+    /**
+     * Creates a new predefined shift.
+     *
+     * @param predefineShiftDto the DTO containing the details of the predefined shift to save
+     * @return the saved PredefineShiftDto
+     */
+    @PostMapping
+    public PredefineShiftDto createPredefineShift(@RequestBody PredefineShiftDto predefineShiftDto) {
+        return predefineShiftService.createPredefineShift(predefineShiftDto);
+    }
+
+    /**
+     * Updates an existing predefined shift.
+     *
+     * @param predefineShiftDto the DTO containing the details of the predefined shift to update
+     * @return the updated PredefineShiftDto
+     */
+    @PutMapping
+    public PredefineShiftDto updatePredefineShift(@RequestBody PredefineShiftDto predefineShiftDto) {
+        return predefineShiftService.updatePredefineShift(predefineShiftDto);
+    }
+
+    /**
+     * Deletes a predefined shift by its ID.
+     *
+     * @param id the ID of the predefined shift to delete
+     */
+    @DeleteMapping("/{id}")
+    public void deletePredefineShift(@PathVariable long id) {
+        predefineShiftService.deletePredefineShift(id);
     }
 }

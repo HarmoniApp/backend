@@ -20,12 +20,26 @@ public record PredefineShiftDto(long id, String name, LocalTime start, LocalTime
      * @param predefineShift the PredefineShift entity to convert
      * @return the resulting PredefineShiftDto
      */
-    public static PredefineShiftDto toDto(PredefineShift predefineShift) {
+    public static PredefineShiftDto fromEntity(PredefineShift predefineShift) {
         return new PredefineShiftDto(
                 predefineShift.getId(),
                 predefineShift.getName(),
                 predefineShift.getStart(),
                 predefineShift.getEnd()
+        );
+    }
+
+    /**
+     * Converts a PredefineShiftDto to a PredefineShift entity.
+     *
+     * @return the resulting PredefineShift entity
+     */
+    public PredefineShift toEntity() {
+        return new PredefineShift(
+                this.id,
+                this.name,
+                this.start,
+                this.end
         );
     }
 }

@@ -24,15 +24,16 @@ public class ShiftService {
      * @throws IllegalArgumentException if the shift with the specified ID does not exist
      */
     public ShiftDto getShift(long id) {
-        var shiftOptional = repositoryCollector.getShifts().findById(id);
-
-        if (shiftOptional.isEmpty()) {
-            throw new IllegalArgumentException();
+        try {
+            var shiftOptional = repositoryCollector.getShifts().findById(id);
+            if (shiftOptional.isEmpty()) {
+                throw new IllegalArgumentException();
+            }
+            var shift = shiftOptional.get();
+            return ShiftDto.fromEntity(shift);
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
         }
-
-        var shift = shiftOptional.get();
-
-        return ShiftDto.toDto(shift);
     }
 
 }
