@@ -10,5 +10,5 @@ import java.util.Set;
  * @param lastName  the last name of the user
  * @param languages the set of languages associated with the user
  */
-public record UserLanguageDto(long id, String firstName, String lastName, Set<Language> languages) {
+public record UserLanguageDto(long id, String firstName, String lastName, Set<String> languages) {
 }
