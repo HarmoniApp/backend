@@ -5,29 +5,23 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.harmoniapp.harmonidata.enums.Language;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Objects;
 
 @Entity
-@Table(name = "user_language")
-@IdClass(UserLanguageId.class)
+@Table(name = "absent_type")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserLanguage {
+public class AbsenceType {
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Id
-    @Enumerated(EnumType.STRING)
-    @Column(name = "language")
-    private Language language;
+    private String name;
 
     @Override
     public final boolean equals(Object o) {
@@ -38,12 +32,14 @@ public class UserLanguage {
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ?
                 ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        UserLanguage userLanguage = (UserLanguage) o;
-        return Objects.equals(user, userLanguage.user) && language == userLanguage.language;
+        AbsenceType absenceType = (AbsenceType) o;
+        return getId() != null && Objects.equals(getId(), absenceType.getId());
     }
+
 
     @Override
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
+
 }

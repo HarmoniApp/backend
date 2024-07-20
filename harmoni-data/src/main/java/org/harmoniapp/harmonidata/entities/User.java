@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.harmoniapp.harmonidata.enums.ContractType;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Date;
@@ -13,7 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "\"user\"")
+@Table(name = "user", schema = "public")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,8 +29,8 @@ public class User {
     private String email; //TODO: Later add some validation
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "contract_type")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     private ContractType contractType;
 
     @Temporal(TemporalType.DATE)
@@ -40,16 +41,16 @@ public class User {
     @Column(name = "contract_expiration")
     private Date contractExpiration;
 
-    @ManyToOne
-    @JoinColumn(name="residence_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     private Address residence;
 
-    @ManyToOne
-    @JoinColumn(name = "work_address_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     private Address workAddress;
 
-    @ManyToOne
-    @JoinColumn(name = "supervisor_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     private User supervisor;
 
     @Column(name="phone_number")
@@ -58,11 +59,19 @@ public class User {
     @Column(name = "employee_id")
     private String employeeId;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserRole> roles;
+    @ManyToMany
+    @JoinTable(
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserLanguage> languages;
+    @ManyToMany
+    @JoinTable(
+            name = "user_language",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "language_id"))
+    private Set<Language> languages;
 
     @Override
     public final boolean equals(Object o) {

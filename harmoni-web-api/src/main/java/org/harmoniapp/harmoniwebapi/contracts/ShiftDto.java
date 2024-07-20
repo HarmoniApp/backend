@@ -1,9 +1,9 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.entities.User;
-import org.harmoniapp.harmonidata.enums.Role;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * @param userId  the userId associated with the shift
  * @param role    the role of the user during the shift
  */
-public record ShiftDto(long id, LocalDateTime start, LocalDateTime end, @JsonProperty("user_id") long userId, Role role) {
+public record ShiftDto(long id, LocalDateTime start, LocalDateTime end, @JsonProperty("user_id") long userId, String role) {
 
     /**
      * Converts a Shift entity to a ShiftDto.
@@ -30,7 +30,7 @@ public record ShiftDto(long id, LocalDateTime start, LocalDateTime end, @JsonPro
                 shift.getStart(),
                 shift.getEnd(),
                 shift.getUser().getId(),
-                shift.getRole()
+                shift.getRole().getName()
         );
     }
 
@@ -40,13 +40,13 @@ public record ShiftDto(long id, LocalDateTime start, LocalDateTime end, @JsonPro
      * @param user the User entity associated with the shift
      * @return the resulting Shift entity
      */
-    public Shift toEntity(User user) {
+    public Shift toEntity(User user, Role role) {
         return new Shift(
                 this.id,
                 this.start,
                 this.end,
                 user,
-                this.role
+                role
         );
     }
 }
