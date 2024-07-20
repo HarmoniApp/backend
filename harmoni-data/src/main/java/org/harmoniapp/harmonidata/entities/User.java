@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Date;
@@ -12,7 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "user")
+@Table(name = "user", schema = "public")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,8 +29,8 @@ public class User {
     private String email; //TODO: Later add some validation
     private String password;
 
-    @ManyToOne
-    @JoinColumn(name = "contract_type_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     private ContractType contractType;
 
     @Temporal(TemporalType.DATE)
@@ -39,16 +41,16 @@ public class User {
     @Column(name = "contract_expiration")
     private Date contractExpiration;
 
-    @ManyToOne
-    @JoinColumn(name="residence_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     private Address residence;
 
-    @ManyToOne
-    @JoinColumn(name = "work_address_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     private Address workAddress;
 
-    @ManyToOne
-    @JoinColumn(name = "supervisor_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     private User supervisor;
 
     @Column(name="phone_number")

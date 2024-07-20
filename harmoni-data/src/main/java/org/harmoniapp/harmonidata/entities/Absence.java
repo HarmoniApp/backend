@@ -22,9 +22,11 @@ public class Absence {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "\"start\"")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime start;
 
+    @Column(name = "\"end\"")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime end;
 

@@ -11,7 +11,7 @@ import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "predefine_shift")
+@Table(name = "predefine_shift", schema = "public")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,9 +23,11 @@ public class PredefineShift {
 
     private String name;
 
+    @Column(name = "\"start\"")
     @Temporal(TemporalType.TIME)
     private LocalTime start;
 
+    @Column(name = "\"end\"")
     @Temporal(TemporalType.TIME)
     private LocalTime end;
 

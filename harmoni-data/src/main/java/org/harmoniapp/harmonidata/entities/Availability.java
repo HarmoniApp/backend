@@ -25,9 +25,11 @@ public class Availability {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "\"start\"")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime start;
 
+    @Column(name = "\"end\"")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime end;
 
