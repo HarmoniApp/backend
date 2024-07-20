@@ -29,7 +29,7 @@ public class User {
     private String email; //TODO: Later add some validation
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn
     private ContractType contractType;
 
@@ -41,15 +41,15 @@ public class User {
     @Column(name = "contract_expiration")
     private Date contractExpiration;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn
     private Address residence;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn
     private Address workAddress;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn
     private User supervisor;
 
