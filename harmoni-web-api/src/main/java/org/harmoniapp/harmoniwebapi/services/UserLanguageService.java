@@ -3,7 +3,6 @@ package org.harmoniapp.harmoniwebapi.services;
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.User;
-import org.harmoniapp.harmonidata.entities.UserLanguage;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.UserLanguageDto;
 import org.springframework.context.annotation.ComponentScan;

@@ -3,7 +3,6 @@ package org.harmoniapp.harmoniwebapi.contracts;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.entities.User;
-import org.harmoniapp.harmonidata.enums.Role;
 
 import java.time.LocalDateTime;
 

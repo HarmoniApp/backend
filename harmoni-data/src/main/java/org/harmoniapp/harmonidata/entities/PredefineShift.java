@@ -23,10 +23,10 @@ public class PredefineShift {
 
     private String name;
 
-    @Column(columnDefinition = "TIME")
+    @Temporal(TemporalType.TIME)
     private LocalTime start;
 
-    @Column(name = "\"end\"", columnDefinition = "TIME")
+    @Temporal(TemporalType.TIME)
     private LocalTime end;
 
     @Override

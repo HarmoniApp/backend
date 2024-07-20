@@ -7,44 +7,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "absence")
+@Table(name = "role")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Absence {
+public class Role {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime start;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime end;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "absence_type_id")
-    private AbsenceType absenceType;
-
-    @ManyToOne
-    @JoinColumn(name = "status_id")
-    private Status status;
-
-    @Temporal(TemporalType.DATE)
-    private Date submission;
-
-    @Temporal(TemporalType.DATE)
-    private Date updated;
+    private String name;
 
     @Override
     public final boolean equals(Object o) {
@@ -55,10 +31,8 @@ public class Absence {
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ?
                 ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Absence absence = (Absence) o;
-        return getId() != null && Objects.equals(getId(), absence.getId());
-    }
-
+        Role role = (Role) o;
+        return getId() != null && Objects.equals(getId(), role.getId());    }
 
     @Override
     public final int hashCode() {

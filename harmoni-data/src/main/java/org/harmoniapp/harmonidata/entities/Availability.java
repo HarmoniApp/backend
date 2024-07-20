@@ -25,10 +25,10 @@ public class Availability {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(columnDefinition = "TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime start;
 
-    @Column(name = "\"end\"", columnDefinition = "TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime end;
 
     @Override

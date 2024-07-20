@@ -1,7 +1,5 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
-import org.harmoniapp.harmonidata.enums.Language;
-
 import java.util.Set;
 
 /**

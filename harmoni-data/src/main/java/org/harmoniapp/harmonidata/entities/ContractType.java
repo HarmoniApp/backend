@@ -5,28 +5,23 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.harmoniapp.harmonidata.enums.Role;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Objects;
 
 @Entity
-@Table(name = "user_role")
-@IdClass(UserRoleId.class)
+@Table(name = "contract_type")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRole {
+public class ContractType {
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Id
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private String name;
 
     @Override
     public final boolean equals(Object o) {
@@ -37,9 +32,10 @@ public class UserRole {
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ?
                 ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        UserRole userRole = (UserRole) o;
-        return Objects.equals(user, userRole.user) && role == userRole.role;
+        ContractType contractType = (ContractType) o;
+        return getId() != null && Objects.equals(getId(), contractType.getId());
     }
+
 
     @Override
     public final int hashCode() {

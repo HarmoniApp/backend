@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.harmoniapp.harmonidata.enums.ContractType;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Date;
@@ -13,7 +12,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "\"user\"")
+@Table(name = "user")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,8 +27,8 @@ public class User {
     private String email; //TODO: Later add some validation
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "contract_type")
+    @ManyToOne
+    @JoinColumn(name = "contract_type_id")
     private ContractType contractType;
 
     @Temporal(TemporalType.DATE)
@@ -58,11 +57,19 @@ public class User {
     @Column(name = "employee_id")
     private String employeeId;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserRole> roles;
+    @ManyToMany
+    @JoinTable(
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserLanguage> languages;
+    @ManyToMany
+    @JoinTable(
+            name = "user_language",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "language_id"))
+    private Set<Language> languages;
 
     @Override
     public final boolean equals(Object o) {
