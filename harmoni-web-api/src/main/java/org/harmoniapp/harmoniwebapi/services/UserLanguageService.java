@@ -2,8 +2,8 @@ package org.harmoniapp.harmoniwebapi.services;
 
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.harmonidata.entities.Language;
 import org.harmoniapp.harmonidata.entities.User;
-import org.harmoniapp.harmonidata.entities.UserLanguage;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.UserLanguageDto;
 import org.springframework.context.annotation.ComponentScan;
@@ -40,7 +40,7 @@ public class UserLanguageService {
         var user = userOptional.get();
 
         return new UserLanguageDto(user.getId(), user.getFirstname(), user.getSurname(),
-                user.getLanguages().stream().map(UserLanguage::getLanguage).collect(Collectors.toSet()));
+                user.getLanguages().stream().map(Language::getName).collect(Collectors.toSet()));
     }
 
     /**
@@ -58,7 +58,7 @@ public class UserLanguageService {
                         p.getId(),
                         p.getFirstname(),
                         p.getSurname(),
-                        p.getLanguages().stream().map(UserLanguage::getLanguage).collect(Collectors.toSet())
+                        p.getLanguages().stream().map(Language::getName).collect(Collectors.toSet())
                 )).toList();
     }
 }
