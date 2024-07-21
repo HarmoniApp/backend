@@ -28,17 +28,18 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void addUser(@RequestBody UserDto userDto) {
-        service.add(userDto);
+    public UserDto addUser(@RequestBody UserDto userDto) {
+        return service.add(userDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateUser(@PathVariable long id, @RequestBody UserDto userDto) {
-        long updatedId = service.update(id, userDto);
-        return ResponseEntity.created(URI.create("user/"+updatedId)).build();
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDto updateUser(@PathVariable long id, @RequestBody UserDto userDto) {
+        return service.update(id, userDto);
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> deleteUser(@PathVariable long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
