@@ -8,7 +8,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service class for managing contractType.
@@ -49,7 +48,7 @@ public class ContractTypeService {
             var contractTypes = repositoryCollector.getContractTypes().findAll();
             return contractTypes.stream()
                     .map(ContractTypeDto::fromEntity)
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (Exception e) {
             throw new RuntimeException("An error occurred: " + e.getMessage(), e);
         }
