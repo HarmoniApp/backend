@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
  * @param start   the start time of the shift
  * @param end     the end time of the shift
  * @param userId  the userId associated with the shift
- * @param role    the role of the user during the shift
+ * @param roleId    the roleId of the user during the shift
  */
-public record ShiftDto(long id, LocalDateTime start, LocalDateTime end, @JsonProperty("user_id") long userId, String role) {
+public record ShiftDto(long id, LocalDateTime start, LocalDateTime end, @JsonProperty("user_id") long userId,  @JsonProperty("role_id") long roleId) {
 
     /**
      * Converts a Shift entity to a ShiftDto.
@@ -30,7 +30,7 @@ public record ShiftDto(long id, LocalDateTime start, LocalDateTime end, @JsonPro
                 shift.getStart(),
                 shift.getEnd(),
                 shift.getUser().getId(),
-                shift.getRole().getName()
+                shift.getRole().getId()
         );
     }
 

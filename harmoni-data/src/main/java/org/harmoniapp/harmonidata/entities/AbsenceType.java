@@ -10,7 +10,7 @@ import org.hibernate.proxy.HibernateProxy;
 import java.util.Objects;
 
 @Entity
-@Table(name = "absent_type")
+@Table(name = "absence_type")
 @Getter
 @Setter
 @NoArgsConstructor
