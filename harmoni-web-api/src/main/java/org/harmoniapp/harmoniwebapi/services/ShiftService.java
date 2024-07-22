@@ -56,7 +56,7 @@ public class ShiftService {
             List<Shift> shifts = repositoryCollector.getShifts().findAllByDateRange(start, end);
             return shifts.stream()
                     .map(ShiftDto::fromEntity)
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (Exception e) {
             throw new RuntimeException("An error occurred: " + e.getMessage(), e);
         }

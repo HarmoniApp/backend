@@ -36,7 +36,7 @@ public class ContractTypeController {
      *
      * @return a list of ContractTypeDto containing the details of all contractType
      */
-    @GetMapping("/all")
+    @GetMapping
     public List<ContractTypeDto> getAllContractTypes() {
         return contractTypeService.getAllContractTypes();
     }
