@@ -29,11 +29,9 @@ public class PredefineShiftService {
      */
     public PredefineShiftDto getPredefineShift(long id) {
         try {
-            var predefineShiftOptional = repositoryCollector.getPredefineShifts().findById(id);
-            if (predefineShiftOptional.isEmpty()) {
-                throw new IllegalArgumentException("PredefineShift with ID " + id + " not found");
-            }
-            var predefineShift = predefineShiftOptional.get();
+            PredefineShift predefineShift = repositoryCollector.getPredefineShifts().findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("PredefineShift with ID " + id + " not found"));
+
             return PredefineShiftDto.fromEntity(predefineShift);
         } catch (Exception e) {
             throw new RuntimeException("An error occurred: " + e.getMessage(), e);
@@ -44,7 +42,7 @@ public class PredefineShiftService {
      * Retrieves a list of all PredefineShiftDto.
      *
      * @return a list of PredefineShiftDto containing the details of all predefined shifts
-     * @throws RuntimeException if there is an error accessing the database
+     * @throws RuntimeException if there is an error
      */
     public List<PredefineShiftDto> getAllPredefineShifts() {
         try {
