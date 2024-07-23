@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.ShiftDto;
 import org.harmoniapp.harmoniwebapi.contracts.UserLanguageDto;
 import org.harmoniapp.harmoniwebapi.services.ShiftService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -29,16 +31,44 @@ public class ShiftController {
         return shiftService.getShift(id);
     }
 
-//    /**
-//     * Retrieves a paginated list of shifts.
-//     *
-//     * @param page the page number to retrieve (optional, default is 0)
-//     * @return a list of ShiftDto containing the details of shifts for the specified page
-//     */
-//    @GetMapping("")
-//    public List<ShiftDto> getShifts(@RequestParam(required = false, defaultValue = "0") int page) {
-//        return shiftService.getShiftPage(page);
-//    }
+    /**
+     * Retrieves a list of ShiftDto within the specified date range.
+     *
+     * @param start the start date and time in ISO-8601 string format
+     * @param end   the end date and time in ISO-8601 string format
+     * @return a list of ShiftDto within the specified date range
+     */
+    @GetMapping("/range")
+    public List<ShiftDto> getShiftsByDateRange(@RequestParam("start") String start, @RequestParam("end") String end) {
+        LocalDateTime startDate = LocalDateTime.parse(start);
+        LocalDateTime endDate = LocalDateTime.parse(end);
+        return shiftService.getShiftsByDateRange(startDate, endDate);
+    }
+
+    /**
+     * Creates a new Shift.
+     *
+     * @param shiftDto the ShiftDto containing the details of the shift to create
+     * @return the created ShiftDto
+     */
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ShiftDto addShift(@RequestBody ShiftDto shiftDto) {
+        return shiftService.createShift(shiftDto);
+    }
+
+    /**
+     * Updates an existing Shift or creates a new one if it doesn't exist.
+     *
+     * @param id       the ID of the shift to update
+     * @param shiftDto the ShiftDto containing the details of the shift to update
+     * @return the updated or newly created ShiftDto
+     */
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ShiftDto updateShift(@PathVariable long id, @RequestBody ShiftDto shiftDto) {
+        return shiftService.updateShift(id, shiftDto);
+    }
 
     /**
      * Deletes a shift by its ID.
@@ -46,6 +76,7 @@ public class ShiftController {
      * @param id the ID of the shift to delete
      */
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteShift(@PathVariable long id) {
         shiftService.deleteShift(id);
     }

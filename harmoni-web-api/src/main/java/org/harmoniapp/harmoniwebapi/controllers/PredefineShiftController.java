@@ -3,6 +3,7 @@ package org.harmoniapp.harmoniwebapi.controllers;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.PredefineShiftDto;
 import org.harmoniapp.harmoniwebapi.services.PredefineShiftService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,6 +46,7 @@ public class PredefineShiftController {
      * @return the saved PredefineShiftDto
      */
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public PredefineShiftDto createPredefineShift(@RequestBody PredefineShiftDto predefineShiftDto) {
         return predefineShiftService.createPredefineShift(predefineShiftDto);
     }
@@ -56,6 +58,7 @@ public class PredefineShiftController {
      * @return the updated PredefineShiftDto
      */
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
     public PredefineShiftDto updatePredefineShift(@PathVariable long id, @RequestBody PredefineShiftDto predefineShiftDto) {
         return predefineShiftService.updatePredefineShift(id, predefineShiftDto);
     }
@@ -66,6 +69,7 @@ public class PredefineShiftController {
      * @param id the ID of the predefined shift to delete
      */
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePredefineShift(@PathVariable long id) {
         predefineShiftService.deletePredefineShift(id);
     }
