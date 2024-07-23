@@ -7,11 +7,27 @@ import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.User;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
+/**
+ * Data Transfer Object (DTO) for User.
+ *
+ * @param id                 The unique identifier for the user.
+ * @param firstname          The first name of the user.
+ * @param surname            The surname of the user.
+ * @param email              The email address of the user.
+ * @param password           The password of the user (not serialized).
+ * @param contractType       The type of contract for the user.
+ * @param contractSignature  The date when the contract was signed.
+ * @param contractExpiration The date when the contract expires.
+ * @param residence          The residential address of the user.
+ * @param workAddress        The work address of the user.
+ * @param supervisorId       The ID of the user's supervisor, if applicable.
+ * @param phoneNumber        The phone number of the user.
+ * @param employeeId         The employee ID of the user.
+ * @param roles              The roles assigned to the user.
+ * @param languages          The languages known by the user.
+ */
 public record UserDto(
         long id,
         String firstname,
@@ -29,6 +45,12 @@ public record UserDto(
         List<Role> roles,
         List<Language> languages) {
 
+    /**
+     * Converts a User entity to a UserDto.
+     *
+     * @param user The User entity to be converted.
+     * @return A UserDto representing the User entity.
+     */
     public static UserDto fromEntity(User user) {
         return new UserDto(
                 user.getId(),
@@ -48,6 +70,12 @@ public record UserDto(
                 user.getLanguages().stream().toList()
         );
     }
+
+    /**
+     * Converts this UserDto to a User entity.
+     *
+     * @return A User entity representing this UserDto.
+     */
     public User toEntity() {
         return new User(
                 this.id,
