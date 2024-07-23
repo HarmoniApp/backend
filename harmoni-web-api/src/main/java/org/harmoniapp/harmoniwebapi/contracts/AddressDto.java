@@ -24,7 +24,7 @@ public record AddressDto(
 
     public Address toEntity() {
         return new Address(
-                null,
+                id,
                 zipCode,
                 city,
                 street,

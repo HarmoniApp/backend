@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.harmoniapp.harmoniwebapi.services.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -17,7 +15,7 @@ public class UserController {
     private final UserService service;
 
     @GetMapping
-    public List<UserDto> getUsers(@RequestParam(required = false, defaultValue = "0") int page) {
+    public List<UserDto> getAllUsers(@RequestParam(required = false, defaultValue = "0") int page) {
         return service.getUsers(page);
     }
 
@@ -26,9 +24,10 @@ public class UserController {
         return service.getUser(id);
     }
 
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto addUser(@RequestBody UserDto userDto) {
+    public UserDto createUser(@RequestBody UserDto userDto) {
         return service.add(userDto);
     }
 
@@ -40,10 +39,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> deleteUser(@PathVariable long id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
+    public void deleteUser(@PathVariable long id) {
+       service.delete(id);
     }
-
-
 }

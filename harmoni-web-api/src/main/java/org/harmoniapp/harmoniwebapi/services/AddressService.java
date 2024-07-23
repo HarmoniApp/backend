@@ -27,25 +27,31 @@ public class AddressService {
     }
 
     public AddressDto createAddress(AddressDto addressDto) {
+        Address address = saveAddressEntity(addressDto);
+
+        return AddressDto.fromEntity(address);
+    }
+
+    public Address saveAddressEntity(AddressDto addressDto) {
         Address address = addressDto.toEntity();
 
-        return AddressDto.fromEntity(repositoryCollector.getAddresses().save(address));
+        return repositoryCollector.getAddresses().save(address);
     }
 
     public AddressDto updateAddress(long id, AddressDto addressDto) {
-        Address address = repositoryCollector.getAddresses().findById(id).orElse(null);
+        var existingAddress = repositoryCollector.getAddresses().findById(id);
 
-        if (address != null) {
-            address.setApartment(addressDto.apartment());
-            address.setCity(addressDto.city());
-            address.setStreet(addressDto.street());
-            address.setZipCode(addressDto.zipCode());
-            address.setBuildingNumber(addressDto.buildingNumber());
-        } else {
-            address = addressDto.toEntity();
-        }
+        Address newAddress = addressDto.toEntity();
+        newAddress.setId(existingAddress.map(Address::getId).orElse(null));
 
-        return AddressDto.fromEntity(repositoryCollector.getAddresses().save(address));
+        return AddressDto.fromEntity(repositoryCollector.getAddresses().save(newAddress));
+    }
+
+    public Address updateAddress(Address existingAddress, AddressDto addressDto) {
+        Address newAddress = addressDto.toEntity();
+        newAddress.setId(existingAddress.getId());
+
+        return repositoryCollector.getAddresses().save(newAddress);
     }
 
     public void deleteAddress(long id) {

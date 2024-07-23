@@ -3,6 +3,8 @@ package org.harmoniapp.harmoniwebapi.services;
 import com.google.common.collect.Lists;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.harmonidata.entities.Address;
+import org.harmoniapp.harmonidata.entities.ContractType;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 @ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class UserService {
     private final RepositoryCollector repositoryCollector;
+    private final AddressService addressService;
     private final int page_size = 20;
 
     public List<UserDto> getUsers(int page) {
@@ -30,35 +33,31 @@ public class UserService {
     }
 
     public UserDto getUser(long id) {
-        var userOptional = repositoryCollector.getUsers().findById(id);
-
-        if (userOptional.isEmpty()) {
-            throw new EntityNotFoundException();
-        }
-
-        var user = userOptional.get();
+        User user = repositoryCollector.getUsers()
+                .findById(id)
+                .orElseThrow(IllegalArgumentException::new);
 
         return UserDto.fromEntity(user);
     }
 
+    @Transactional
     public UserDto add(UserDto userDto) {
         User user = userDto.toEntity();
 
-        var contractType = repositoryCollector.getContractTypes().findById(userDto.contractType().getId());
-        if (contractType.isEmpty()) {
-            throw new EntityNotFoundException();
-        }
-        user.setContractType(contractType.get());
+        ContractType contractType = repositoryCollector.getContractTypes()
+                .findById(userDto.contractType().getId())
+                .orElseThrow(IllegalArgumentException::new);
 
-        var supervisor = repositoryCollector.getUsers().findById(userDto.supervisorId());
-        if (supervisor.isEmpty()) {
-            user.setSupervisor(null);
-        } else {
-            user.setSupervisor(supervisor.get());
-        }
+        user.setContractType(contractType);
 
-        user.setResidence(userDto.residence().toEntity());
-        user.setWorkAddress(userDto.workAddress().toEntity());
+        User supervisor = repositoryCollector.getUsers().findById(userDto.supervisorId()).orElse(null);
+        user.setSupervisor(supervisor);
+
+        Address residence = addressService.saveAddressEntity(userDto.residence());
+        user.setResidence(residence);
+
+        Address workAddress = addressService.saveAddressEntity(userDto.workAddress());
+        user.setWorkAddress(workAddress);
 
         user.setLanguages(
                 userDto.languages().stream()
@@ -71,7 +70,7 @@ public class UserService {
                         .collect(Collectors.toSet())
         );
 
-        var response = repositoryCollector.getUsers().save(user);
+        User response = repositoryCollector.getUsers().save(user);
         return UserDto.fromEntity(response);
     }
 
@@ -85,21 +84,32 @@ public class UserService {
                 existingUser.map(User::getId).orElse(null)
         );
 
-        var contractType = repositoryCollector.getContractTypes().findById(userDto.contractType().getId());
-        if (contractType.isEmpty()) {
-            throw new EntityNotFoundException();
-        }
-        user.setContractType(contractType.get());
+        ContractType contractType = repositoryCollector.getContractTypes()
+                .findById(userDto.contractType().getId())
+                .orElseThrow(IllegalArgumentException::new);
 
-        var supervisor = repositoryCollector.getUsers().findById(userDto.supervisorId());
-        if (supervisor.isEmpty()) {
-            user.setSupervisor(null);
+        user.setContractType(contractType);
+
+        User supervisor = repositoryCollector.getUsers().findById(userDto.supervisorId()).orElse(null);
+        user.setSupervisor(supervisor);
+
+        Address residence;
+        if (existingUser.isPresent()) {
+            residence = existingUser.get().getResidence();
+            residence = addressService.updateAddress(residence, userDto.residence());
         } else {
-            user.setSupervisor(supervisor.get());
+            residence = addressService.saveAddressEntity(userDto.residence());
         }
+        user.setResidence(residence);
 
-        user.setResidence(userDto.residence().toEntity());
-        user.setWorkAddress(userDto.workAddress().toEntity());
+        Address workAddress;
+        if (existingUser.isPresent()) {
+            workAddress = existingUser.get().getWorkAddress();
+            workAddress = addressService.updateAddress(workAddress, userDto.workAddress());
+        } else {
+            workAddress = addressService.saveAddressEntity(userDto.workAddress());
+        }
+        user.setWorkAddress(workAddress);
 
         user.setLanguages(
                 userDto.languages().stream()
@@ -112,14 +122,14 @@ public class UserService {
                         .collect(Collectors.toSet())
         );
 
-        var response = repositoryCollector.getUsers().save(user);
+        User response = repositoryCollector.getUsers().save(user);
         return UserDto.fromEntity(response);
     }
 
     public void delete(long id) {
         var userOptional = repositoryCollector.getUsers().findById(id);
         if (userOptional.isEmpty()) {
-            throw new EntityNotFoundException();
+            throw new IllegalArgumentException();
         }
         repositoryCollector.getUsers().deleteById(id);
     }
