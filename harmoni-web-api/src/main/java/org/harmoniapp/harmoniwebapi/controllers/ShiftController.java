@@ -2,7 +2,6 @@ package org.harmoniapp.harmoniwebapi.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.ShiftDto;
-import org.harmoniapp.harmoniwebapi.contracts.UserLanguageDto;
 import org.harmoniapp.harmoniwebapi.services.ShiftService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

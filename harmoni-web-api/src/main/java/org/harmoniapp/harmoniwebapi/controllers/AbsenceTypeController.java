@@ -36,7 +36,7 @@ public class AbsenceTypeController {
      *
      * @return a list of AbsenceTypeDto containing the details of all absenceType
      */
-    @GetMapping("/all")
+    @GetMapping
     public List<AbsenceTypeDto> getAllAbsenceTypes() {
         return absenceTypeService.getAllAbsenceTypes();
     }
