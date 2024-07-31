@@ -1,8 +1,8 @@
 package org.harmoniapp.harmoniwebapi.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.harmoniwebapi.contracts.UserLanguageDto;
-import org.harmoniapp.harmoniwebapi.services.UserLanguageService;
+import org.harmoniapp.harmoniwebapi.contracts.PartialUserDto;
+import org.harmoniapp.harmoniwebapi.services.PartialUserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,9 +13,9 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user-language")
-public class UserLanguageController {
-    private final UserLanguageService service;
+@RequestMapping("user/simple")
+public class PartialUserController {
+    private final PartialUserService service;
 
     /**
      * Retrieves a paginated list of users and their associated languages.
@@ -24,7 +24,7 @@ public class UserLanguageController {
      * @return a list of UserLanguageDto containing user information and their languages
      */
     @GetMapping("")
-    public List<UserLanguageDto> getUsers(@RequestParam(required = false, defaultValue = "0") int page) {
+    public List<PartialUserDto> getUsers(@RequestParam(required = false, defaultValue = "0") int page) {
         return service.getUsersPage(page);
     }
 
@@ -36,7 +36,7 @@ public class UserLanguageController {
      * @return a UserLanguageDto containing user information and their languages
      */
     @GetMapping("/{id}")
-    public UserLanguageDto getUser(@PathVariable long id) {
+    public PartialUserDto getUser(@PathVariable long id) {
         return service.getUser(id);
     }
 }
