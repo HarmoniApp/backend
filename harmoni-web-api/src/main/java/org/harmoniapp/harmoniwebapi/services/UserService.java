@@ -1,6 +1,5 @@
 package org.harmoniapp.harmoniwebapi.services;
 
-import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.Address;
 import org.harmoniapp.harmonidata.entities.ContractType;
@@ -11,6 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final RepositoryCollector repositoryCollector;
     private final AddressService addressService;
-    private final int page_size = 20;
+//    private final int page_size = 20;
 
     /**
      * Retrieves users with pagination support.
@@ -34,11 +34,14 @@ public class UserService {
      */
     public List<UserDto> getUsers(int page) {
         List<User> users = repositoryCollector.getUsers().findAll();
-        List<List<User>> pagedUsers = Lists.partition(users, page_size);
-
-        return pagedUsers.get(page).stream()
+        return users.stream()
                 .map(UserDto::fromEntity)
                 .toList();
+        //        List<List<User>> pagedUsers = Lists.partition(users, page_size);
+
+//        return pagedUsers.get(page).stream()
+//                .map(UserDto::fromEntity)
+//                .toList();
     }
 
     /**
@@ -83,7 +86,7 @@ public class UserService {
 
         user.setLanguages(
                 userDto.languages().stream()
-                        .map(p -> repositoryCollector.getLanguages().findById(p.getId()).get())
+                        .map(p -> repositoryCollector.getLanguages().findById(p.id()).get())
                         .collect(Collectors.toSet()));
 
         user.setRoles(
@@ -142,7 +145,7 @@ public class UserService {
 
         user.setLanguages(
                 userDto.languages().stream()
-                        .map(p -> repositoryCollector.getLanguages().findById(p.getId()).get())
+                        .map(p -> repositoryCollector.getLanguages().findById(p.id()).get())
                         .collect(Collectors.toSet()));
 
         user.setRoles(
@@ -167,5 +170,146 @@ public class UserService {
             throw new IllegalArgumentException();
         }
         repositoryCollector.getUsers().deleteById(id);
+    }
+
+    public List<UserDto> getUsersWithFilter(List<String> roles, List<String> contracts, List<String> languages) {
+        if (roles != null) {
+            if (contracts != null) {
+                if (languages != null) {
+                    return getUsersByContractAndRoleAndLanguage(roles, contracts, languages);
+                } else {
+                    return getUsersByContractAndRole(contracts, roles);
+                }
+            } else {
+                return getUsersByRole(roles);
+            }
+        } else if (contracts != null) {
+            if (languages != null) {
+                return getUsersByContractAndLanguage(contracts, languages);
+            } else {
+                return getUsersByContract(contracts);
+            }
+        } else if (languages != null) {
+            return getUsersByLanguages(languages);
+        }
+        return getUsers(0);
+    }
+
+    private List<UserDto> getUsersByLanguages(List<String> languages) {
+        List<Long> languageIds = new ArrayList<>();
+        for (String lang : languages) {
+            try {
+                Long id = Long.valueOf(lang);
+                languageIds.add(id);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        List<User> users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(null, null, null, null, languageIds, languages);
+        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
+    }
+
+    private List<UserDto> getUsersByContractAndLanguage(List<String> contracts, List<String> languages) {
+        List<Long> contractIds = new ArrayList<>();
+        for (String c : contracts) {
+            try {
+                Long id = Long.valueOf(c);
+                contractIds.add(id);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        List<Long> languageIds = new ArrayList<>();
+        for (String lang : languages) {
+            try {
+                Long id = Long.valueOf(lang);
+                languageIds.add(id);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        List<User> users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contractIds, contracts, null, null, languageIds, languages);
+        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
+    }
+
+    private List<UserDto> getUsersByContractAndRoleAndLanguage(List<String> roles, List<String> contracts, List<String> languages) {
+        List<Long> roleIds = new ArrayList<>();
+        for (String r : roles) {
+            try {
+                Long id = Long.valueOf(r);
+                roleIds.add(id);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        List<Long> contractIds = new ArrayList<>();
+        for (String c : contracts) {
+            try {
+                Long id = Long.valueOf(c);
+                contractIds.add(id);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        List<Long> languageIds = new ArrayList<>();
+        for (String lang : languages) {
+            try {
+                Long id = Long.valueOf(lang);
+                languageIds.add(id);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        List<User> users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contractIds, contracts, roleIds, roles, languageIds, languages);
+        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
+    }
+
+    private List<UserDto> getUsersByContract(List<String> contracts) {
+        List<Long> contractIds = new ArrayList<>();
+        for (String c : contracts) {
+            try {
+                Long id = Long.valueOf(c);
+                contractIds.add(id);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        List<User> users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contractIds, contracts, null, null, null, null);
+        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
+    }
+
+    private List<UserDto> getUsersByContractAndRole(List<String> contracts, List<String> roles) {
+        List<Long> contractIds = new ArrayList<>();
+        for (String c : contracts) {
+            try {
+                Long id = Long.valueOf(c);
+                contractIds.add(id);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        List<Long> roleIds = new ArrayList<>();
+        for (String r : roles) {
+            try {
+                Long id = Long.valueOf(r);
+                roleIds.add(id);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        List<User> users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contractIds, contracts, roleIds, roles, null, null);
+        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
+    }
+
+    private List<UserDto> getUsersByRole(List<String> roles) {
+        List<Long> roleIds = new ArrayList<>();
+        for (String r : roles) {
+            try {
+                Long id = Long.valueOf(r);
+                roleIds.add(id);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        List<User> users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(null, null, roleIds, roles, null, null);
+        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
     }
 }
