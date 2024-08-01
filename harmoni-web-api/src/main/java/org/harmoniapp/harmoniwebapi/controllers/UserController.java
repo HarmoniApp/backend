@@ -40,6 +40,15 @@ public class UserController {
         return service.getUser(id);
     }
 
+    @GetMapping("/search")
+    public List<UserDto> getUsersWithFilter(@RequestParam(name = "role", required = false) List<String> roles,
+                                            @RequestParam(name = "contract", required = false) List<String> contracts,
+                                            @RequestParam(name = "language", required = false) List<String> language,
+                                            @RequestParam(name = "sortBy", required = false) String  sortBy,
+                                            @RequestParam(name = "order", required = false, defaultValue = "asc") String  order) {
+        return service.getUsersWithFilter(roles, contracts, language);
+    }
+
     /**
      * Creates a new user.
      *
