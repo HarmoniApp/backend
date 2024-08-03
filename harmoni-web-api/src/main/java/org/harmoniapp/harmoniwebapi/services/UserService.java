@@ -7,6 +7,7 @@ import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -172,144 +173,54 @@ public class UserService {
         repositoryCollector.getUsers().deleteById(id);
     }
 
-    public List<UserDto> getUsersWithFilter(List<String> roles, List<String> contracts, List<String> languages) {
-        if (roles != null) {
-            if (contracts != null) {
-                if (languages != null) {
-                    return getUsersByContractAndRoleAndLanguage(roles, contracts, languages);
-                } else {
-                    return getUsersByContractAndRole(contracts, roles);
-                }
-            } else {
-                return getUsersByRole(roles);
-            }
-        } else if (contracts != null) {
-            if (languages != null) {
-                return getUsersByContractAndLanguage(contracts, languages);
-            } else {
-                return getUsersByContract(contracts);
-            }
-        } else if (languages != null) {
-            return getUsersByLanguages(languages);
+    public List<UserDto> getUsersWithFilter(List<String> roles, List<String> contracts, List<String> languages, String sortBy, String order) {
+        List<Long> roleIds = null;
+        if (roles == null || roles.isEmpty()) {
+            roles = null;
+        } else {
+            roleIds = castToLongs(roles);
         }
-        return getUsers(0);
+
+        List<Long> contractIds = null;
+        if (contracts == null || contracts.isEmpty()) {
+            contracts = null;
+        } else {
+            contractIds = castToLongs(contracts);
+        }
+
+        List<Long> languageIds = null;
+        if (languages == null || languages.isEmpty()) {
+            languages = null;
+        } else {
+            languageIds = castToLongs(languages);
+        }
+
+        if (sortBy == null || sortBy.isEmpty()) {
+            sortBy = "lastname";
+        }
+
+        Sort.Direction sortDirection;
+        if (order == null || order.isEmpty() || order.equalsIgnoreCase("asc")) {
+            sortDirection = Sort.Direction.ASC;
+        } else {
+            sortDirection = Sort.Direction.DESC;
+        }
+
+        List<User> users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contractIds, contracts,
+                roleIds, roles,
+                languageIds, languages, Sort.by(sortDirection, sortBy));
+        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
     }
 
-    private List<UserDto> getUsersByLanguages(List<String> languages) {
-        List<Long> languageIds = new ArrayList<>();
-        for (String lang : languages) {
+    private List<Long> castToLongs(List<String> collection) {
+        List<Long> ids = new ArrayList<>();
+        for (String lang : collection) {
             try {
                 Long id = Long.valueOf(lang);
-                languageIds.add(id);
+                ids.add(id);
             } catch (NumberFormatException ignored) {
             }
         }
-
-        List<User> users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(null, null, null, null, languageIds, languages);
-        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
-    }
-
-    private List<UserDto> getUsersByContractAndLanguage(List<String> contracts, List<String> languages) {
-        List<Long> contractIds = new ArrayList<>();
-        for (String c : contracts) {
-            try {
-                Long id = Long.valueOf(c);
-                contractIds.add(id);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-
-        List<Long> languageIds = new ArrayList<>();
-        for (String lang : languages) {
-            try {
-                Long id = Long.valueOf(lang);
-                languageIds.add(id);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-
-        List<User> users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contractIds, contracts, null, null, languageIds, languages);
-        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
-    }
-
-    private List<UserDto> getUsersByContractAndRoleAndLanguage(List<String> roles, List<String> contracts, List<String> languages) {
-        List<Long> roleIds = new ArrayList<>();
-        for (String r : roles) {
-            try {
-                Long id = Long.valueOf(r);
-                roleIds.add(id);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-
-        List<Long> contractIds = new ArrayList<>();
-        for (String c : contracts) {
-            try {
-                Long id = Long.valueOf(c);
-                contractIds.add(id);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-
-        List<Long> languageIds = new ArrayList<>();
-        for (String lang : languages) {
-            try {
-                Long id = Long.valueOf(lang);
-                languageIds.add(id);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-
-        List<User> users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contractIds, contracts, roleIds, roles, languageIds, languages);
-        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
-    }
-
-    private List<UserDto> getUsersByContract(List<String> contracts) {
-        List<Long> contractIds = new ArrayList<>();
-        for (String c : contracts) {
-            try {
-                Long id = Long.valueOf(c);
-                contractIds.add(id);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        List<User> users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contractIds, contracts, null, null, null, null);
-        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
-    }
-
-    private List<UserDto> getUsersByContractAndRole(List<String> contracts, List<String> roles) {
-        List<Long> contractIds = new ArrayList<>();
-        for (String c : contracts) {
-            try {
-                Long id = Long.valueOf(c);
-                contractIds.add(id);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-
-        List<Long> roleIds = new ArrayList<>();
-        for (String r : roles) {
-            try {
-                Long id = Long.valueOf(r);
-                roleIds.add(id);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-
-        List<User> users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contractIds, contracts, roleIds, roles, null, null);
-        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
-    }
-
-    private List<UserDto> getUsersByRole(List<String> roles) {
-        List<Long> roleIds = new ArrayList<>();
-        for (String r : roles) {
-            try {
-                Long id = Long.valueOf(r);
-                roleIds.add(id);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        List<User> users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(null, null, roleIds, roles, null, null);
-        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
+        return ids;
     }
 }
