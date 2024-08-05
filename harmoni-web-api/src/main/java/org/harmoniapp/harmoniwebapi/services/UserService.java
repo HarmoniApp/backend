@@ -223,4 +223,22 @@ public class UserService {
         }
         return ids;
     }
+
+    public List<UserDto> getUsersSearch(String q) {
+        if (q == null || q.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
+        q = q.toUpperCase();
+        List<String> qSplit = List.of(q.split(" "));
+
+        List<User> users;
+        if (qSplit.size() > 1) {
+            users = repositoryCollector.getUsers().findAllBySearchName(qSplit);
+        } else {
+            users = repositoryCollector.getUsers().FindAllBySearch(q);
+        }
+
+        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
+    }
 }
