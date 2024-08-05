@@ -19,14 +19,22 @@ public class UserController {
     private final UserService service;
 
     /**
-     * Retrieves all users with pagination support.
+     * Retrieves a list of UserDto objects based on specified request parameters.
      *
-     * @param page The page number to retrieve, default is 0.
-     * @return A list of UserDto objects for the specified page.
+     * @param roles     Optional list of role IDs to filter users by roles.
+     * @param contracts Optional list of contract IDs to filter users by contracts.
+     * @param language  Optional list of language IDs to filter users by languages.
+     * @param sortBy    Optional field name by which the results should be sorted. Defaults to "firstname" if not provided.
+     * @param order     Optional sort order for the results. Can be "asc" for ascending or "desc" for descending. Defaults to "asc" if not provided.
+     * @return A list of UserDto objects matching the specified criteria, sorted as requested.
      */
     @GetMapping
-    public List<UserDto> getAllUsers(@RequestParam(required = false, defaultValue = "0") int page) {
-        return service.getUsers(page);
+    public List<UserDto> getAllUsers(@RequestParam(name = "role", required = false) List<Long> roles,
+                                     @RequestParam(name = "contract", required = false) List<Long> contracts,
+                                     @RequestParam(name = "language", required = false) List<Long> language,
+                                     @RequestParam(name = "sortBy", required = false, defaultValue = "firstname") String  sortBy,
+                                     @RequestParam(name = "order", required = false, defaultValue = "asc") String  order) {
+        return service.getUsers(roles, contracts, language, sortBy, order);
     }
 
     /**
@@ -40,16 +48,7 @@ public class UserController {
         return service.getUser(id);
     }
 
-    @GetMapping("/search")
-    public List<UserDto> getUsersWithFilter(@RequestParam(name = "role", required = false) List<String> roles,
-                                            @RequestParam(name = "contract", required = false) List<String> contracts,
-                                            @RequestParam(name = "language", required = false) List<String> language,
-                                            @RequestParam(name = "sortBy", required = false, defaultValue = "firstname") String  sortBy,
-                                            @RequestParam(name = "order", required = false, defaultValue = "asc") String  order) {
-        return service.getUsersWithFilter(roles, contracts, language, sortBy, order);
-    }
-
-    @GetMapping("/search-nav") // temporary path
+    @GetMapping("/search") // temporary path
     public List<UserDto> getUsersSearch(@RequestParam String q) {
         return service.getUsersSearch(q);
     }

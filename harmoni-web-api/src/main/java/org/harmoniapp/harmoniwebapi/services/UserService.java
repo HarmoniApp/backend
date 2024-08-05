@@ -11,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,24 +24,38 @@ import java.util.stream.Collectors;
 public class UserService {
     private final RepositoryCollector repositoryCollector;
     private final AddressService addressService;
-//    private final int page_size = 20;
+
 
     /**
-     * Retrieves users with pagination support.
+     * Retrieves a list of UserDto objects based on specified criteria.
      *
-     * @param page The page number to retrieve.
-     * @return A list of UserDto objects for the specified page.
+     * @param roles     List of role IDs to filter users by roles.
+     * @param contracts List of contract IDs to filter users by contracts.
+     * @param languages List of language IDs to filter users by languages.
+     * @param sortBy    Field name by which the results should be sorted.
+     * @param order     Sort order for the results. Can be "asc" for ascending or "desc" for descending. Defaults to "asc" if null or empty.
+     * @return A list of UserDto objects matching the specified criteria, sorted as requested.
      */
-    public List<UserDto> getUsers(int page) {
-        List<User> users = repositoryCollector.getUsers().findAll();
+    public List<UserDto> getUsers(List<Long> roles, List<Long> contracts, List<Long> languages, String sortBy, String order) {
+        Sort.Direction sortDirection;
+        if (order == null || order.isEmpty() || order.equalsIgnoreCase("asc")) {
+            sortDirection = Sort.Direction.ASC;
+        } else {
+            sortDirection = Sort.Direction.DESC;
+        }
+        Sort sort = Sort.by(sortDirection, sortBy);
+
+        List<User> users;
+        if ((roles == null || roles.isEmpty())
+                && (contracts == null || contracts.isEmpty())
+                && (languages == null || languages.isEmpty())) {
+            users = repositoryCollector.getUsers().findAll(sort);
+        } else {
+            users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contracts, roles, languages, sort);
+        }
         return users.stream()
                 .map(UserDto::fromEntity)
                 .toList();
-        //        List<List<User>> pagedUsers = Lists.partition(users, page_size);
-
-//        return pagedUsers.get(page).stream()
-//                .map(UserDto::fromEntity)
-//                .toList();
     }
 
     /**
@@ -171,57 +184,6 @@ public class UserService {
             throw new IllegalArgumentException();
         }
         repositoryCollector.getUsers().deleteById(id);
-    }
-
-    public List<UserDto> getUsersWithFilter(List<String> roles, List<String> contracts, List<String> languages, String sortBy, String order) {
-        List<Long> roleIds = null;
-        if (roles == null || roles.isEmpty()) {
-            roles = null;
-        } else {
-            roleIds = castToLongs(roles);
-        }
-
-        List<Long> contractIds = null;
-        if (contracts == null || contracts.isEmpty()) {
-            contracts = null;
-        } else {
-            contractIds = castToLongs(contracts);
-        }
-
-        List<Long> languageIds = null;
-        if (languages == null || languages.isEmpty()) {
-            languages = null;
-        } else {
-            languageIds = castToLongs(languages);
-        }
-
-        if (sortBy == null || sortBy.isEmpty()) {
-            sortBy = "lastname";
-        }
-
-        Sort.Direction sortDirection;
-        if (order == null || order.isEmpty() || order.equalsIgnoreCase("asc")) {
-            sortDirection = Sort.Direction.ASC;
-        } else {
-            sortDirection = Sort.Direction.DESC;
-        }
-
-        List<User> users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contractIds, contracts,
-                roleIds, roles,
-                languageIds, languages, Sort.by(sortDirection, sortBy));
-        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
-    }
-
-    private List<Long> castToLongs(List<String> collection) {
-        List<Long> ids = new ArrayList<>();
-        for (String lang : collection) {
-            try {
-                Long id = Long.valueOf(lang);
-                ids.add(id);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        return ids;
     }
 
     public List<UserDto> getUsersSearch(String q) {
