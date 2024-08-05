@@ -24,8 +24,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     @Query("""
             select u from User u left join u.roles roles left join u.languages languages
-            where upper(u.firstname) = upper(concat('%', ?1, '%')) or
-                  upper(u.surname) = upper(concat('%', ?1, '%')) or
+            where upper(u.firstname) like upper(concat('%', ?1, '%')) or
+                  upper(u.surname) like upper(concat('%', ?1, '%')) or
                   upper(u.email) like upper(concat('%', ?1, '%')) or
                   upper(u.contractType.name) like upper(concat('%', ?1, '%')) or
                   upper(u.residence.city) like upper(concat('%', ?1, '%')) or
