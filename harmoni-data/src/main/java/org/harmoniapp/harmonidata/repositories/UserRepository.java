@@ -21,4 +21,21 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
                                                    @Nullable Collection<Long> roleIds, @Nullable Collection<String> roles,
                                                    @Nullable Collection<Long> languageIds, @Nullable Collection<String> languages,
                                                    Sort sort);
+
+    @Query("""
+            select u from User u left join u.roles roles left join u.languages languages
+            where upper(u.firstname) = upper(concat('%', ?1, '%')) or
+                  upper(u.surname) = upper(concat('%', ?1, '%')) or
+                  upper(u.email) like upper(concat('%', ?1, '%')) or
+                  upper(u.contractType.name) like upper(concat('%', ?1, '%')) or
+                  upper(u.residence.city) like upper(concat('%', ?1, '%')) or
+                  upper(u.workAddress.city) like upper(concat('%', ?1, '%')) or
+                  upper(roles.name) like upper(concat('%', ?1, '%')) or
+                  upper(languages.name) like upper(concat('%', ?1, '%'))""")
+    List<User> FindAllBySearch(String search);
+
+    @Query("""
+        select u from User u
+        where upper(u.firstname) in ?1 and upper(u.surname) in ?1""")
+    List<User> findAllBySearchName(List<String> search);
 }

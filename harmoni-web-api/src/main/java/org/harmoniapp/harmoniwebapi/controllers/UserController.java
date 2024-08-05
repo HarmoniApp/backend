@@ -49,6 +49,11 @@ public class UserController {
         return service.getUsersWithFilter(roles, contracts, language, sortBy, order);
     }
 
+    @GetMapping("/search-nav") // temporary path
+    public List<UserDto> getUsersSearch(@RequestParam String q) {
+        return service.getUsersSearch(q);
+    }
+
     /**
      * Creates a new user.
      *
