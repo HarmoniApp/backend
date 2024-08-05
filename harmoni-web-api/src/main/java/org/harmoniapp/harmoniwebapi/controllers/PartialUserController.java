@@ -18,25 +18,44 @@ public class PartialUserController {
     private final PartialUserService service;
 
     /**
-     * Retrieves a paginated list of users and their associated languages.
+     * Retrieves a list of PartialUserDto based on the specified filtering and sorting criteria.
      *
-     * @param page the page number to retrieve (default is 0)
-     * @return a list of UserLanguageDto containing user information and their languages
+     * @param roles     an optional list of role IDs to filter the users by roles. If not specified, no role-based filtering is applied.
+     * @param contracts an optional list of contract IDs to filter the users by contracts. If not specified, no contract-based filtering is applied.
+     * @param language  an optional list of language IDs to filter the users by languages. If not specified, no language-based filtering is applied.
+     * @param sortBy    an optional field by which to sort the results. Default is "firstname".
+     * @param order     an optional order of sorting, either "asc" for ascending or "desc" for descending. Default is "asc".
+     * @return a list of {@link PartialUserDto} objects that match the specified criteria.
      */
     @GetMapping("")
-    public List<PartialUserDto> getUsers(@RequestParam(required = false, defaultValue = "0") int page) {
-        return service.getUsersPage(page);
+    public List<PartialUserDto> getUsers(@RequestParam(name = "role", required = false) List<Long> roles,
+                                         @RequestParam(name = "contract", required = false) List<Long> contracts,
+                                         @RequestParam(name = "language", required = false) List<Long> language,
+                                         @RequestParam(name = "sortBy", required = false, defaultValue = "firstname") String  sortBy,
+                                         @RequestParam(name = "order", required = false, defaultValue = "asc") String  order) {
+        return service.getUsers(roles, contracts, language, sortBy, order);
     }
 
 
     /**
-     * Retrieves a user's information and their associated languages by user ID.
+     * Retrieves a user by their unique identifier.
      *
-     * @param id the ID of the user to retrieve
-     * @return a UserLanguageDto containing user information and their languages
+     * @param id the unique identifier of the user.
+     * @return the {@link PartialUserDto} object representing the user with the specified ID.
      */
     @GetMapping("/{id}")
     public PartialUserDto getUser(@PathVariable long id) {
         return service.getUser(id);
+    }
+
+    /**
+     * Retrieves a list of users based on a search query.
+     *
+     * @param q the search query string to filter users by. This can match against various user attributes.
+     * @return a list of {@link PartialUserDto} objects that match the search query.
+     */
+    @GetMapping("/search")
+    public List<PartialUserDto> getUsersSearch(@RequestParam String q) {
+        return service.getUsersSearch(q);
     }
 }
