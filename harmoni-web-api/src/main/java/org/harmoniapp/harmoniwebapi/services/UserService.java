@@ -186,6 +186,13 @@ public class UserService {
         repositoryCollector.getUsers().deleteById(id);
     }
 
+    /**
+     * Searches for users based on a query string.
+     *
+     * @param q The query string used to search for users. Must not be null or empty.
+     * @return A list of UserDto objects that match the search criteria.
+     * @throws IllegalArgumentException if the query string is null or empty.
+     */
     public List<UserDto> getUsersSearch(String q) {
         if (q == null || q.isEmpty()) {
             throw new IllegalArgumentException();

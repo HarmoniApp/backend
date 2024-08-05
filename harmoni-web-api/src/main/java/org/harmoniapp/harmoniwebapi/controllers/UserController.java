@@ -48,7 +48,13 @@ public class UserController {
         return service.getUser(id);
     }
 
-    @GetMapping("/search") // temporary path
+    /**
+     * Searches for users based on a query string and returns a list of UserDto objects.
+     *
+     * @param q The query string used to search for users. Must not be null or empty.
+     * @return A list of UserDto objects that match the search criteria.
+     */
+    @GetMapping("/search")
     public List<UserDto> getUsersSearch(@RequestParam String q) {
         return service.getUsersSearch(q);
     }
