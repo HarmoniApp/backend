@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("user/simple")
+@CrossOrigin(origins = "http://localhost:3000")
 public class PartialUserController {
     private final PartialUserService service;
 

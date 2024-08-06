@@ -16,6 +16,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/shift")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ShiftController {
     private final ShiftService shiftService;
 
