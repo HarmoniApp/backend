@@ -1,6 +1,5 @@
 package org.harmoniapp.harmoniwebapi.services;
 
-import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.Address;
 import org.harmoniapp.harmonidata.entities.ContractType;
@@ -8,6 +7,7 @@ import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,19 +24,36 @@ import java.util.stream.Collectors;
 public class UserService {
     private final RepositoryCollector repositoryCollector;
     private final AddressService addressService;
-    private final int page_size = 20;
+
 
     /**
-     * Retrieves users with pagination support.
+     * Retrieves a list of UserDto objects based on specified criteria.
      *
-     * @param page The page number to retrieve.
-     * @return A list of UserDto objects for the specified page.
+     * @param roles     List of role IDs to filter users by roles.
+     * @param contracts List of contract IDs to filter users by contracts.
+     * @param languages List of language IDs to filter users by languages.
+     * @param sortBy    Field name by which the results should be sorted.
+     * @param order     Sort order for the results. Can be "asc" for ascending or "desc" for descending. Defaults to "asc" if null or empty.
+     * @return A list of UserDto objects matching the specified criteria, sorted as requested.
      */
-    public List<UserDto> getUsers(int page) {
-        List<User> users = repositoryCollector.getUsers().findAll();
-        List<List<User>> pagedUsers = Lists.partition(users, page_size);
+    public List<UserDto> getUsers(List<Long> roles, List<Long> contracts, List<Long> languages, String sortBy, String order) {
+        Sort.Direction sortDirection;
+        if (order == null || order.isEmpty() || order.equalsIgnoreCase("asc")) {
+            sortDirection = Sort.Direction.ASC;
+        } else {
+            sortDirection = Sort.Direction.DESC;
+        }
+        Sort sort = Sort.by(sortDirection, sortBy);
 
-        return pagedUsers.get(page).stream()
+        List<User> users;
+        if ((roles == null || roles.isEmpty())
+                && (contracts == null || contracts.isEmpty())
+                && (languages == null || languages.isEmpty())) {
+            users = repositoryCollector.getUsers().findAll(sort);
+        } else {
+            users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contracts, roles, languages, sort);
+        }
+        return users.stream()
                 .map(UserDto::fromEntity)
                 .toList();
     }
@@ -83,7 +100,7 @@ public class UserService {
 
         user.setLanguages(
                 userDto.languages().stream()
-                        .map(p -> repositoryCollector.getLanguages().findById(p.getId()).get())
+                        .map(p -> repositoryCollector.getLanguages().findById(p.id()).get())
                         .collect(Collectors.toSet()));
 
         user.setRoles(
@@ -142,7 +159,7 @@ public class UserService {
 
         user.setLanguages(
                 userDto.languages().stream()
-                        .map(p -> repositoryCollector.getLanguages().findById(p.getId()).get())
+                        .map(p -> repositoryCollector.getLanguages().findById(p.id()).get())
                         .collect(Collectors.toSet()));
 
         user.setRoles(
@@ -167,5 +184,30 @@ public class UserService {
             throw new IllegalArgumentException();
         }
         repositoryCollector.getUsers().deleteById(id);
+    }
+
+    /**
+     * Searches for users based on a query string.
+     *
+     * @param q The query string used to search for users. Must not be null or empty.
+     * @return A list of UserDto objects that match the search criteria.
+     * @throws IllegalArgumentException if the query string is null or empty.
+     */
+    public List<UserDto> getUsersSearch(String q) {
+        if (q == null || q.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
+        q = q.toUpperCase();
+        List<String> qSplit = List.of(q.split(" "));
+
+        List<User> users;
+        if (qSplit.size() > 1) {
+            users = repositoryCollector.getUsers().findAllBySearchName(qSplit);
+        } else {
+            users = repositoryCollector.getUsers().FindAllBySearch(q);
+        }
+
+        return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
     }
 }

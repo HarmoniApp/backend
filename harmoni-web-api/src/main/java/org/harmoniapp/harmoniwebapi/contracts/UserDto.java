@@ -2,7 +2,6 @@ package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.harmoniapp.harmonidata.entities.ContractType;
-import org.harmoniapp.harmonidata.entities.Language;
 import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.User;
 
@@ -43,7 +42,7 @@ public record UserDto(
         @JsonProperty("phone_number") String phoneNumber,
         @JsonProperty("employee_id") String employeeId,
         List<Role> roles,
-        List<Language> languages) {
+        List<LanguageDto> languages) {
 
     /**
      * Converts a User entity to a UserDto.
@@ -67,7 +66,7 @@ public record UserDto(
                 user.getPhoneNumber(),
                 user.getEmployeeId(),
                 user.getRoles().stream().toList(),
-                user.getLanguages().stream().toList()
+                user.getLanguages().stream().map(p -> new LanguageDto(p.getId(), p.getName())).toList()
         );
     }
 

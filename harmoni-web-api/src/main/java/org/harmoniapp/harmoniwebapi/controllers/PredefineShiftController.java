@@ -34,7 +34,7 @@ public class PredefineShiftController {
      *
      * @return a list of PredefineShiftDto containing the details of all predefined shifts
      */
-    @GetMapping("/all")
+    @GetMapping
     public List<PredefineShiftDto> getAllPredefineShifts() {
         return predefineShiftService.getAllPredefineShifts();
     }
