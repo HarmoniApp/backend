@@ -26,7 +26,7 @@ public class LanguageController {
      * @return a list of {@link LanguageDto} representing all languages.
      */
     @GetMapping
-    public List<LanguageDto> getAllAddresses() {
+    public List<LanguageDto> getAllLanguages() {
         return service.getAllLanguages();
     }
 
@@ -37,7 +37,7 @@ public class LanguageController {
      * @return the {@link LanguageDto} representing the language.
      */
     @GetMapping("/{id}")
-    public LanguageDto getAddress(@PathVariable long id) {
+    public LanguageDto getLanguage(@PathVariable long id) {
         return service.getLanguageById(id);
     }
 
@@ -49,7 +49,7 @@ public class LanguageController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public LanguageDto createAddress(@RequestBody LanguageDto dto) {
+    public LanguageDto createLanguage(@RequestBody LanguageDto dto) {
         return service.createLanguage(dto);
     }
 
@@ -62,7 +62,7 @@ public class LanguageController {
      */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public LanguageDto updateAddress(@PathVariable long id, @RequestBody LanguageDto dto) {
+    public LanguageDto updateLanguage(@PathVariable long id, @RequestBody LanguageDto dto) {
         return service.updateLanguage(id, dto);
     }
 
@@ -73,7 +73,7 @@ public class LanguageController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAddress(@PathVariable long id) {
+    public void deleteLanguage(@PathVariable long id) {
         service.deleteLanguage(id);
     }
 
