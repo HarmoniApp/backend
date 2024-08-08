@@ -16,6 +16,7 @@ public class BasicRepositoryCollector implements RepositoryCollector {
     private final PredefineShiftRepository predefineShifts;
     private final RoleRepository roles;
     private final ShiftRepository shifts;
+    private final StatusRepository statuses;
     private final UserRepository users;
     private final VacationRepository vacations;
 }

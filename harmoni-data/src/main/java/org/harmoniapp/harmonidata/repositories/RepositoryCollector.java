@@ -20,6 +20,8 @@ public interface RepositoryCollector {
 
     ShiftRepository getShifts();
 
+    StatusRepository getStatuses();
+
     UserRepository getUsers();
 
     VacationRepository getVacations();
