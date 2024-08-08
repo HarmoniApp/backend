@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.LanguageDto;
 import org.harmoniapp.harmoniwebapi.services.LanguageService;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.List;
  * This controller provides RESTful endpoints for CRUD operations on languages.
  * It uses {@link LanguageService} to handle the business logic.
  */
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("language")
 @CrossOrigin(origins = "http://localhost:3000")
