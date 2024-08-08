@@ -27,6 +27,3 @@ public class AbsenceController {
     }
 
 }
-
-//- [ ] Endpoint który edytuje PUT dla pracownika nie może zmienić statusu ale wszystko inne może
-//- [ ] Endpoint dla pracodawcy PUT ale chodzi mi o to ze on będzie aktualizować tylko status np na zaakceptowane czy na odrzucone i jak odrzuci to powinna być informacja zwrotna dlaczego nie może dostać urlopu. PRACODAWCA MOZE TYLKO ZATWIERDZIC LUB ODRZUCIC I TO BEDZIE JAKO PUT NA STATUS TYLKO I WYLACZNIE
