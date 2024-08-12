@@ -9,8 +9,11 @@ import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+
+
 
     @Query("""
             select u from User u left join u.roles roles left join u.languages languages
@@ -38,4 +41,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
         select u from User u
         where upper(u.firstname) in ?1 and upper(u.surname) in ?1""")
     List<User> findAllBySearchName(List<String> search);
+
+    @Query("select u from User u left join u.roles roles where roles.id in ?1 order by u.firstname, u.surname")
+    List<User> findSupervisors(List<Long> ids);
+
 }
