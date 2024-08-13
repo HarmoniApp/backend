@@ -17,7 +17,7 @@ import java.util.Date;
  * @param end             the end time of the absence
  * @param userId          the ID of the user associated with the absence
  * @param absenceTypeId   the ID of the absence type
- * @param statusId        the ID of the status
+ * @param status          the status object
  * @param submission      the submission date of the absence
  * @param updated         the last updated date of the absence
  */
@@ -27,7 +27,7 @@ public record AbsenceDto(
         LocalDateTime end,
         @JsonProperty("user_id") Long userId,
         @JsonProperty("absence_type_id") Long absenceTypeId,
-        @JsonProperty("status_id") Long statusId,
+        Status status,
         Date submission,
         Date updated) {
 
@@ -44,7 +44,7 @@ public record AbsenceDto(
                 absence.getEnd(),
                 absence.getUser().getId(),
                 absence.getAbsenceType().getId(),
-                absence.getStatus().getId(),
+                absence.getStatus(),
                 absence.getSubmission(),
                 absence.getUpdated()
         );
