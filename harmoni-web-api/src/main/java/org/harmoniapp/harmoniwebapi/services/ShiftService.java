@@ -97,7 +97,7 @@ public class ShiftService {
      */
     @Transactional
     public ShiftDto updateShift(long id, ShiftDto shiftDto) {
-        try {
+        try { //TODO: fix to work with only one field changed
             Shift existingShift = repositoryCollector.getShifts().findById(id)
                     .orElse(null);
 
