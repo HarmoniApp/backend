@@ -81,13 +81,13 @@ public class PredefineShiftService {
      * @throws RuntimeException if there is an error accessing the database or the provided data is invalid
      */
     public PredefineShiftDto updatePredefineShift(long id, PredefineShiftDto predefineShiftDto) {
-        try { //TODO: fix to work with only one field changed
+        try {
             PredefineShift newPredefineShift = predefineShiftDto.toEntity();
             return repositoryCollector.getPredefineShifts().findById(id)
               .map(predefineShift -> {
-                  predefineShift.setName(newPredefineShift.getName());
-                  predefineShift.setStart(newPredefineShift.getStart());
-                  predefineShift.setEnd(newPredefineShift.getEnd());
+                  predefineShift.setName(newPredefineShift.getName() != null ? newPredefineShift.getName() : predefineShift.getName());
+                  predefineShift.setStart(newPredefineShift.getStart() != null ? newPredefineShift.getStart() : predefineShift.getStart());
+                  predefineShift.setEnd(newPredefineShift.getEnd() != null ? newPredefineShift.getEnd() : predefineShift.getEnd());
                   PredefineShift updatedPredefineShift = repositoryCollector.getPredefineShifts().save(predefineShift);
                   return PredefineShiftDto.fromEntity(updatedPredefineShift);
               })
