@@ -12,6 +12,7 @@ import org.harmoniapp.harmonidata.entities.Address;
  * @param street         The street name of the address.
  * @param buildingNumber The building number of the address.
  * @param apartment      The apartment number of the address, if applicable.
+ * @param departmentName The department name of the company
  */
 public record AddressDto(
         long id,
@@ -19,7 +20,8 @@ public record AddressDto(
         String city,
         String street,
         @JsonProperty("building_number") String buildingNumber,
-        String apartment) {
+        String apartment,
+        @JsonProperty("department_name") String departmentName) {
 
     /**
      * Converts an Address entity to an AddressDto.
@@ -34,7 +36,8 @@ public record AddressDto(
                 address.getCity(),
                 address.getStreet(),
                 address.getBuildingNumber(),
-                address.getApartment()
+                address.getApartment(),
+                address.getDepartmentName()
         );
     }
 
@@ -50,7 +53,8 @@ public record AddressDto(
                 city,
                 street,
                 buildingNumber,
-                apartment
+                apartment,
+                departmentName
         );
     }
 }

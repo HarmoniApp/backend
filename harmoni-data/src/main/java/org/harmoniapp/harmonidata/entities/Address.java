@@ -31,6 +31,9 @@ public class Address {
 
     private String apartment;
 
+    @Column(name = "department_name")
+    private String departmentName;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;
