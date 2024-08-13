@@ -62,4 +62,49 @@ public class AbsenceService {
         Absence savedAbsence = repositoryCollector.getAbsences().save(absence);
         return AbsenceDto.fromEntity(savedAbsence);
     }
+
+    /**
+     * Updates an existing Absence or creates a new one if it doesn't exist.
+     * IMPORTANT it is updated by employee
+     *
+     * @param id the ID of the absence to update
+     * @param absenceDto the AbsenceDto containing the updated details of the absence
+     * @return the updated or newly created AbsenceDto
+     * @throws IllegalArgumentException if the user or absence type ID provided does not exist
+     * @throws RuntimeException if an error occurs during the update process
+     */
+    public AbsenceDto updateAbsence(long id, AbsenceDto absenceDto) {
+        try { //TODO: What if status is approved then we can't change it to awaiting
+            Absence existingAbsence = repositoryCollector.getAbsences().findById(id)
+                    .orElse(null);
+
+            User user = repositoryCollector.getUsers().findById(absenceDto.userId() != null ? absenceDto.userId() : existingAbsence.getUser().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+            AbsenceType absenceType = repositoryCollector.getAbsenceTypes().findById(absenceDto.absenceTypeId()!= null ? absenceDto.absenceTypeId() : existingAbsence.getAbsenceType().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("AbsenceType not found"));
+
+            Status status = repositoryCollector.getStatuses()
+                    .findById(1L)    //Here status MUST be awaiting
+                    .orElseThrow(IllegalArgumentException::new);
+
+            if(existingAbsence == null) {
+                Absence newAbsence = absenceDto.toEntity(user, absenceType, status);
+                Absence savedAbsence = repositoryCollector.getAbsences().save(newAbsence);
+                return AbsenceDto.fromEntity(savedAbsence);
+            } else {
+                existingAbsence.setStart(absenceDto.start() != null ? absenceDto.start() : existingAbsence.getStart());
+                existingAbsence.setEnd(absenceDto.end() != null ? absenceDto.end() : existingAbsence.getEnd());
+                existingAbsence.setUser(user);
+                existingAbsence.setAbsenceType(absenceType);
+                existingAbsence.setStatus(status);
+                existingAbsence.setSubmission(absenceDto.submission() != null ? absenceDto.submission() : existingAbsence.getSubmission());
+                existingAbsence.setUpdated(absenceDto.updated() != null ? absenceDto.updated() : existingAbsence.getUpdated());
+                Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
+                return AbsenceDto.fromEntity(updatedAbsence);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
+        }
+    }
 }
