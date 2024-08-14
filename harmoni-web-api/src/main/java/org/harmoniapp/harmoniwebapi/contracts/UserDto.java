@@ -5,6 +5,7 @@ import org.harmoniapp.harmonidata.entities.ContractType;
 import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.User;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -34,8 +35,8 @@ public record UserDto(
         String email,
         String password,
         @JsonProperty("contract_type") ContractType contractType,
-        @JsonProperty("contract_signature") Date contractSignature,
-        @JsonProperty("contract_expiration") Date contractExpiration,
+        @JsonProperty("contract_signature") LocalDate contractSignature,
+        @JsonProperty("contract_expiration") LocalDate contractExpiration,
         AddressDto residence,
         @JsonProperty("work_address") AddressDto workAddress,
         @JsonProperty("supervisor_id") Long supervisorId,

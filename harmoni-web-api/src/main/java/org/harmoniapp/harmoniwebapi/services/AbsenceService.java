@@ -8,6 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -111,6 +113,40 @@ public class AbsenceService {
             }
         } catch (Exception e) {
             throw new RuntimeException("An error occurred: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Updates the status of an existing Absence.
+     * IMPORTANT it is updated by employer
+     *
+     * @param id the ID of the absence to update
+     * @param absenceDto the AbsenceDto containing the new status of the absence
+     * @return the updated AbsenceDto
+     * @throws IllegalArgumentException if the provided status ID does not exist
+     * @throws RuntimeException if the absence does not exist or if an error occurs during the update process
+     */
+    @Transactional
+    public AbsenceDto updateAbsenceStatus(long id, AbsenceDto absenceDto) {
+        try {
+
+            Absence existingAbsence = repositoryCollector.getAbsences().findById(id)
+                    .orElse(null);
+
+            Status status = repositoryCollector.getStatuses()
+                    .findById(absenceDto.status().getId())
+                    .orElseThrow(IllegalArgumentException::new);
+
+            if(existingAbsence == null) {
+                throw new RuntimeException("You can only change status if absence exists");
+            } else {
+                existingAbsence.setStatus(status);
+                existingAbsence.setUpdated(LocalDate.now());
+                Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
+                return AbsenceDto.fromEntity(updatedAbsence);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update absence status: " + e.getMessage(), e);
         }
     }
 }
