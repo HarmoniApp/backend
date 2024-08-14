@@ -33,7 +33,7 @@ public class AddressController {
     /**
      * Retrieves all departments.
      *
-     * @return A list of all departments AddressDto objects.
+     * @return A list of all departments.
      */
     @GetMapping("/departments")
     public List<Map<String, Object>> getAllDepartments(){

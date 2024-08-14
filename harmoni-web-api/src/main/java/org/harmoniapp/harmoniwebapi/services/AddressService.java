@@ -35,7 +35,7 @@ public class AddressService {
     /**
      * Retrieves all departments.
      *
-     * @return A list of all departments AddressDto objects.
+     * @return A list of all departments.
      */
     @Transactional
     public List<Map<String, Object>> getAllDepartments() {
