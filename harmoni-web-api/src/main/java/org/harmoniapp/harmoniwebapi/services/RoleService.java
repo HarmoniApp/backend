@@ -6,6 +6,7 @@ import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.RoleDto;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -79,12 +80,13 @@ public class RoleService {
      * @return the updated or created RoleDto
      * @throws RuntimeException if an error occurs during update
      */
+    @Transactional
     public RoleDto updateRole(long id, RoleDto roleDto) {
         try {
             Role newRole = roleDto.toEntity();
             return repositoryCollector.getRoles().findById(id)
                     .map(role -> {
-                        role.setName(newRole.getName() != null ? newRole.getName() : role.getName());
+                        role.setName(newRole.getName());
                         role.setSup(newRole.isSup());
                         Role updatedRole = repositoryCollector.getRoles().save(role);
                         return RoleDto.fromEntity(updatedRole);

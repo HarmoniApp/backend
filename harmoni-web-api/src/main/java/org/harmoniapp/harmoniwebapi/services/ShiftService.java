@@ -101,10 +101,10 @@ public class ShiftService {
             Shift existingShift = repositoryCollector.getShifts().findById(id)
                     .orElse(null);
 
-            User user = repositoryCollector.getUsers().findById(shiftDto.userId() != null ? shiftDto.userId() : existingShift.getUser().getId())
+            User user = repositoryCollector.getUsers().findById(shiftDto.userId())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-            Role role = repositoryCollector.getRoles().findById(shiftDto.roleId() != null ? shiftDto.roleId() : existingShift.getRole().getId())
+            Role role = repositoryCollector.getRoles().findById(shiftDto.roleId())
                     .orElseThrow(() -> new IllegalArgumentException("Role not found"));
 
             if (existingShift == null) {
@@ -112,8 +112,8 @@ public class ShiftService {
                 Shift savedShift = repositoryCollector.getShifts().save(newShift);
                 return ShiftDto.fromEntity(savedShift);
             } else {
-                existingShift.setStart(shiftDto.start() != null ? shiftDto.start() : existingShift.getStart());
-                existingShift.setEnd(shiftDto.end() != null ? shiftDto.end() : existingShift.getEnd());
+                existingShift.setStart(shiftDto.start());
+                existingShift.setEnd(shiftDto.end());
                 existingShift.setUser(user);
                 existingShift.setRole(role);
                 Shift updatedShift = repositoryCollector.getShifts().save(existingShift);
