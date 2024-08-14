@@ -6,6 +6,7 @@ import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.AbsenceDto;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -73,15 +74,20 @@ public class AbsenceService {
      * @throws IllegalArgumentException if the user or absence type ID provided does not exist
      * @throws RuntimeException if an error occurs during the update process
      */
+    @Transactional
     public AbsenceDto updateAbsence(long id, AbsenceDto absenceDto) {
-        try { //TODO: What if status is approved then we can't change it to awaiting
+        try {
+            if(absenceDto.status().getId() != 1L){ // Employee can only change absence if the status is awaiting
+                throw new RuntimeException("An error occurred: You are not allowed to update the status of the absence");
+            }
+
             Absence existingAbsence = repositoryCollector.getAbsences().findById(id)
                     .orElse(null);
 
-            User user = repositoryCollector.getUsers().findById(absenceDto.userId() != null ? absenceDto.userId() : existingAbsence.getUser().getId())
+            User user = repositoryCollector.getUsers().findById(absenceDto.userId())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-            AbsenceType absenceType = repositoryCollector.getAbsenceTypes().findById(absenceDto.absenceTypeId()!= null ? absenceDto.absenceTypeId() : existingAbsence.getAbsenceType().getId())
+            AbsenceType absenceType = repositoryCollector.getAbsenceTypes().findById(absenceDto.absenceTypeId())
                     .orElseThrow(() -> new IllegalArgumentException("AbsenceType not found"));
 
             Status status = repositoryCollector.getStatuses()
@@ -93,13 +99,13 @@ public class AbsenceService {
                 Absence savedAbsence = repositoryCollector.getAbsences().save(newAbsence);
                 return AbsenceDto.fromEntity(savedAbsence);
             } else {
-                existingAbsence.setStart(absenceDto.start() != null ? absenceDto.start() : existingAbsence.getStart());
-                existingAbsence.setEnd(absenceDto.end() != null ? absenceDto.end() : existingAbsence.getEnd());
+                existingAbsence.setStart(absenceDto.start());
+                existingAbsence.setEnd(absenceDto.end());
                 existingAbsence.setUser(user);
                 existingAbsence.setAbsenceType(absenceType);
                 existingAbsence.setStatus(status);
-                existingAbsence.setSubmission(absenceDto.submission() != null ? absenceDto.submission() : existingAbsence.getSubmission());
-                existingAbsence.setUpdated(absenceDto.updated() != null ? absenceDto.updated() : existingAbsence.getUpdated());
+                existingAbsence.setSubmission(absenceDto.submission());
+                existingAbsence.setUpdated(absenceDto.updated());
                 Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
                 return AbsenceDto.fromEntity(updatedAbsence);
             }

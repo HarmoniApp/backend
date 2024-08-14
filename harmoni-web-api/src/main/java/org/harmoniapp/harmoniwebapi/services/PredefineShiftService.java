@@ -6,6 +6,7 @@ import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.PredefineShiftDto;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,14 +81,15 @@ public class PredefineShiftService {
      * @return the updated or newly created PredefineShiftDto
      * @throws RuntimeException if there is an error accessing the database or the provided data is invalid
      */
+    @Transactional
     public PredefineShiftDto updatePredefineShift(long id, PredefineShiftDto predefineShiftDto) {
         try {
             PredefineShift newPredefineShift = predefineShiftDto.toEntity();
             return repositoryCollector.getPredefineShifts().findById(id)
               .map(predefineShift -> {
-                  predefineShift.setName(newPredefineShift.getName() != null ? newPredefineShift.getName() : predefineShift.getName());
-                  predefineShift.setStart(newPredefineShift.getStart() != null ? newPredefineShift.getStart() : predefineShift.getStart());
-                  predefineShift.setEnd(newPredefineShift.getEnd() != null ? newPredefineShift.getEnd() : predefineShift.getEnd());
+                  predefineShift.setName(newPredefineShift.getName());
+                  predefineShift.setStart(newPredefineShift.getStart());
+                  predefineShift.setEnd(newPredefineShift.getEnd());
                   PredefineShift updatedPredefineShift = repositoryCollector.getPredefineShifts().save(predefineShift);
                   return PredefineShiftDto.fromEntity(updatedPredefineShift);
               })

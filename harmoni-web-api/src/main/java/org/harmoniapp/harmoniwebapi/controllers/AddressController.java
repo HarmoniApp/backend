@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * REST controller for managing addresses.
@@ -27,6 +28,16 @@ public class AddressController {
     @GetMapping
     public List<AddressDto> getAllAddresses() {
         return service.getAllAddresses();
+    }
+
+    /**
+     * Retrieves all departments.
+     *
+     * @return A list of all departments AddressDto objects.
+     */
+    @GetMapping("/departments")
+    public List<Map<String, Object>> getAllDepartments(){
+        return service.getAllDepartments();
     }
 
     /**

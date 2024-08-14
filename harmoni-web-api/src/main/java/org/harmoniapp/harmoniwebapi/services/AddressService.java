@@ -6,8 +6,11 @@ import org.harmoniapp.harmonidata.entities.Address;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.AddressDto;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Service class for managing addresses.
@@ -28,6 +31,26 @@ public class AddressService {
 
         return addresses.stream().map(AddressDto::fromEntity).toList();
     }
+
+    /**
+     * Retrieves all departments.
+     *
+     * @return A list of all departments AddressDto objects.
+     */
+    @Transactional
+    public List<Map<String, Object>> getAllDepartments() {
+        List<Address> addresses = repositoryCollector.getAddresses().findAll();
+
+        return addresses.stream()
+                .filter(address -> address.getDepartmentName() != null)
+                .map(address -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", address.getId());
+                    map.put("departmentName", address.getDepartmentName());
+                    return map;
+                }).toList();
+    }
+
 
     /**
      * Retrieves an address by its ID.
