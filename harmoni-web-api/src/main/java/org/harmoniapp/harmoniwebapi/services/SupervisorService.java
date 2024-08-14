@@ -17,8 +17,7 @@ public class SupervisorService {
     private final RepositoryCollector repositories;
 
     public List<SupervisorDto> getAllSupervisors(){
-        List<Long> roleIds = List.of(1L, 2L, 3L, 4L);
-        List<User> users = repositories.getUsers().findSupervisors(roleIds);
+        List<User> users = repositories.getUsers().findSupervisors();
         return users.stream()
                 .map(SupervisorDto::fromEntity)
                 .toList();

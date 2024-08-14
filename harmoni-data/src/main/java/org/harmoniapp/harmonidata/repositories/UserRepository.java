@@ -13,8 +13,6 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
-
-
     @Query("""
             select u from User u left join u.roles roles left join u.languages languages
             where (u.contractType.id in ?1 or ?1 is null) and
@@ -42,7 +40,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
         where upper(u.firstname) in ?1 and upper(u.surname) in ?1""")
     List<User> findAllBySearchName(List<String> search);
 
-    @Query("select u from User u left join u.roles roles where roles.id in ?1 order by u.firstname, u.surname")
-    List<User> findSupervisors(List<Long> ids);
-
+    @Query("""
+        select u from User u left join u.roles roles
+        where roles.isSup = true""")
+    List<User> findSupervisors();
 }
