@@ -80,7 +80,7 @@ public class UserService {
      * @return The created UserDto object.
      */
     @Transactional
-    public UserDto add(UserDto userDto) {
+    public UserDto createUser(UserDto userDto) {
         User user = userDto.toEntity();
 
         ContractType contractType = repositoryCollector.getContractTypes()
@@ -95,7 +95,8 @@ public class UserService {
         Address residence = addressService.saveAddressEntity(userDto.residence());
         user.setResidence(residence);
 
-        Address workAddress = addressService.saveAddressEntity(userDto.workAddress());
+        Address workAddress = repositoryCollector.getAddresses().findById(userDto.workAddress().id())
+                        .orElseThrow(IllegalArgumentException::new);
         user.setWorkAddress(workAddress);
 
         user.setLanguages(
@@ -148,13 +149,8 @@ public class UserService {
         }
         user.setResidence(residence);
 
-        Address workAddress;
-        if (existingUser.isPresent()) {
-            workAddress = existingUser.get().getWorkAddress();
-            workAddress = addressService.updateAddress(workAddress, userDto.workAddress());
-        } else {
-            workAddress = addressService.saveAddressEntity(userDto.workAddress());
-        }
+        Address workAddress = repositoryCollector.getAddresses().findById(userDto.workAddress().id())
+                .orElseThrow(IllegalArgumentException::new);
         user.setWorkAddress(workAddress);
 
         user.setLanguages(
