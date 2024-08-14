@@ -23,6 +23,9 @@ public class Role {
 
     private String name;
 
+    @Column(name = "is_sup")
+    private boolean isSup;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

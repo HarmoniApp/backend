@@ -1,17 +1,12 @@
 package org.harmoniapp.harmoniwebapi.services;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.harmonidata.entities.PredefineShift;
 import org.harmoniapp.harmonidata.entities.Role;
-import org.harmoniapp.harmonidata.entities.Shift;
-import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
-import org.harmoniapp.harmoniwebapi.contracts.AbsenceTypeDto;
-import org.harmoniapp.harmoniwebapi.contracts.PredefineShiftDto;
 import org.harmoniapp.harmoniwebapi.contracts.RoleDto;
-import org.harmoniapp.harmoniwebapi.contracts.ShiftDto;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -85,13 +80,14 @@ public class RoleService {
      * @return the updated or created RoleDto
      * @throws RuntimeException if an error occurs during update
      */
+    @Transactional
     public RoleDto updateRole(long id, RoleDto roleDto) {
         try {
             Role newRole = roleDto.toEntity();
             return repositoryCollector.getRoles().findById(id)
                     .map(role -> {
-                        role.setId(role.getId());
-                        role.setName(role.getName());
+                        role.setName(newRole.getName());
+                        role.setSup(newRole.isSup());
                         Role updatedRole = repositoryCollector.getRoles().save(role);
                         return RoleDto.fromEntity(updatedRole);
                     })
