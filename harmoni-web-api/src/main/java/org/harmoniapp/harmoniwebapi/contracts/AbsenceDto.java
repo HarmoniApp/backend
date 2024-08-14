@@ -1,11 +1,13 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.harmoniapp.harmonidata.entities.Absence;
 import org.harmoniapp.harmonidata.entities.AbsenceType;
 import org.harmoniapp.harmonidata.entities.Status;
 import org.harmoniapp.harmonidata.entities.User;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -23,13 +25,13 @@ import java.util.Date;
  */
 public record AbsenceDto(
         long id,
-        LocalDateTime start,
-        LocalDateTime end,
+        LocalDate start,
+        LocalDate end,
         @JsonProperty("user_id") Long userId,
         @JsonProperty("absence_type_id") Long absenceTypeId,
         Status status,
-        Date submission,
-        Date updated) {
+        LocalDate submission,
+        LocalDate updated) {
 
     /**
      * Converts an Absence entity to an AbsenceDto.

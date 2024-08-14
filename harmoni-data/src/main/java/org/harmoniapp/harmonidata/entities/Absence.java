@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
@@ -23,12 +24,10 @@ public class Absence {
     private Long id;
 
     @Column(name = "\"start\"")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime start;
+    private LocalDate start;
 
     @Column(name = "\"end\"")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime end;
+    private LocalDate end;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -42,11 +41,9 @@ public class Absence {
     @JoinColumn(name = "status_id")
     private Status status;
 
-    @Temporal(TemporalType.DATE)
-    private Date submission;
+    private LocalDate submission;
 
-    @Temporal(TemporalType.DATE)
-    private Date updated;
+    private LocalDate updated;
 
     @Override
     public final boolean equals(Object o) {
