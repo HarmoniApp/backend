@@ -56,7 +56,7 @@ public class AbsenceController {
      * @param absenceDto the AbsenceDto containing the new status of the absence
      * @return the updated AbsenceDto
      */
-    @PutMapping("/{id}/status")
+    @PatchMapping("/{id}/status")
     @ResponseStatus(HttpStatus.CREATED)
     public AbsenceDto updateAbsenceStatus(@PathVariable long id, @RequestBody AbsenceDto absenceDto) {
         return absenceService.updateAbsenceStatus(id, absenceDto);
