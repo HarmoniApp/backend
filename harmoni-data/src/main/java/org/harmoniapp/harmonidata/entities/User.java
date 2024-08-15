@@ -9,6 +9,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
@@ -33,13 +34,11 @@ public class User {
     @JoinColumn
     private ContractType contractType;
 
-    @Temporal(TemporalType.DATE)
     @Column(name="contract_signature")
-    private Date contractSignature;
+    private LocalDate contractSignature;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "contract_expiration")
-    private Date contractExpiration;
+    private LocalDate contractExpiration;
 
     @ManyToOne
     @JoinColumn
