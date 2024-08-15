@@ -129,22 +129,17 @@ public class AbsenceService {
     @Transactional
     public AbsenceDto updateAbsenceStatus(long id, AbsenceDto absenceDto) {
         try {
-
             Absence existingAbsence = repositoryCollector.getAbsences().findById(id)
-                    .orElse(null);
+                    .orElseThrow(() -> new RuntimeException("You can only change status if absence exists"));
 
             Status status = repositoryCollector.getStatuses()
                     .findById(absenceDto.status().getId())
                     .orElseThrow(IllegalArgumentException::new);
 
-            if(existingAbsence == null) {
-                throw new RuntimeException("You can only change status if absence exists");
-            } else {
-                existingAbsence.setStatus(status);
-                existingAbsence.setUpdated(LocalDate.now());
-                Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
-                return AbsenceDto.fromEntity(updatedAbsence);
-            }
+            existingAbsence.setStatus(status);
+            existingAbsence.setUpdated(LocalDate.now());
+            Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
+            return AbsenceDto.fromEntity(updatedAbsence);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update absence status: " + e.getMessage(), e);
         }
