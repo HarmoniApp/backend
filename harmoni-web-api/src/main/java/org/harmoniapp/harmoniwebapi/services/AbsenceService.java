@@ -23,6 +23,20 @@ public class AbsenceService {
     private final RepositoryCollector repositoryCollector;
 
     /**
+     * Retrieves all Absences by user ID.
+     *
+     * @param id the ID of the user whose absences are to be retrieved
+     * @return a list of AbsenceDto corresponding to the user's absences
+     */
+    public List<AbsenceDto> getAbsenceByUserId(long id) {
+        List<Absence> userAbsences = repositoryCollector.getAbsences().findByUserId(id);
+
+        return userAbsences.stream()
+                .map(AbsenceDto::fromEntity)
+                .toList();
+    }
+
+    /**
      * Retrieves a list of all absences.
      *
      * @return a list of AbsenceDto containing the details of all absences
@@ -47,7 +61,7 @@ public class AbsenceService {
      * @throws IllegalArgumentException if the user or absence type ID provided does not exist
      * @throws RuntimeException if an error occurs during creation
      */
-    public AbsenceDto createAbsence(AbsenceDto absenceDto) {
+    public AbsenceDto createAbsence(AbsenceDto absenceDto) { //subision + datagodzina, updated data+godzina
 
         User user = repositoryCollector.getUsers()
                 .findById(absenceDto.userId())
@@ -62,6 +76,8 @@ public class AbsenceService {
                 .orElseThrow(IllegalArgumentException::new);
 
         Absence absence = absenceDto.toEntity(user, absenceType, status);
+        absence.setSubmission(LocalDate.now());
+        absence.setUpdated(LocalDate.now());
         Absence savedAbsence = repositoryCollector.getAbsences().save(absence);
         return AbsenceDto.fromEntity(savedAbsence);
     }
@@ -121,19 +137,19 @@ public class AbsenceService {
      * IMPORTANT it is updated by employer
      *
      * @param id the ID of the absence to update
-     * @param absenceDto the AbsenceDto containing the new status of the absence
+     * @param statusId the ID of the new status to set for the absence
      * @return the updated AbsenceDto
      * @throws IllegalArgumentException if the provided status ID does not exist
      * @throws RuntimeException if the absence does not exist or if an error occurs during the update process
      */
     @Transactional
-    public AbsenceDto updateAbsenceStatus(long id, AbsenceDto absenceDto) {
+    public AbsenceDto updateAbsenceStatus(long id, long statusId) {
         try {
             Absence existingAbsence = repositoryCollector.getAbsences().findById(id)
                     .orElseThrow(() -> new RuntimeException("You can only change status if absence exists"));
 
             Status status = repositoryCollector.getStatuses()
-                    .findById(absenceDto.status().getId())
+                    .findById(statusId)
                     .orElseThrow(IllegalArgumentException::new);
 
             existingAbsence.setStatus(status);
