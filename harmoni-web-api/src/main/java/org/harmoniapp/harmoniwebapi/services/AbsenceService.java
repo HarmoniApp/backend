@@ -61,7 +61,7 @@ public class AbsenceService {
      * @throws IllegalArgumentException if the user or absence type ID provided does not exist
      * @throws RuntimeException if an error occurs during creation
      */
-    public AbsenceDto createAbsence(AbsenceDto absenceDto) { //subision + datagodzina, updated data+godzina
+    public AbsenceDto createAbsence(AbsenceDto absenceDto) { //TODO: change subbmision and updated to date anh hour
 
         User user = repositoryCollector.getUsers()
                 .findById(absenceDto.userId())
