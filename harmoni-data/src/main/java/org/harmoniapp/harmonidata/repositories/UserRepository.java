@@ -38,4 +38,9 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
         select u from User u
         where upper(u.firstname) in ?1 and upper(u.surname) in ?1""")
     List<User> findAllBySearchName(List<String> search);
+
+    @Query("""
+        select u from User u left join u.roles roles
+        where roles.isSup = true""")
+    List<User> findSupervisors();
 }
