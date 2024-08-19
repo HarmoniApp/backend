@@ -39,7 +39,7 @@ public record SupervisorDto(long id,
                 user.getId(),
                 user.getFirstname(),
                 user.getSurname(),
-                roles.stream().toList(),
+                roles,
                 user.getEmployeeId());
     }
 }
