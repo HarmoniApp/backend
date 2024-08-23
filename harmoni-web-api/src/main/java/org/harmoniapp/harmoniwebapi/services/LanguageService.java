@@ -26,7 +26,7 @@ public class LanguageService {
      * @return a list of {@link LanguageDto} representing all languages.
      */
     public List<LanguageDto> getAllLanguages() {
-        List<Language> languages = repositoryCollector.getLanguages().findAll(Sort.by(Sort.Direction.ASC, "name"));
+        List<Language> languages = repositoryCollector.getLanguages().findAll(Sort.by("name"));
 
         return languages.stream()
                 .map(LanguageDto::fromEntity)
