@@ -5,6 +5,7 @@ import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.RoleDto;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +47,7 @@ public class RoleService {
      */
     public List<RoleDto> getAllRoles() {
         try {
-            var role = repositoryCollector.getRoles().findAll();
+            var role = repositoryCollector.getRoles().findAll(Sort.by("name"));
             return role.stream()
                     .map(RoleDto::fromEntity)
                     .toList();
