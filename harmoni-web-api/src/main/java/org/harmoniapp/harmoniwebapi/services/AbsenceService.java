@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.*;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.AbsenceDto;
+import org.harmoniapp.harmoniwebapi.contracts.StatusDto;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,20 @@ public class AbsenceService {
         List<Absence> userAbsences = repositoryCollector.getAbsences().findByUserId(id);
 
         return userAbsences.stream()
+                .map(AbsenceDto::fromEntity)
+                .toList();
+    }
+
+    /**
+     * Retrieves all Absences by status name.
+     *
+     * @param statusName the name of the status to filter absences by
+     * @return a list of AbsenceDto representing the absences with the specified status
+     */
+    public List<AbsenceDto> getAbsenceByStatus(String statusName) {
+        List<Absence> absencesWithStatus = repositoryCollector.getAbsences().findAbsenceByStatusName(statusName);
+
+        return absencesWithStatus.stream()
                 .map(AbsenceDto::fromEntity)
                 .toList();
     }
