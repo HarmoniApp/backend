@@ -31,7 +31,8 @@ public record AbsenceDto(
         @JsonProperty("absence_type_id") Long absenceTypeId,
         Status status,
         LocalDate submission,
-        LocalDate updated) {
+        LocalDate updated,
+        @JsonProperty("working_days") Long workingDays) {
 
     /**
      * Converts an Absence entity to an AbsenceDto.
@@ -48,7 +49,8 @@ public record AbsenceDto(
                 absence.getAbsenceType().getId(),
                 absence.getStatus(),
                 absence.getSubmission(),
-                absence.getUpdated()
+                absence.getUpdated(),
+                absence.getWorkingDays()
         );
     }
 
@@ -69,7 +71,8 @@ public record AbsenceDto(
                 absenceType,
                 status,
                 this.submission,
-                this.updated
+                this.updated,
+                this.workingDays
         );
     }
 }

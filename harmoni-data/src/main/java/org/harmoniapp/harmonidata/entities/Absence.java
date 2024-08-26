@@ -45,6 +45,9 @@ public class Absence {
 
     private LocalDate updated;
 
+    @Column(name = "working_days")
+    private Long workingDays;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

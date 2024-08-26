@@ -4,13 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.*;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.AbsenceDto;
-import org.harmoniapp.harmoniwebapi.contracts.StatusDto;
+import org.harmoniapp.harmoniwebapi.contracts.HolidayCalculator;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,11 +39,11 @@ public class AbsenceService {
     /**
      * Retrieves all Absences by status name.
      *
-     * @param statusName the name of the status to filter absences by
+     * @param statusId the id of the status to filter absences by
      * @return a list of AbsenceDto representing the absences with the specified status
      */
-    public List<AbsenceDto> getAbsenceByStatus(String statusName) {
-        List<Absence> absencesWithStatus = repositoryCollector.getAbsences().findAbsenceByStatusName(statusName);
+    public List<AbsenceDto> getAbsenceByStatus(long statusId) {
+        List<Absence> absencesWithStatus = repositoryCollector.getAbsences().findAbsenceByStatusId(statusId);
 
         return absencesWithStatus.stream()
                 .map(AbsenceDto::fromEntity)
@@ -90,9 +89,18 @@ public class AbsenceService {
                 .findById(1L)    //Here status MUST be awaiting
                 .orElseThrow(IllegalArgumentException::new);
 
+        if(absenceDto.start().isBefore(LocalDate.now()) || absenceDto.end().isBefore(LocalDate.now())){
+            throw new RuntimeException("An error occurred: You can't start or end the absence in the past.");
+        }
+        if(absenceDto.end().isBefore(absenceDto.start())){
+            throw new RuntimeException("An error occurred: You can't end the absence before it starts.");
+        }
+        //TODO: add how many days left employee has to take absence
+
         Absence absence = absenceDto.toEntity(user, absenceType, status);
         absence.setSubmission(LocalDate.now());
         absence.setUpdated(LocalDate.now());
+        absence.setWorkingDays(HolidayCalculator.calculateWorkingDays(absence.getStart(), absence.getEnd()));
         Absence savedAbsence = repositoryCollector.getAbsences().save(absence);
         return AbsenceDto.fromEntity(savedAbsence);
     }
@@ -110,7 +118,7 @@ public class AbsenceService {
     @Transactional
     public AbsenceDto updateAbsence(long id, AbsenceDto absenceDto) {
         try {
-            if(absenceDto.status().getId() != 1L){ // Employee can only change absence if the status is awaiting
+            if(absenceDto.status().getId() != 1L && absenceDto.status().getId() != 3L){ // Employee can only change absence if the status is awaiting or cancelled
                 throw new RuntimeException("An error occurred: You are not allowed to update the status of the absence");
             }
 
@@ -124,11 +132,19 @@ public class AbsenceService {
                     .orElseThrow(() -> new IllegalArgumentException("AbsenceType not found"));
 
             Status status = repositoryCollector.getStatuses()
-                    .findById(1L)    //Here status MUST be awaiting
+                    .findById(absenceDto.status().getId())
                     .orElseThrow(IllegalArgumentException::new);
+
+            if(absenceDto.start().isBefore(LocalDate.now()) || absenceDto.end().isBefore(LocalDate.now())){
+                throw new RuntimeException("An error occurred: You can't start or end the absence in the past.");
+            }
+            if(absenceDto.end().isBefore(absenceDto.start())){
+                throw new RuntimeException("An error occurred: You can't end the absence before it starts.");
+            }
 
             if(existingAbsence == null) {
                 Absence newAbsence = absenceDto.toEntity(user, absenceType, status);
+                newAbsence.setWorkingDays(HolidayCalculator.calculateWorkingDays(newAbsence.getStart(), newAbsence.getEnd()));
                 Absence savedAbsence = repositoryCollector.getAbsences().save(newAbsence);
                 return AbsenceDto.fromEntity(savedAbsence);
             } else {
@@ -139,6 +155,7 @@ public class AbsenceService {
                 existingAbsence.setStatus(status);
                 existingAbsence.setSubmission(absenceDto.submission());
                 existingAbsence.setUpdated(absenceDto.updated());
+                existingAbsence.setWorkingDays(HolidayCalculator.calculateWorkingDays(existingAbsence.getStart(), existingAbsence.getEnd()));
                 Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
                 return AbsenceDto.fromEntity(updatedAbsence);
             }
