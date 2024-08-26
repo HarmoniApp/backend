@@ -22,4 +22,15 @@ public record StatusDto(long id, String name) {
                 status.getName()
         );
     }
+
+    /**
+     * Converts a StatusDto to a Status entity.
+     *
+     * @return the resulting Status entity
+     */
+    public Status toEntity() {
+        return new Status(
+                this.id,
+                this.name);
+    }
 }

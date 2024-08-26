@@ -31,6 +31,17 @@ public class AbsenceController {
     }
 
     /**
+     * Retrieves a list of Absences with the specified status name.
+     *
+     * @param name the name of the status to filter absences by
+     * @return a list of AbsenceDto representing the absences with the specified status name
+     */
+    @GetMapping("status/{name}")
+    public List<AbsenceDto> getAbsenceByStatus(@PathVariable String name){
+        return absenceService.getAbsenceByStatus(name);
+    }
+
+    /**
      * Retrieves a list of all Absences.
      *
      * @return a list of AbsenceDto representing all absences
