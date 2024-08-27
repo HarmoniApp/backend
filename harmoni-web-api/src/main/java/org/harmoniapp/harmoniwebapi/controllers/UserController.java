@@ -1,5 +1,6 @@
 package org.harmoniapp.harmoniwebapi.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.harmoniapp.harmoniwebapi.services.UserService;
@@ -68,7 +69,7 @@ public class UserController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto createUser(@RequestBody UserDto userDto) {
+    public UserDto createUser(@Valid @RequestBody UserDto userDto) {
         return service.add(userDto);
     }
 
@@ -81,7 +82,7 @@ public class UserController {
      */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto updateUser(@PathVariable long id, @RequestBody UserDto userDto) {
+    public UserDto updateUser(@PathVariable long id,@Valid @RequestBody UserDto userDto) {
         return service.update(id, userDto);
     }
 
