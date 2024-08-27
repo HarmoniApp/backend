@@ -1,5 +1,6 @@
 package org.harmoniapp.harmoniwebapi.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.AbsenceDto;
 import org.harmoniapp.harmoniwebapi.services.AbsenceService;
@@ -59,7 +60,7 @@ public class AbsenceController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public AbsenceDto createAbsence(@RequestBody AbsenceDto absenceDto) {
+    public AbsenceDto createAbsence(@Valid @RequestBody AbsenceDto absenceDto) {
         return absenceService.createAbsence(absenceDto);
     }
 
@@ -72,7 +73,7 @@ public class AbsenceController {
      */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public AbsenceDto updateAbsence(@PathVariable long id, @RequestBody AbsenceDto absenceDto) {
+    public AbsenceDto updateAbsence(@PathVariable long id, @Valid @RequestBody AbsenceDto absenceDto) {
         return absenceService.updateAbsence(id, absenceDto);
     }
 
