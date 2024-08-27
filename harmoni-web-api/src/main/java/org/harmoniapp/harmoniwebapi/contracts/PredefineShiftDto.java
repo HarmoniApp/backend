@@ -1,5 +1,8 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import org.harmoniapp.harmonidata.entities.PredefineShift;
 
 import java.time.LocalTime;
@@ -12,7 +15,18 @@ import java.time.LocalTime;
  * @param start the start time of the predefined shift
  * @param end   the end time of the predefined shift
  */
-public record PredefineShiftDto(long id, String name, LocalTime start, LocalTime end) {
+public record PredefineShiftDto(
+        long id,
+
+        @NotEmpty(message = "Shift name cannot be empty")
+        @Pattern(regexp = "^[a-zA-Z0-9\\-\\s]+$", message = "Shift name must contain only letters, digits, dashes, and spaces")
+        String name,
+
+        @NotNull(message = "Start time cannot be null")
+        LocalTime start,
+
+        @NotNull(message = "End time cannot be null")
+        LocalTime end) {
 
     /**
      * Converts a PredefineShift entity to a PredefineShiftDto.
