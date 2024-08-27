@@ -73,7 +73,7 @@ public class AddressController {
      */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public AddressDto updateAddress(@Valid @PathVariable long id, @RequestBody AddressDto dto) {
+    public AddressDto updateAddress(@PathVariable long id, @Valid @RequestBody AddressDto dto) {
         return service.updateAddress(id, dto);
     }
 
