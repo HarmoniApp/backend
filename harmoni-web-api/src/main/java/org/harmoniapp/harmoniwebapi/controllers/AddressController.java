@@ -1,5 +1,6 @@
 package org.harmoniapp.harmoniwebapi.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.AddressDto;
 import org.harmoniapp.harmoniwebapi.services.AddressService;
@@ -59,7 +60,7 @@ public class AddressController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public AddressDto createAddress(@RequestBody AddressDto dto) {
+    public AddressDto createAddress(@Valid @RequestBody AddressDto dto) {
         return service.createAddress(dto);
     }
 
@@ -72,7 +73,7 @@ public class AddressController {
      */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public AddressDto updateAddress(@PathVariable long id, @RequestBody AddressDto dto) {
+    public AddressDto updateAddress(@Valid @PathVariable long id, @RequestBody AddressDto dto) {
         return service.updateAddress(id, dto);
     }
 
