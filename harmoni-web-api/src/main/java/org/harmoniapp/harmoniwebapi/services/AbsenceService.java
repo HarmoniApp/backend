@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.*;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.AbsenceDto;
-import org.harmoniapp.harmoniwebapi.contracts.HolidayCalculator;
+import org.harmoniapp.harmoniwebapi.utils.HolidayCalculator;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
