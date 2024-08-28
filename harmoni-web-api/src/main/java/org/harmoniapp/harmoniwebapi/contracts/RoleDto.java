@@ -1,6 +1,8 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import org.harmoniapp.harmonidata.entities.Role;
 
 /**
@@ -10,7 +12,14 @@ import org.harmoniapp.harmonidata.entities.Role;
  * @param name  the name of the role
  * @param isSup indicates whether the role is a superior role.
  */
-public record RoleDto(long id, String name, @JsonProperty("is_sup") boolean isSup) {
+public record RoleDto(
+        long id,
+
+        @NotEmpty(message = "Role name cannot be empty")
+        @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Role name must contain only letters and digits")
+        String name,
+
+        @JsonProperty("is_sup") boolean isSup) {
 
     /**
      * Converts a Role entity to a RoleDto.
