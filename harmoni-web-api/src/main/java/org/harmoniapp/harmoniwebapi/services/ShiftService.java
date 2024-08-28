@@ -52,11 +52,12 @@ public class ShiftService {
      * @return a list of ShiftDto containing the details of shifts within the date range
      * @throws RuntimeException if an error occurs while retrieving shifts
      */
-    public List<ShiftDto> getShiftsByDateRange(LocalDate start, LocalDate end) {
+    public List<ShiftDto> getShiftsByDateRange(LocalDate start, LocalDate end, Long userId) {
         try {
-            List<Shift> shifts = repositoryCollector.getShifts().findAllByDateRange(
+            List<Shift> shifts = repositoryCollector.getShifts().findAllByDateRangeAndUserId(
                     start.atStartOfDay(),
-                    end.atTime(LocalTime.MAX));
+                    end.atTime(LocalTime.MAX),
+                    userId);
             return shifts.stream()
                     .map(ShiftDto::fromEntity)
                     .toList();

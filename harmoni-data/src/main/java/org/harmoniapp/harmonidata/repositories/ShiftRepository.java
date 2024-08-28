@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ShiftRepository extends JpaRepository<Shift, Long> {
 
-    @Query("SELECT s FROM Shift s WHERE s.start >= :start AND s.end <= :end")
-    List<Shift> findAllByDateRange(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+    @Query("SELECT s FROM Shift s WHERE s.start >= :start AND s.end <= :end AND s.user.id = :userId")
+    List<Shift> findAllByDateRangeAndUserId(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("userId") Long userId);
 
 }
