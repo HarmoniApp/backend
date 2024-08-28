@@ -30,7 +30,9 @@ public record ShiftDto(
         @JsonProperty("user_id") Long userId,
 
         @NotNull(message = "Role ID cannot be null")
-        @JsonProperty("role_id") Long roleId) {
+        @JsonProperty("role_id") Long roleId,
+
+        boolean published) {
 
     /**
      * Converts a Shift entity to a ShiftDto.
@@ -44,7 +46,8 @@ public record ShiftDto(
                 shift.getStart(),
                 shift.getEnd(),
                 shift.getUser().getId(),
-                shift.getRole().getId()
+                shift.getRole().getId(),
+                shift.isPublished()
         );
     }
 
@@ -60,7 +63,8 @@ public record ShiftDto(
                 this.start,
                 this.end,
                 user,
-                role
+                role,
+                this.published
         );
     }
 }

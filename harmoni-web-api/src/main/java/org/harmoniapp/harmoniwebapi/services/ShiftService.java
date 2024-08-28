@@ -108,7 +108,7 @@ public class ShiftService {
                     .orElseThrow(() -> new IllegalArgumentException("Role not found"));
 
             if (existingShift == null) {
-                Shift newShift = new Shift(id, shiftDto.start(), shiftDto.end(), user, role);
+                Shift newShift = new Shift(id, shiftDto.start(), shiftDto.end(), user, role, shiftDto.published());
                 Shift savedShift = repositoryCollector.getShifts().save(newShift);
                 return ShiftDto.fromEntity(savedShift);
             } else {
@@ -116,6 +116,7 @@ public class ShiftService {
                 existingShift.setEnd(shiftDto.end());
                 existingShift.setUser(user);
                 existingShift.setRole(role);
+                existingShift.setPublished(shiftDto.published());
                 Shift updatedShift = repositoryCollector.getShifts().save(existingShift);
                 return ShiftDto.fromEntity(updatedShift);
             }
