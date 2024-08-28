@@ -11,7 +11,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,9 +52,11 @@ public class ShiftService {
      * @return a list of ShiftDto containing the details of shifts within the date range
      * @throws RuntimeException if an error occurs while retrieving shifts
      */
-    public List<ShiftDto> getShiftsByDateRange(LocalDateTime start, LocalDateTime end) {
+    public List<ShiftDto> getShiftsByDateRange(LocalDate start, LocalDate end) {
         try {
-            List<Shift> shifts = repositoryCollector.getShifts().findAllByDateRange(start, end);
+            List<Shift> shifts = repositoryCollector.getShifts().findAllByDateRange(
+                    start.atStartOfDay(),
+                    end.atTime(LocalTime.MAX));
             return shifts.stream()
                     .map(ShiftDto::fromEntity)
                     .toList();
@@ -108,12 +111,12 @@ public class ShiftService {
                     .orElseThrow(() -> new IllegalArgumentException("Role not found"));
 
             if (existingShift == null) {
-                Shift newShift = new Shift(id, shiftDto.start(), shiftDto.end(), user, role);
+                Shift newShift = new Shift(id, shiftDto.start().atStartOfDay(), shiftDto.end().atTime(LocalTime.MAX), user, role);
                 Shift savedShift = repositoryCollector.getShifts().save(newShift);
                 return ShiftDto.fromEntity(savedShift);
             } else {
-                existingShift.setStart(shiftDto.start());
-                existingShift.setEnd(shiftDto.end());
+                existingShift.setStart(shiftDto.start().atStartOfDay());
+                existingShift.setEnd(shiftDto.end().atTime(LocalTime.MAX));
                 existingShift.setUser(user);
                 existingShift.setRole(role);
                 Shift updatedShift = repositoryCollector.getShifts().save(existingShift);

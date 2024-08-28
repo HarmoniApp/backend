@@ -6,7 +6,7 @@ import org.harmoniapp.harmoniwebapi.services.ShiftService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -40,8 +40,8 @@ public class ShiftController {
      */
     @GetMapping("/range")
     public List<ShiftDto> getShiftsByDateRange(@RequestParam("start") String start, @RequestParam("end") String end) {
-        LocalDateTime startDate = LocalDateTime.parse(start);
-        LocalDateTime endDate = LocalDateTime.parse(end);
+        LocalDate startDate = LocalDate.parse(start);
+        LocalDate endDate = LocalDate.parse(end);
         return shiftService.getShiftsByDateRange(startDate, endDate);
     }
 

@@ -5,7 +5,8 @@ import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.entities.User;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 /**
  * Data Transfer Object for Shift.
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
  * @param userId  the userId associated with the shift
  * @param roleId    the roleId of the user during the shift
  */
-public record ShiftDto(Long id, LocalDateTime start, LocalDateTime end, @JsonProperty("user_id") Long userId,  @JsonProperty("role_id") Long roleId) {
+public record ShiftDto(Long id, LocalDate start, LocalDate end, @JsonProperty("user_id") Long userId,  @JsonProperty("role_id") Long roleId) {
 
     /**
      * Converts a Shift entity to a ShiftDto.
@@ -27,8 +28,8 @@ public record ShiftDto(Long id, LocalDateTime start, LocalDateTime end, @JsonPro
     public static ShiftDto fromEntity(Shift shift) {
         return new ShiftDto(
                 shift.getId(),
-                shift.getStart(),
-                shift.getEnd(),
+                shift.getStart().toLocalDate(),
+                shift.getEnd().toLocalDate(),
                 shift.getUser().getId(),
                 shift.getRole().getId()
         );
@@ -43,8 +44,8 @@ public record ShiftDto(Long id, LocalDateTime start, LocalDateTime end, @JsonPro
     public Shift toEntity(User user, Role role) {
         return new Shift(
                 this.id,
-                this.start,
-                this.end,
+                this.start.atStartOfDay(),
+                this.end.atTime(LocalTime.MAX),
                 user,
                 role
         );
