@@ -1,6 +1,7 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.harmoniapp.harmonidata.entities.ContractType;
 import org.harmoniapp.harmonidata.entities.Role;
@@ -59,9 +60,11 @@ public record UserDto(
         @JsonProperty("contract_expiration") LocalDate contractExpiration,
 
         @NotNull(message = "Residence cannot be null")
+        @Valid
         AddressDto residence,
 
         @NotNull(message = "Work address cannot be null")
+        @Valid
         @JsonProperty("work_address") AddressDto workAddress,
 
         @JsonProperty("supervisor_id") Long supervisorId,
