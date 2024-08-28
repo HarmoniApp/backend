@@ -7,6 +7,7 @@ import org.harmoniapp.harmoniwebapi.services.AbsenceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -40,6 +41,19 @@ public class AbsenceController {
     @GetMapping("status/{id}")
     public List<AbsenceDto> getAbsenceByStatus(@PathVariable long id){
         return absenceService.getAbsenceByStatus(id);
+    }
+
+    /**
+     * Retrieves a list of approved absences for a specified user within a given date range.
+     *
+     * @param startDate the start date of the range to filter absences (format: yyyy-MM-dd)
+     * @param endDate   the end date of the range to filter absences (format: yyyy-MM-dd)
+     * @param userId    the ID of the user to filter absences for
+     * @return a list of AbsenceDto representing the approved absences within the specified date range for the given user
+     */
+    @GetMapping("/range/user")
+    public List<AbsenceDto> getAbsenceByDateRangeAndUserId(@RequestParam("startDate") LocalDate startDate, @RequestParam("endDate") LocalDate endDate, @RequestParam("userId") Long userId){
+        return absenceService.getAbsenceByDateRangeAndUserId(userId, startDate, endDate);
     }
 
     /**
