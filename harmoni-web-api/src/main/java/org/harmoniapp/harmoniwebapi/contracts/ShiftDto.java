@@ -1,6 +1,7 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.entities.User;
@@ -16,7 +17,20 @@ import java.time.LocalDateTime;
  * @param userId  the userId associated with the shift
  * @param roleId    the roleId of the user during the shift
  */
-public record ShiftDto(Long id, LocalDateTime start, LocalDateTime end, @JsonProperty("user_id") Long userId,  @JsonProperty("role_id") Long roleId) {
+public record ShiftDto(
+        Long id,
+
+        @NotNull(message = "Start time cannot be null")
+        LocalDateTime start,
+
+        @NotNull(message = "End time cannot be null")
+        LocalDateTime end,
+
+        @NotNull(message = "User ID cannot be null")
+        @JsonProperty("user_id") Long userId,
+
+        @NotNull(message = "Role ID cannot be null")
+        @JsonProperty("role_id") Long roleId) {
 
     /**
      * Converts a Shift entity to a ShiftDto.
