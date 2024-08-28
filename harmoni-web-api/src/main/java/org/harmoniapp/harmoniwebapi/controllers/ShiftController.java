@@ -39,10 +39,10 @@ public class ShiftController {
      * @return a list of ShiftDto within the specified date range
      */
     @GetMapping("/range")
-    public List<ShiftDto> getShiftsByDateRange(@RequestParam("start") String start, @RequestParam("end") String end) {
+    public List<ShiftDto> getShiftsByDateRange(@RequestParam("start") String start, @RequestParam("end") String end, @RequestParam("user_id") Long userId) {
         LocalDateTime startDate = LocalDateTime.parse(start);
         LocalDateTime endDate = LocalDateTime.parse(end);
-        return shiftService.getShiftsByDateRange(startDate, endDate);
+        return shiftService.getShiftsByDateRange(startDate, endDate, userId);
     }
 
     /**
