@@ -2,10 +2,7 @@ package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import org.harmoniapp.harmonidata.entities.Absence;
 import org.harmoniapp.harmonidata.entities.AbsenceType;
 import org.harmoniapp.harmonidata.entities.Status;
@@ -39,11 +36,11 @@ public record AbsenceDto(
         LocalDate end,
 
         @NotNull(message = "User ID cannot be null")
-        @Digits(integer = 6, fraction = 0, message = "User ID must be a valid number with up to 6 digits")
+        @Positive(message = "User ID must be a positive number")
         @JsonProperty("user_id") Long userId,
 
         @NotNull(message = "Absence type ID cannot be null")
-        @Digits(integer = 6, fraction = 0, message = "Absence type ID must be a valid number with up to 6 digits")
+        @Positive(message = "Absence ID must be a positive number")
         @JsonProperty("absence_type_id") Long absenceTypeId,
 
         Status status,

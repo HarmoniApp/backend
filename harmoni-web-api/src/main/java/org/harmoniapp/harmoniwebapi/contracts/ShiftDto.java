@@ -2,6 +2,7 @@ package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.entities.User;
@@ -27,9 +28,11 @@ public record ShiftDto(
         LocalDateTime end,
 
         @NotNull(message = "User ID cannot be null")
+        @Positive(message = "User ID must be a positive number")
         @JsonProperty("user_id") Long userId,
 
         @NotNull(message = "Role ID cannot be null")
+        @Positive(message = "Role ID must be a positive number")
         @JsonProperty("role_id") Long roleId,
 
         boolean published) {
