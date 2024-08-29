@@ -67,8 +67,8 @@ public class AbsenceService {
                 .toList();
     }
 
-    public List<AbsenceDto> getApprovedAbsenceByUserId(Long userId) {
-        List<Absence> userAbsences = repositoryCollector.getAbsences().findByUserId(userId);
+    public List<AbsenceDto> getApprovedAbsenceByDateRangeAndUserId(long userId, LocalDate startDate, LocalDate endDate) {
+        List<Absence> userAbsences = repositoryCollector.getAbsences().findAbsenceByDateRangeAndUserId(startDate, endDate, userId);
 
         return userAbsences.stream()
                 .filter(a -> a.getStatus().getId() == 2)
