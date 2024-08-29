@@ -56,6 +56,11 @@ public class AbsenceController {
         return absenceService.getAbsenceByDateRangeAndUserId(userId, startDate, endDate);
     }
 
+    @GetMapping("/user/{userId}/onlyApproved")
+    public List<AbsenceDto> getApprovedAbsenceByUserId(@PathVariable Long userId){
+        return absenceService.getApprovedAbsenceByUserId(userId);
+    }
+
     /**
      * Retrieves a list of all Absences.
      *

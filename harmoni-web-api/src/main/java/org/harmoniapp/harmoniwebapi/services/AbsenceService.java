@@ -67,6 +67,15 @@ public class AbsenceService {
                 .toList();
     }
 
+    public List<AbsenceDto> getApprovedAbsenceByUserId(Long userId) {
+        List<Absence> userAbsences = repositoryCollector.getAbsences().findByUserId(userId);
+
+        return userAbsences.stream()
+                .filter(a -> a.getStatus().getId() == 2)
+                .map(AbsenceDto::fromEntity)
+                .toList();
+    }
+
     /**
      * Retrieves a list of all absences.
      *
