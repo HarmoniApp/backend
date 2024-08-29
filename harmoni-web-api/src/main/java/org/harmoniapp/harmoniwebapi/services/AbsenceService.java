@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -221,6 +223,17 @@ public class AbsenceService {
 
             existingAbsence.setStatus(status);
             existingAbsence.setUpdated(LocalDate.now());
+
+            if (status.getId() == 2) { // if the absence is approved, delete all shifts for the user that overlap with the absence period
+                LocalDateTime startDateTime = existingAbsence.getStart().atStartOfDay();
+                LocalDateTime endDateTime = existingAbsence.getEnd().atTime(LocalTime.MAX);
+
+                List<Shift> overlappingShifts = repositoryCollector.getShifts()
+                        .findAllByDateRangeAndUserId(startDateTime, endDateTime, existingAbsence.getUser().getId());
+
+                repositoryCollector.getShifts().deleteAll(overlappingShifts);
+            }
+
             Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
             return AbsenceDto.fromEntity(updatedAbsence);
         } catch (Exception e) {
