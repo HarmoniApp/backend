@@ -1,6 +1,8 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import org.harmoniapp.harmonidata.entities.ContractType;
 import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.User;
@@ -30,19 +32,55 @@ import java.util.List;
  */
 public record UserDto(
         long id,
+
+        @NotEmpty(message = "First name cannot be empty")
+        @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
+        @Pattern(regexp = "^[a-zA-Z]+$", message = "Firstname must contain only letters")
         String firstname,
+
+        @NotEmpty(message = "Surname cannot be empty")
+        @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
+        @Pattern(regexp = "^[a-zA-Z]+$", message = "Surname must contain only letters")
         String surname,
+
+        @NotEmpty(message = "Email cannot be empty")
+        @Email(message = "Email should be valid")
         String email,
+
+        //TODO: validation?
         String password,
+
+        @NotNull(message = "Contract type cannot be null")
         @JsonProperty("contract_type") ContractType contractType,
+
+        @NotNull(message = "Contract signature date cannot be null")
         @JsonProperty("contract_signature") LocalDate contractSignature,
+
+        @NotNull(message = "Contract expiration date cannot be null")
         @JsonProperty("contract_expiration") LocalDate contractExpiration,
+
+        @NotNull(message = "Residence cannot be null")
+        @Valid
         AddressDto residence,
+
+        @NotNull(message = "Work address cannot be null")
+        @Valid
         @JsonProperty("work_address") AddressDto workAddress,
+
         @JsonProperty("supervisor_id") Long supervisorId,
+
+        @NotEmpty(message = "Phone number cannot be empty")
+        @Pattern(regexp = "^[+]?\\d{1,3}[ ]?(\\d[ ]?){9,15}$", message = "Phone number must be between 9 and 15 digits, and can contain spaces and a leading '+'")
         @JsonProperty("phone_number") String phoneNumber,
+
+        @NotEmpty(message = "Employee ID cannot be empty")
+        @Size(max = 20, message = "Employee ID must be less than or equal to 20 characters")
         @JsonProperty("employee_id") String employeeId,
+
+        @NotEmpty(message = "Roles cannot be null or empty")
         List<Role> roles,
+
+        @NotEmpty(message = "Languages cannot be null or empty")
         List<LanguageDto> languages) {
 
     /**

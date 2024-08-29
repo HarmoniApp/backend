@@ -20,8 +20,7 @@ public class Shift {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "\"start\"")
+    
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime start;
 
@@ -36,6 +35,8 @@ public class Shift {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+
+    private boolean published;
 
     @Override
     public final boolean equals(Object o) {

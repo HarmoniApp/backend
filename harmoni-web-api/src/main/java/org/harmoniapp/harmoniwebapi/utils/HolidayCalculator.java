@@ -1,4 +1,4 @@
-package org.harmoniapp.harmoniwebapi.contracts;
+package org.harmoniapp.harmoniwebapi.utils;
 
 import java.time.LocalDate;
 import java.time.Month;

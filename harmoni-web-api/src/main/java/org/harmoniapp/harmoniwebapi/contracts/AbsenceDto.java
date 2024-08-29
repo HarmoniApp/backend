@@ -2,14 +2,13 @@ package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.*;
 import org.harmoniapp.harmonidata.entities.Absence;
 import org.harmoniapp.harmonidata.entities.AbsenceType;
 import org.harmoniapp.harmonidata.entities.Status;
 import org.harmoniapp.harmonidata.entities.User;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * Data Transfer Object for Absence.
@@ -25,13 +24,32 @@ import java.util.Date;
  */
 public record AbsenceDto(
         long id,
+
+        @NotNull(message = "Start date cannot be null")
+        @FutureOrPresent(message = "Start date must be in the future or present")
+        @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate start,
+
+        @NotNull(message = "End date cannot be null")
+        @FutureOrPresent(message = "End date must be in the future or present")
+        @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate end,
+
+        @NotNull(message = "User ID cannot be null")
+        @Positive(message = "User ID must be a positive number")
         @JsonProperty("user_id") Long userId,
+
+        @NotNull(message = "Absence type ID cannot be null")
+        @Positive(message = "Absence ID must be a positive number")
         @JsonProperty("absence_type_id") Long absenceTypeId,
+
         Status status,
+
+        @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate submission,
+
         LocalDate updated,
+
         @JsonProperty("working_days") Long workingDays) {
 
     /**

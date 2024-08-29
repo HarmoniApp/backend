@@ -1,5 +1,6 @@
 package org.harmoniapp.harmoniwebapi.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.PredefineShiftDto;
 import org.harmoniapp.harmoniwebapi.services.PredefineShiftService;
@@ -48,7 +49,7 @@ public class PredefineShiftController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PredefineShiftDto createPredefineShift(@RequestBody PredefineShiftDto predefineShiftDto) {
+    public PredefineShiftDto createPredefineShift(@Valid @RequestBody PredefineShiftDto predefineShiftDto) {
         return predefineShiftService.createPredefineShift(predefineShiftDto);
     }
 
@@ -60,7 +61,7 @@ public class PredefineShiftController {
      */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public PredefineShiftDto updatePredefineShift(@PathVariable long id, @RequestBody PredefineShiftDto predefineShiftDto) {
+    public PredefineShiftDto updatePredefineShift(@PathVariable long id, @Valid @RequestBody PredefineShiftDto predefineShiftDto) {
         return predefineShiftService.updatePredefineShift(id, predefineShiftDto);
     }
 

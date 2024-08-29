@@ -1,5 +1,7 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import org.harmoniapp.harmonidata.entities.Language;
 
 /**
@@ -7,7 +9,12 @@ import org.harmoniapp.harmonidata.entities.Language;
  * This record represents a language with an ID and a name.
  * It provides methods to convert between {@link Language} entities and {@link LanguageDto}.
  */
-public record LanguageDto(Long id, String name) {
+public record LanguageDto(
+        Long id,
+
+        @NotEmpty(message = "Language name cannot be empty")
+        @Pattern(regexp = "^[a-zA-Z]+$", message = "Language name must contain only letters")
+        String name) {
 
     /**
      * Converts a {@link Language} entity to a {@link LanguageDto}.

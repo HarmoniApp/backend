@@ -1,11 +1,13 @@
 package org.harmoniapp.harmoniwebapi.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.AbsenceDto;
 import org.harmoniapp.harmoniwebapi.services.AbsenceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -42,6 +44,19 @@ public class AbsenceController {
     }
 
     /**
+     * Retrieves a list of approved absences for a specified user within a given date range.
+     *
+     * @param startDate the start date of the range to filter absences (format: yyyy-MM-dd)
+     * @param endDate   the end date of the range to filter absences (format: yyyy-MM-dd)
+     * @param userId    the ID of the user to filter absences for
+     * @return a list of AbsenceDto representing the approved absences within the specified date range for the given user
+     */
+    @GetMapping("/range/user")
+    public List<AbsenceDto> getAbsenceByDateRangeAndUserId(@RequestParam("startDate") LocalDate startDate, @RequestParam("endDate") LocalDate endDate, @RequestParam("userId") Long userId){
+        return absenceService.getAbsenceByDateRangeAndUserId(userId, startDate, endDate);
+    }
+
+    /**
      * Retrieves a list of all Absences.
      *
      * @return a list of AbsenceDto representing all absences
@@ -59,7 +74,7 @@ public class AbsenceController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public AbsenceDto createAbsence(@RequestBody AbsenceDto absenceDto) {
+    public AbsenceDto createAbsence(@Valid @RequestBody AbsenceDto absenceDto) {
         return absenceService.createAbsence(absenceDto);
     }
 
@@ -72,7 +87,7 @@ public class AbsenceController {
      */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public AbsenceDto updateAbsence(@PathVariable long id, @RequestBody AbsenceDto absenceDto) {
+    public AbsenceDto updateAbsence(@PathVariable long id, @Valid @RequestBody AbsenceDto absenceDto) {
         return absenceService.updateAbsence(id, absenceDto);
     }
 

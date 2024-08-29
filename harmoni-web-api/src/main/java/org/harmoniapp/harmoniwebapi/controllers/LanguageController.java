@@ -1,5 +1,6 @@
 package org.harmoniapp.harmoniwebapi.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.LanguageDto;
 import org.harmoniapp.harmoniwebapi.services.LanguageService;
@@ -49,7 +50,7 @@ public class LanguageController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public LanguageDto createLanguage(@RequestBody LanguageDto dto) {
+    public LanguageDto createLanguage(@Valid @RequestBody LanguageDto dto) {
         return service.createLanguage(dto);
     }
 
@@ -62,7 +63,7 @@ public class LanguageController {
      */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public LanguageDto updateLanguage(@PathVariable long id, @RequestBody LanguageDto dto) {
+    public LanguageDto updateLanguage(@PathVariable long id, @Valid @RequestBody LanguageDto dto) {
         return service.updateLanguage(id, dto);
     }
 

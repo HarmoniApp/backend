@@ -1,5 +1,6 @@
 package org.harmoniapp.harmoniwebapi.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.RoleDto;
 import org.harmoniapp.harmoniwebapi.services.RoleService;
@@ -48,7 +49,7 @@ public class RoleController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RoleDto createRole(@RequestBody RoleDto roleDto) {
+    public RoleDto createRole(@Valid @RequestBody RoleDto roleDto) {
         return roleService.createRole(roleDto);
     }
 
@@ -61,7 +62,7 @@ public class RoleController {
      */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public RoleDto updateRole(@PathVariable long id, @RequestBody RoleDto roleDto) {
+    public RoleDto updateRole(@PathVariable long id, @Valid @RequestBody RoleDto roleDto) {
         return roleService.updateRole(id, roleDto);
     }
 
