@@ -67,6 +67,15 @@ public class AbsenceService {
                 .toList();
     }
 
+    /**
+     * Retrieves a list of approved absences for a specified user within a given date range.
+     *
+     * @param userId    the ID of the user to filter absences for
+     * @param startDate the start date of the range to filter absences
+     * @param endDate   the end date of the range to filter absences
+     * @return a list of AbsenceDto representing the approved absences within the specified date range for the given user
+     * @throws RuntimeException if an error occurs during the retrieval process
+     */
     public List<AbsenceDto> getApprovedAbsenceByDateRangeAndUserId(long userId, LocalDate startDate, LocalDate endDate) {
         List<Absence> userAbsences = repositoryCollector.getAbsences().findAbsenceByDateRangeAndUserId(startDate, endDate, userId);
 
