@@ -75,8 +75,7 @@ public class ShiftService {
             User user = repositoryCollector.getUsers().findById(shiftDto.userId())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-            Role role = repositoryCollector.getRoles().findById(shiftDto.roleId())
-                    .orElseThrow(() -> new IllegalArgumentException("Role not found"));
+            Role role = repositoryCollector.getRoles().findByName(shiftDto.roleName());
 
             Shift shift = shiftDto.toEntity(user, role);
             Shift savedShift = repositoryCollector.getShifts().save(shift);
@@ -104,8 +103,7 @@ public class ShiftService {
             User user = repositoryCollector.getUsers().findById(shiftDto.userId())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-            Role role = repositoryCollector.getRoles().findById(shiftDto.roleId())
-                    .orElseThrow(() -> new IllegalArgumentException("Role not found"));
+            Role role = repositoryCollector.getRoles().findByName(shiftDto.roleName());
 
             if (existingShift == null) {
                 Shift newShift = new Shift(id, shiftDto.start(), shiftDto.end(), user, role, false);

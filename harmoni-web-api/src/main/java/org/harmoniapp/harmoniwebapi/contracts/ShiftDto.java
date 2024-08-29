@@ -33,7 +33,7 @@ public record ShiftDto(
 
         @NotNull(message = "Role ID cannot be null")
         @Positive(message = "Role ID must be a positive number")
-        @JsonProperty("role_id") Long roleId,
+        @JsonProperty("role_name") String roleName,
 
         boolean published) {
 
@@ -49,7 +49,7 @@ public record ShiftDto(
                 shift.getStart(),
                 shift.getEnd(),
                 shift.getUser().getId(),
-                shift.getRole().getId(),
+                shift.getRole().getName(),
                 shift.isPublished()
         );
     }
