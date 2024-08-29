@@ -1,6 +1,7 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.harmoniapp.harmonidata.entities.Role;
@@ -12,11 +13,11 @@ import java.time.LocalDateTime;
 /**
  * Data Transfer Object for Shift.
  *
- * @param id      the unique identifier of the shift
- * @param start   the start time of the shift
- * @param end     the end time of the shift
- * @param userId  the userId associated with the shift
- * @param roleId    the roleId of the user during the shift
+ * @param id        the unique identifier of the shift
+ * @param start     the start time of the shift
+ * @param end       the end time of the shift
+ * @param userId    the userId associated with the shift
+ * @param roleName  the roleName of the user during the shift
  */
 public record ShiftDto(
         Long id,
@@ -31,8 +32,8 @@ public record ShiftDto(
         @Positive(message = "User ID must be a positive number")
         @JsonProperty("user_id") Long userId,
 
-        @NotNull(message = "Role ID cannot be null")
-        @Positive(message = "Role ID must be a positive number")
+        @NotNull(message = "Role Name cannot be null")
+        @NotEmpty(message = "Role Name cannot be empty")
         @JsonProperty("role_name") String roleName,
 
         boolean published) {
