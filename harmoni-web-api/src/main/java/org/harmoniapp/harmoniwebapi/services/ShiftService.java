@@ -126,6 +126,23 @@ public class ShiftService {
     }
 
     /**
+     * Publishes an existing shift by setting its 'published' status to true.
+     *
+     * @param shiftDd the ID of the shift to publish
+     * @return the updated ShiftDto after setting the published status to true
+     * @throws IllegalArgumentException if the shift with the given ID is not found
+     */
+    @Transactional
+    public ShiftDto publishShift(long shiftDd) {
+        Shift existingShift = repositoryCollector.getShifts().findById(shiftDd)
+                .orElseThrow(() -> new IllegalArgumentException("Shift not found"));
+
+        existingShift.setPublished(true);
+        Shift updatedShift = repositoryCollector.getShifts().save(existingShift);
+        return ShiftDto.fromEntity(updatedShift);
+    }
+
+    /**
      * Deletes a Shift by its ID.
      *
      * @param id the ID of the Shift to be deleted

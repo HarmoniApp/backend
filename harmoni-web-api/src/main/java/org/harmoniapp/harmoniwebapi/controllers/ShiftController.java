@@ -71,6 +71,18 @@ public class ShiftController {
     }
 
     /**
+     * Publishes an existing shift by its ID.
+     *
+     * @param id the ID of the shift to publish
+     * @return the updated ShiftDto with the 'published' status set to true
+     */
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ShiftDto publishShift(@PathVariable long id) {
+        return shiftService.publishShift(id);
+    }
+
+    /**
      * Deletes a shift by its ID.
      *
      * @param id the ID of the shift to delete
