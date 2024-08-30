@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -62,6 +64,24 @@ public class AbsenceService {
         List<Absence> absenceByDateRangeAndUserId = repositoryCollector.getAbsences().findAbsenceByDateRangeAndUserId(startDate, endDate, userId);
 
         return absenceByDateRangeAndUserId.stream()
+                .filter(a -> a.getStatus().getId() == 2)
+                .map(AbsenceDto::fromEntity)
+                .toList();
+    }
+
+    /**
+     * Retrieves a list of approved absences for a specified user within a given date range.
+     *
+     * @param userId    the ID of the user to filter absences for
+     * @param startDate the start date of the range to filter absences
+     * @param endDate   the end date of the range to filter absences
+     * @return a list of AbsenceDto representing the approved absences within the specified date range for the given user
+     * @throws RuntimeException if an error occurs during the retrieval process
+     */
+    public List<AbsenceDto> getApprovedAbsenceByDateRangeAndUserId(long userId, LocalDate startDate, LocalDate endDate) {
+        List<Absence> userAbsences = repositoryCollector.getAbsences().findAbsenceByDateRangeAndUserId(startDate, endDate, userId);
+
+        return userAbsences.stream()
                 .filter(a -> a.getStatus().getId() == 2)
                 .map(AbsenceDto::fromEntity)
                 .toList();
@@ -203,6 +223,17 @@ public class AbsenceService {
 
             existingAbsence.setStatus(status);
             existingAbsence.setUpdated(LocalDate.now());
+
+            if (status.getId() == 2) { // if the absence is approved, delete all shifts for the user that overlap with the absence period
+                LocalDateTime startDateTime = existingAbsence.getStart().atStartOfDay();
+                LocalDateTime endDateTime = existingAbsence.getEnd().atTime(LocalTime.MAX);
+
+                List<Shift> overlappingShifts = repositoryCollector.getShifts()
+                        .findAllByDateRangeAndUserId(startDateTime, endDateTime, existingAbsence.getUser().getId());
+
+                repositoryCollector.getShifts().deleteAll(overlappingShifts);
+            }
+
             Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
             return AbsenceDto.fromEntity(updatedAbsence);
         } catch (Exception e) {

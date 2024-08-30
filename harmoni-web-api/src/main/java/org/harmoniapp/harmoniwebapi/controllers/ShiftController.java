@@ -39,10 +39,10 @@ public class ShiftController {
      * @return a list of ShiftDto within the specified date range
      */
     @GetMapping("/range")
-    public List<ShiftDto> getShiftsByDateRange(@RequestParam("start") String start, @RequestParam("end") String end, @RequestParam("user_id") Long userId) {
+    public List<ShiftDto> getShiftsByDateRangeAndUserId(@RequestParam("start") String start, @RequestParam("end") String end, @RequestParam("user_id") Long userId) {
         LocalDateTime startDate = LocalDateTime.parse(start);
         LocalDateTime endDate = LocalDateTime.parse(end);
-        return shiftService.getShiftsByDateRange(startDate, endDate, userId);
+        return shiftService.getShiftsByDateRangeAndUserId(startDate, endDate, userId);
     }
 
     /**
@@ -68,6 +68,18 @@ public class ShiftController {
     @ResponseStatus(HttpStatus.CREATED)
     public ShiftDto updateShift(@PathVariable long id, @RequestBody ShiftDto shiftDto) {
         return shiftService.updateShift(id, shiftDto);
+    }
+
+    /**
+     * Publishes an existing shift by its ID.
+     *
+     * @param id the ID of the shift to publish
+     * @return the updated ShiftDto with the 'published' status set to true
+     */
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ShiftDto publishShift(@PathVariable long id) {
+        return shiftService.publishShift(id);
     }
 
     /**

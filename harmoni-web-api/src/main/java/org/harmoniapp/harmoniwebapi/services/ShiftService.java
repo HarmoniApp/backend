@@ -51,7 +51,7 @@ public class ShiftService {
      * @return a list of ShiftDto containing the details of shifts within the date range
      * @throws RuntimeException if an error occurs while retrieving shifts
      */
-    public List<ShiftDto> getShiftsByDateRange(LocalDateTime start, LocalDateTime end, Long userId) {
+    public List<ShiftDto> getShiftsByDateRangeAndUserId(LocalDateTime start, LocalDateTime end, Long userId) {
         try {
             List<Shift> shifts = repositoryCollector.getShifts().findAllByDateRangeAndUserId(start, end, userId);
             return shifts.stream()
@@ -75,8 +75,7 @@ public class ShiftService {
             User user = repositoryCollector.getUsers().findById(shiftDto.userId())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-            Role role = repositoryCollector.getRoles().findById(shiftDto.roleId())
-                    .orElseThrow(() -> new IllegalArgumentException("Role not found"));
+            Role role = repositoryCollector.getRoles().findByName(shiftDto.roleName());
 
             Shift shift = shiftDto.toEntity(user, role);
             Shift savedShift = repositoryCollector.getShifts().save(shift);
@@ -104,11 +103,10 @@ public class ShiftService {
             User user = repositoryCollector.getUsers().findById(shiftDto.userId())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-            Role role = repositoryCollector.getRoles().findById(shiftDto.roleId())
-                    .orElseThrow(() -> new IllegalArgumentException("Role not found"));
+            Role role = repositoryCollector.getRoles().findByName(shiftDto.roleName());
 
             if (existingShift == null) {
-                Shift newShift = new Shift(id, shiftDto.start(), shiftDto.end(), user, role, shiftDto.published());
+                Shift newShift = new Shift(id, shiftDto.start(), shiftDto.end(), user, role, false);
                 Shift savedShift = repositoryCollector.getShifts().save(newShift);
                 return ShiftDto.fromEntity(savedShift);
             } else {
@@ -116,13 +114,30 @@ public class ShiftService {
                 existingShift.setEnd(shiftDto.end());
                 existingShift.setUser(user);
                 existingShift.setRole(role);
-                existingShift.setPublished(shiftDto.published());
+                existingShift.setPublished(false);
                 Shift updatedShift = repositoryCollector.getShifts().save(existingShift);
                 return ShiftDto.fromEntity(updatedShift);
             }
         } catch (Exception e) {
             throw new RuntimeException("An error occurred: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Publishes an existing shift by setting its 'published' status to true.
+     *
+     * @param shiftDd the ID of the shift to publish
+     * @return the updated ShiftDto after setting the published status to true
+     * @throws IllegalArgumentException if the shift with the given ID is not found
+     */
+    @Transactional
+    public ShiftDto publishShift(long shiftDd) {
+        Shift existingShift = repositoryCollector.getShifts().findById(shiftDd)
+                .orElseThrow(() -> new IllegalArgumentException("Shift not found"));
+
+        existingShift.setPublished(true);
+        Shift updatedShift = repositoryCollector.getShifts().save(existingShift);
+        return ShiftDto.fromEntity(updatedShift);
     }
 
     /**

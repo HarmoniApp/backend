@@ -57,6 +57,19 @@ public class AbsenceController {
     }
 
     /**
+     * Retrieves a list of approved absences for a specified user within a given date range.
+     *
+     * @param startDate the start date of the range to filter absences (format: yyyy-MM-dd)
+     * @param endDate   the end date of the range to filter absences (format: yyyy-MM-dd)
+     * @param userId    the ID of the user to filter absences for
+     * @return a list of AbsenceDto representing the approved absences within the specified date range for the given user
+     */
+    @GetMapping("/range/onlyApproved")
+    public List<AbsenceDto> getApprovedAbsenceByDateRangeAndUserId(@RequestParam("startDate") LocalDate startDate, @RequestParam("endDate") LocalDate endDate, @RequestParam("userId") Long userId){
+        return absenceService.getApprovedAbsenceByDateRangeAndUserId(userId, startDate, endDate);
+    }
+
+    /**
      * Retrieves a list of all Absences.
      *
      * @return a list of AbsenceDto representing all absences
