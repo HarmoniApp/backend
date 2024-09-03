@@ -6,9 +6,9 @@ import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.AbsenceDto;
+import org.harmoniapp.harmoniwebapi.contracts.PartialAbsenceDto;
 import org.harmoniapp.harmoniwebapi.contracts.ShiftDto;
 import org.harmoniapp.harmoniwebapi.contracts.UserScheduleDto;
-import org.harmoniapp.harmoniwebapi.contracts.WeekScheduleDto;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
@@ -40,12 +40,13 @@ public class UserScheduleService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<Shift> shifts = repositoryCollector.getShifts().findAllByDateRangeAndUserId(startDate, endDate, userId);
-        List<Absence> absences = repositoryCollector.getAbsences().findAbsenceByDateRangeAndUserId(startDate.toLocalDate(), endDate.toLocalDate(), userId);
+        List<Absence> absences = repositoryCollector.getAbsences().findApprovedAbsenceByDateRangeAndUserId(startDate.toLocalDate(), endDate.toLocalDate(), userId);
 
         List<ShiftDto> shiftDto = shifts.stream().map(ShiftDto::fromEntity).toList();
-        List<AbsenceDto> absenceDto = absences.stream().map(AbsenceDto::fromEntity).toList();
-        WeekScheduleDto weekScheduleDto = new WeekScheduleDto(shiftDto, absenceDto);
+        List<PartialAbsenceDto> partialAbsenceDto = absences.stream()
+                .map(PartialAbsenceDto::fromEntity)
+                .toList();
 
-        return new UserScheduleDto(user.getId(), user.getFirstname(), user.getSurname(), weekScheduleDto);
+        return new UserScheduleDto(userId, shiftDto, partialAbsenceDto);
     }
 }
