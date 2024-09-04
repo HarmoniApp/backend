@@ -23,9 +23,6 @@ public class ArchivedShifts {
     private String fileTitle;
 
     @Lob
-    @Column(name = "pdf_data", nullable = false)
+    @Column(name = "pdf_data")
     private byte[] pdfData;
-
-    @Column(name = "archived_at")
-    private LocalDateTime archivedAt;
 }
