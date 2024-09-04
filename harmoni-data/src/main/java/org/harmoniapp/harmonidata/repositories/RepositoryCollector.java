@@ -8,6 +8,8 @@ public interface RepositoryCollector {
 
     AddressRepository getAddresses();
 
+    ArchivedShiftRepository getArchivedShifts();
+
     AvailabilityRepository getAvailabilities();
 
     ContractTypeRepository getContractTypes();
