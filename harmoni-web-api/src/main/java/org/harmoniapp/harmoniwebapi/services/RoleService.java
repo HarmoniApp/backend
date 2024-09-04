@@ -89,6 +89,7 @@ public class RoleService {
                     .map(role -> {
                         role.setName(newRole.getName());
                         role.setSup(newRole.isSup());
+                        role.setColor(newRole.getColor());
                         Role updatedRole = repositoryCollector.getRoles().save(role);
                         return RoleDto.fromEntity(updatedRole);
                     })

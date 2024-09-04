@@ -26,6 +26,8 @@ public class Role {
     @Column(name = "is_sup")
     private boolean isSup;
 
+    private String color;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

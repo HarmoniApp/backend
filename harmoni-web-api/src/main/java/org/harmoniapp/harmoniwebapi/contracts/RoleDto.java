@@ -3,6 +3,7 @@ package org.harmoniapp.harmoniwebapi.contracts;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import org.harmoniapp.harmonidata.entities.Role;
 
 /**
@@ -19,7 +20,11 @@ public record RoleDto(
         @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Role name must contain only letters and digits")
         String name,
 
-        @JsonProperty("is_sup") boolean isSup) {
+        @JsonProperty("is_sup") boolean isSup,
+
+        @Size(min = 7, max = 7, message = "Color must be exactly 7 characters long")
+        @Pattern(regexp = "^#[0-9a-fA-F]{6}$", message = "Color must be a valid hex code in the format #RRGGBB")
+        String color) {
 
     /**
      * Converts a Role entity to a RoleDto.
@@ -31,7 +36,8 @@ public record RoleDto(
         return new RoleDto(
                 role.getId(),
                 role.getName(),
-                role.isSup());
+                role.isSup(),
+                role.getColor());
     }
 
     /**
@@ -43,7 +49,8 @@ public record RoleDto(
         return new Role(
                 this.id,
                 this.name,
-                this.isSup
+                this.isSup,
+                this.color
         );
     }
 }
