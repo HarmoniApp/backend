@@ -1,6 +1,7 @@
 package org.harmoniapp.harmoniwebapi.services;
 
 import java.awt.Color;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,6 +32,10 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -74,16 +79,10 @@ public class ShiftArchivalService {
             document.add(datePara);
             document.add(Chunk.NEWLINE);
 
-            Font fontHeader = FontFactory.getFont(FontFactory.TIMES_BOLD, 12);
-            Paragraph para = new Paragraph("Shift Report", fontHeader);
-            para.setAlignment(Element.ALIGN_CENTER);
-            document.add(para);
-            document.add(Chunk.NEWLINE);
-
             Map<String, Map<DayOfWeek, List<Shift>>> shiftsByUserAndDay = shifts.stream()
                     .collect(Collectors.groupingBy(
                             shift -> shift.getUser().getEmployeeId(),
-                            Collectors.groupingBy(shift -> shift.getStart().getDayOfWeek())
+                            Collectors.groupingBy(shift -> shift.getStart().toLocalDate().getDayOfWeek())
                     ));
 
             PdfPTable table = new PdfPTable(8);
@@ -98,8 +97,6 @@ public class ShiftArchivalService {
                 table.addCell(header);
             });
 
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-
             for (Map.Entry<String, Map<DayOfWeek, List<Shift>>> userEntry : shiftsByUserAndDay.entrySet()) {
                 String userId = userEntry.getKey();
                 Map<DayOfWeek, List<Shift>> shiftsByDay = userEntry.getValue();
@@ -110,15 +107,15 @@ public class ShiftArchivalService {
                 table.addCell(userIdCell);
 
                 for (DayOfWeek day : DayOfWeek.values()) {
-                    List<Shift> shiftsForDay = shiftsByDay.getOrDefault(day, List.of());
-
                     StringBuilder shiftInfo = new StringBuilder();
-                    if (!shiftsForDay.isEmpty()) {
-                        shiftsForDay.forEach(shift -> {
+
+                    List<Shift> shiftsForDay = shiftsByDay.getOrDefault(day, List.of());
+                    for (Shift shift : shiftsForDay) {
+                        if (shift.getStart().toLocalDate().getDayOfWeek() == day) {
                             shiftInfo.append(shift.getStart().toLocalTime()).append(" - ")
                                     .append(shift.getEnd().toLocalTime()).append(" ")
                                     .append(shift.getRole().getName()).append("\n");
-                        });
+                        }
                     }
 
                     PdfPCell shiftCell = new PdfPCell(new Phrase(shiftInfo.toString()));
@@ -160,4 +157,25 @@ public class ShiftArchivalService {
     public void scheduleWeeklyShiftArchival() {
         archivePreviousWeekShifts();
     }
+
+    public ResponseEntity<InputStreamResource> generatePdfForWeek(LocalDate startOfWeek) {
+        LocalDate endDate = startOfWeek.plusDays(6);
+
+        List<Shift> shifts = repositoryCollector.getShifts()
+                .findAllByDateRange(startOfWeek.atStartOfDay(), endDate.atTime(23, 59, 59));
+
+        if (shifts.isEmpty()) {
+            throw new RuntimeException("No shifts found for the specified date range.");
+        }
+
+        String dateRange = startOfWeek + " - " + endDate;
+        byte[] pdfData = generatePdf(shifts, dateRange);
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(pdfData);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(bis));
+    }
+
 }
