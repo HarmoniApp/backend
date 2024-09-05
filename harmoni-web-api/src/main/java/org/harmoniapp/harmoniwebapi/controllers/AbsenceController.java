@@ -33,6 +33,18 @@ public class AbsenceController {
     }
 
     /**
+     * Retrieves a list of absences for a specific user, filtered by archived status.
+     *
+     * @param id       the ID of the user whose absences are to be retrieved
+     * @param archived a boolean indicating whether to filter by archived absences
+     * @return a list of AbsenceDto objects representing the user's absences
+     */
+    @GetMapping("user/{id}/archived")
+    public List<AbsenceDto> getAbsenceByUserId(@PathVariable long id, @RequestParam boolean archived){
+        return absenceService.getAbsenceByUserIdAndArchive(id, archived);
+    }
+
+    /**
      * Retrieves a list of Absences with the specified status name.
      *
      * @param id the id of the status to filter absences by
@@ -117,6 +129,13 @@ public class AbsenceController {
         return absenceService.updateAbsenceStatus(id, statusId);
     }
 
+    /**
+     * Updates the archived status of an existing Absence identified by its ID.
+     *
+     * @param id       the ID of the absence to be updated
+     * @param archived a boolean indicating the new archived status
+     * @return the updated AbsenceDto object representing the absence with the new archived status
+     */
     @PatchMapping("/archive/{id}")
     public AbsenceDto updateAbsenceArchived(@PathVariable long id, @RequestParam boolean archived) {
         return absenceService.updateAbsenceArchived(id, archived);
