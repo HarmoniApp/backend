@@ -117,4 +117,9 @@ public class AbsenceController {
         return absenceService.updateAbsenceStatus(id, statusId);
     }
 
+    @PatchMapping("/archive/{id}")
+    public AbsenceDto updateAbsenceArchived(@PathVariable long id, @RequestParam boolean archived) {
+        return absenceService.updateAbsenceArchived(id, archived);
+    }
+
 }

@@ -50,7 +50,9 @@ public record AbsenceDto(
 
         LocalDate updated,
 
-        @JsonProperty("working_days") Long workingDays) {
+        @JsonProperty("working_days") Long workingDays,
+
+        boolean archived) {
 
     /**
      * Converts an Absence entity to an AbsenceDto.
@@ -68,7 +70,8 @@ public record AbsenceDto(
                 absence.getStatus(),
                 absence.getSubmission(),
                 absence.getUpdated(),
-                absence.getWorkingDays()
+                absence.getWorkingDays(),
+                absence.isArchived()
         );
     }
 
@@ -90,7 +93,8 @@ public record AbsenceDto(
                 status,
                 this.submission,
                 this.updated,
-                this.workingDays
+                this.workingDays,
+                this.archived
         );
     }
 }

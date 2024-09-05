@@ -48,6 +48,8 @@ public class Absence {
     @Column(name = "working_days")
     private Long workingDays;
 
+    private boolean archived;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;
