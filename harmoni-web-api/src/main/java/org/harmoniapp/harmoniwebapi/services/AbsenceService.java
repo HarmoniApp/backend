@@ -39,6 +39,21 @@ public class AbsenceService {
     }
 
     /**
+     * Retrieves a list of absences for a specific user based on their archived status.
+     *
+     * @param id       the ID of the user whose absences are to be retrieved
+     * @param archived a boolean indicating whether to retrieve archived or non-archived absences
+     * @return a list of AbsenceDto objects representing the user's absences with the specified archived status
+     */
+    public List<AbsenceDto> getAbsenceByUserIdAndArchive(long id, boolean archived) {
+        List<Absence> userAbsences = repositoryCollector.getAbsences().findByUserIdAndArchived(id, archived);
+
+        return userAbsences.stream()
+                .map(AbsenceDto::fromEntity)
+                .toList();
+    }
+
+    /**
      * Retrieves all Absences by status name.
      *
      * @param statusId the id of the status to filter absences by
@@ -234,6 +249,28 @@ public class AbsenceService {
                 repositoryCollector.getShifts().deleteAll(overlappingShifts);
             }
 
+            Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
+            return AbsenceDto.fromEntity(updatedAbsence);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update absence status: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Updates the archived status of an existing absence.
+     *
+     * @param id       the ID of the absence to update
+     * @param archived a boolean indicating the new archived status to set
+     * @return the updated AbsenceDto object representing the absence with the modified archived status
+     * @throws RuntimeException if the absence does not exist or if an error occurs during the update process
+     */
+    @Transactional
+    public AbsenceDto updateAbsenceArchived(long id, boolean archived) {
+        try {
+            Absence existingAbsence = repositoryCollector.getAbsences().findById(id)
+                    .orElseThrow(() -> new RuntimeException("You can only change archived if absence exists"));
+
+            existingAbsence.setArchived(archived);
             Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
             return AbsenceDto.fromEntity(updatedAbsence);
         } catch (Exception e) {

@@ -11,6 +11,9 @@ import java.util.List;
 public interface AbsenceRepository extends JpaRepository<Absence, Long> {
     List<Absence> findByUserId(long userId);
 
+    List<Absence> findByUserIdAndArchived(long userId, boolean archived);
+
+
     @Query("SELECT a FROM Absence a WHERE a.status.id = :statusId")
     List<Absence> findAbsenceByStatusId(@Param("statusId") long statusId);
 
