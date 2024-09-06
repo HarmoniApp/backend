@@ -1,0 +1,22 @@
+package org.harmoniapp.harmonidata.entities;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Table(name = "notification_type")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class NotificationType {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "type_name")
+    private String typeName;
+}
