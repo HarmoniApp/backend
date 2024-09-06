@@ -32,14 +32,21 @@ public class UserScheduleService {
      * @param userId    the ID of the user for whom the schedule is being retrieved
      * @param startDate the start date of the week (as LocalDateTime) to filter shifts and absences
      * @param endDate   the end date of the week (as LocalDateTime) to filter shifts and absences
+     * @param published an optional boolean to filter shifts; if true, only published shifts are returned
      * @return a UserScheduleDto containing the user's details along with their shifts and absences for the specified week
      * @throws RuntimeException if the user is not found in the repository
      */
-    public UserScheduleDto getUserWeeklySchedule(Long userId, LocalDateTime startDate, LocalDateTime endDate) {
+    public UserScheduleDto getUserWeeklySchedule(Long userId, LocalDateTime startDate, LocalDateTime endDate, boolean published) {
         User user = repositoryCollector.getUsers().findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<Shift> shifts = repositoryCollector.getShifts().findAllByDateRangeAndUserId(startDate, endDate, userId);
+        List<Shift> shifts;
+        if (published) {
+            shifts = repositoryCollector.getShifts().findPublishedByDateRangeAndUserId(startDate, endDate, userId);
+        } else {
+            shifts = repositoryCollector.getShifts().findAllByDateRangeAndUserId(startDate, endDate, userId);
+        }
+
         List<Absence> absences = repositoryCollector.getAbsences().findApprovedAbsenceByDateRangeAndUserId(startDate.toLocalDate(), endDate.toLocalDate(), userId);
 
         List<ShiftDto> shiftDto = shifts.stream().map(ShiftDto::fromEntity).toList();
