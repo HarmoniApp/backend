@@ -13,12 +13,22 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Service class for managing notifications.
+ * Provides methods to perform CRUD operations on notifications.
+ */
 @Service
 @RequiredArgsConstructor
 @ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class NotificationService {
     private final RepositoryCollector repositoryCollector;
 
+    /**
+     * Retrieves all notifications by user ID.
+     *
+     * @param userId the ID of the user for whom notifications are retrieved
+     * @return a list of NotificationDto objects representing all notifications for the user
+     */
     public List<NotificationDto> getAllNotificationsByUserId(Long userId) {
         List<Notification> notifications = repositoryCollector.getNotifications().findAllByUserId(userId);
         return notifications.stream()
@@ -26,6 +36,12 @@ public class NotificationService {
                 .toList();
     }
 
+    /**
+     * Retrieves all unread notifications by user ID.
+     *
+     * @param userId the ID of the user for whom unread notifications are retrieved
+     * @return a list of NotificationDto objects representing unread notifications for the user
+     */
     public List<NotificationDto> getAllUnreadNotificationsByUserId(Long userId) {
         List<Notification> notifications = repositoryCollector.getNotifications().findAllUnreadByUserId(userId);
         return notifications.stream()
@@ -33,6 +49,12 @@ public class NotificationService {
                 .toList();
     }
 
+    /**
+     * Creates a new notification.
+     *
+     * @param notificationDto the notificationDto containing the notification details
+     * @return the created NotificationDto object
+     */
     @Transactional
     public NotificationDto createNotification(NotificationDto notificationDto) {
         User user = repositoryCollector.getUsers().findById(notificationDto.userId())
@@ -47,6 +69,12 @@ public class NotificationService {
         return NotificationDto.fromEntity(savedNotification);
     }
 
+    /**
+     * Marks a specific notification as read.
+     *
+     * @param notificationId the ID of the notification to mark as read
+     * @return the updated NotificationDto object representing the read notification
+     */
     @Transactional
     public NotificationDto markNotificationAsRead(Long notificationId) {
         Notification notification = repositoryCollector.getNotifications().findById(notificationId)
@@ -57,6 +85,12 @@ public class NotificationService {
         return NotificationDto.fromEntity(savedNotification);
     }
 
+    /**
+     * Marks all unread notifications for a specific user as read.
+     *
+     * @param userId the ID of the user whose notifications will be marked as read
+     * @return a list of NotificationDto objects representing the marked notifications
+     */
     @Transactional
     public List<NotificationDto> markAllNotificationsAsRead(Long userId) {
         List<Notification> notifications = repositoryCollector.getNotifications().findAllUnreadByUserId(userId);
@@ -68,6 +102,11 @@ public class NotificationService {
                 .toList();
     }
 
+    /**
+     * Deletes a notification by its ID.
+     *
+     * @param notificationId the ID of the notification to be deleted
+     */
     public void deleteNotification(Long notificationId) {
         repositoryCollector.getNotifications().deleteById(notificationId);
     }
