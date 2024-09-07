@@ -34,6 +34,20 @@ public class NotificationService {
     }
 
     @Transactional
+    public NotificationDto createNotification(NotificationDto notificationDto) {
+        User user = repositoryCollector.getUsers().findById(notificationDto.userId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        NotificationType type = repositoryCollector.getNotificationTypes().findByTypeName(notificationDto.typeName());
+
+
+        Notification notification = notificationDto.toEntity(user, type);
+        notification.setCreatedAt(LocalDateTime.now());
+        Notification savedNotification = repositoryCollector.getNotifications().save(notification);
+        return NotificationDto.fromEntity(savedNotification);
+    }
+
+    @Transactional
     public NotificationDto markNotificationAsRead(Long notificationId) {
         Notification notification = repositoryCollector.getNotifications().findById(notificationId)
                 .orElseThrow(() -> new RuntimeException("Notification not found"));

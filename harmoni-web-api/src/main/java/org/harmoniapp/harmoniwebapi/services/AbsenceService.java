@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.*;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.AbsenceDto;
+import org.harmoniapp.harmoniwebapi.contracts.NotificationDto;
 import org.harmoniapp.harmoniwebapi.utils.HolidayCalculator;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.List;
 @ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class AbsenceService {
     private final RepositoryCollector repositoryCollector;
+    private final NotificationService notificationService;
 
     /**
      * Retrieves all Absences by user ID.
@@ -154,6 +156,9 @@ public class AbsenceService {
         absence.setUpdated(LocalDate.now());
         absence.setWorkingDays(HolidayCalculator.calculateWorkingDays(absence.getStart(), absence.getEnd()));
         Absence savedAbsence = repositoryCollector.getAbsences().save(absence);
+
+        newAbsenceCreatedNotification(savedAbsence);
+
         return AbsenceDto.fromEntity(savedAbsence);
     }
 
@@ -277,4 +282,22 @@ public class AbsenceService {
             throw new RuntimeException("Failed to update absence status: " + e.getMessage(), e);
         }
     }
+
+    private void newAbsenceCreatedNotification(Absence savedAbsence) {
+        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(2L) //2 is Awaiting Absence
+                .orElseThrow(() -> new RuntimeException("Notification type not found"));
+
+        NotificationDto notificationDto = new NotificationDto(
+                0L, // id is set automatically by the database
+                savedAbsence.getUser().getSupervisor().getId(), // notification for supervisor
+                "New Absence Awaiting",
+                "New absence awaiting. Employee " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " requested for absence.",
+                notificationType.getTypeName(),
+                false,
+                LocalDateTime.now()
+        );
+
+        notificationService.createNotification(notificationDto);
+    }
+
 }
