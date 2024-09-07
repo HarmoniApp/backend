@@ -204,7 +204,7 @@ public class AbsenceService {
                 newAbsence.setWorkingDays(HolidayCalculator.calculateWorkingDays(newAbsence.getStart(), newAbsence.getEnd()));
                 Absence savedAbsence = repositoryCollector.getAbsences().save(newAbsence);
 
-                employeeUpdatedNotification(savedAbsence);
+                employeeUpdatedAbsenceNotification(savedAbsence);
 
                 return AbsenceDto.fromEntity(savedAbsence);
             } else {
@@ -218,7 +218,7 @@ public class AbsenceService {
                 existingAbsence.setWorkingDays(HolidayCalculator.calculateWorkingDays(existingAbsence.getStart(), existingAbsence.getEnd()));
                 Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
 
-                employeeUpdatedNotification(updatedAbsence);
+                employeeUpdatedAbsenceNotification(updatedAbsence);
 
                 return AbsenceDto.fromEntity(updatedAbsence);
             }
@@ -261,6 +261,9 @@ public class AbsenceService {
             }
 
             Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
+
+            employerChangeAbsenceStatusNotification(updatedAbsence);
+
             return AbsenceDto.fromEntity(updatedAbsence);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update absence status: " + e.getMessage(), e);
@@ -306,7 +309,7 @@ public class AbsenceService {
         notificationService.createNotification(notificationDto);
     }
 
-    private void employeeUpdatedNotification(Absence savedAbsence) {
+    private void employeeUpdatedAbsenceNotification(Absence savedAbsence) {
         NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(5L) //5 is Absence Updated
                 .orElseThrow(() -> new RuntimeException("Notification type not found"));
 
@@ -315,6 +318,26 @@ public class AbsenceService {
                 savedAbsence.getUser().getSupervisor().getId(), // notification for supervisor
                 "Absence is updated",
                 "Absence is updated. Employee " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " has changed their absence. Please review the changes.",
+                notificationType.getTypeName(),
+                false,
+                LocalDateTime.now()
+        );
+
+        notificationService.createNotification(notificationDto);
+    }
+
+    private void employerChangeAbsenceStatusNotification(Absence savedAbsence) {
+        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(3L) //3 is Absence Status Updated
+                .orElseThrow(() -> new RuntimeException("Notification type not found"));
+
+        NotificationDto notificationDto = new NotificationDto(
+                0L, // id is set automatically by the database
+                savedAbsence.getUser().getId(),
+                "Absence Status is updated",
+                "Absence status is updated. Status for absence " +
+                        savedAbsence.getStart() + "-" + savedAbsence.getEnd() +
+                        " is " + savedAbsence.getStatus().getName() +
+                        " Please review the changes.",
                 notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()
