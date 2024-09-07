@@ -14,6 +14,10 @@ public interface RepositoryCollector {
 
     LanguageRepository getLanguages();
 
+    NotificationRepository getNotifications();
+
+    NotificationTypeRepository getNotificationTypes();
+
     PredefineShiftRepository getPredefineShifts();
 
     RoleRepository getRoles();
