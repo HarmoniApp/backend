@@ -203,6 +203,9 @@ public class AbsenceService {
                 Absence newAbsence = absenceDto.toEntity(user, absenceType, status);
                 newAbsence.setWorkingDays(HolidayCalculator.calculateWorkingDays(newAbsence.getStart(), newAbsence.getEnd()));
                 Absence savedAbsence = repositoryCollector.getAbsences().save(newAbsence);
+
+                employeeUpdatedNotification(savedAbsence);
+
                 return AbsenceDto.fromEntity(savedAbsence);
             } else {
                 existingAbsence.setStart(absenceDto.start());
@@ -214,6 +217,9 @@ public class AbsenceService {
                 existingAbsence.setUpdated(absenceDto.updated());
                 existingAbsence.setWorkingDays(HolidayCalculator.calculateWorkingDays(existingAbsence.getStart(), existingAbsence.getEnd()));
                 Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
+
+                employeeUpdatedNotification(updatedAbsence);
+
                 return AbsenceDto.fromEntity(updatedAbsence);
             }
         } catch (Exception e) {
@@ -292,6 +298,23 @@ public class AbsenceService {
                 savedAbsence.getUser().getSupervisor().getId(), // notification for supervisor
                 "New Absence Awaiting",
                 "New absence awaiting. Employee " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " requested for absence.",
+                notificationType.getTypeName(),
+                false,
+                LocalDateTime.now()
+        );
+
+        notificationService.createNotification(notificationDto);
+    }
+
+    private void employeeUpdatedNotification(Absence savedAbsence) {
+        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(5L) //5 is Absence Updated
+                .orElseThrow(() -> new RuntimeException("Notification type not found"));
+
+        NotificationDto notificationDto = new NotificationDto(
+                0L, // id is set automatically by the database
+                savedAbsence.getUser().getSupervisor().getId(), // notification for supervisor
+                "Absence is updated",
+                "Absence is updated. Employee " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " has changed their absence. Please review the changes.",
                 notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()

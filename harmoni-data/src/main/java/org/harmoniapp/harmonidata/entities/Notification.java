@@ -34,5 +34,6 @@ public class Notification {
     private boolean read;
 
     @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt = LocalDateTime.now();
 }
