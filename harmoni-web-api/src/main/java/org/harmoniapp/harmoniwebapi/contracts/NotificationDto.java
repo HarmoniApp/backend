@@ -10,6 +10,17 @@ import org.harmoniapp.harmonidata.entities.User;
 
 import java.time.LocalDateTime;
 
+/**
+ * Data Transfer Object for Notification.
+ *
+ * @param id        the unique identifier of the notification
+ * @param userId    the ID of the user associated with the notification
+ * @param title     the title of the notification
+ * @param message   the message content of the notification
+ * @param typeName  the type of the notification
+ * @param read      indicates if the notification has been read
+ * @param createdAt the timestamp when the notification was created
+ */
 public record NotificationDto(
         long id,
 
@@ -34,18 +45,31 @@ public record NotificationDto(
         @JsonProperty("created_at")LocalDateTime createdAt
         ) {
 
-        public static NotificationDto fromEntity(Notification notification) {
-            return new NotificationDto(
-                    notification.getId(),
-                    notification.getUser().getId(),
-                    notification.getTitle(),
-                    notification.getMessage(),
-                    notification.getType().getTypeName(),
-                    notification.isRead(),
-                    notification.getCreatedAt()
-            );
-        }
+    /**
+     * Converts a Notification entity to a NotificationDto.
+     *
+     * @param notification the Notification entity to convert
+     * @return the resulting NotificationDto
+     */
+    public static NotificationDto fromEntity(Notification notification) {
+        return new NotificationDto(
+                notification.getId(),
+                notification.getUser().getId(),
+                notification.getTitle(),
+                notification.getMessage(),
+                notification.getType().getTypeName(),
+                notification.isRead(),
+                notification.getCreatedAt()
+        );
+    }
 
+    /**
+     * Converts a NotificationDto to a Notification entity.
+     *
+     * @param user the user associated with the notification
+     * @param type the notification type entity
+     * @return the resulting Notification entity
+     */
     public Notification toEntity(User user, NotificationType type) {
         return new Notification(
                 this.id,

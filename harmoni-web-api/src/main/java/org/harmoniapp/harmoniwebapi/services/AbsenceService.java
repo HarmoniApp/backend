@@ -122,7 +122,7 @@ public class AbsenceService {
     }
 
     /**
-     * Creates a new Absence.
+     * Creates a new Absence and sends a notification to the supervisor.
      *
      * @param absenceDto the AbsenceDto containing the details of the absence to create
      * @return the created AbsenceDto
@@ -163,7 +163,7 @@ public class AbsenceService {
     }
 
     /**
-     * Updates an existing Absence or creates a new one if it doesn't exist.
+     * Updates an existing Absence or creates a new one if it doesn't exist and sends a notification.
      * IMPORTANT it is updated by employee
      *
      * @param id the ID of the absence to update
@@ -228,7 +228,7 @@ public class AbsenceService {
     }
 
     /**
-     * Updates the status of an existing Absence.
+     * Updates the status of an existing Absence and sends a notification to the employee.
      * IMPORTANT it is updated by employer
      *
      * @param id the ID of the absence to update
@@ -292,13 +292,18 @@ public class AbsenceService {
         }
     }
 
+    /**
+     * Sends a notification to the supervisor when a new absence is created.
+     *
+     * @param savedAbsence the saved absence
+     */
     private void newAbsenceCreatedNotification(Absence savedAbsence) {
         NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(2L) //2 is Awaiting Absence
                 .orElseThrow(() -> new RuntimeException("Notification type not found"));
 
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
-                savedAbsence.getUser().getSupervisor().getId(), // notification for supervisor
+                savedAbsence.getUser().getSupervisor().getId(),
                 "New Absence Awaiting",
                 "New absence awaiting. Employee " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " requested for absence.",
                 notificationType.getTypeName(),
@@ -309,13 +314,18 @@ public class AbsenceService {
         notificationService.createNotification(notificationDto);
     }
 
+    /**
+     * Sends a notification to the supervisor when an employee updates an absence.
+     *
+     * @param savedAbsence the saved absence
+     */
     private void employeeUpdatedAbsenceNotification(Absence savedAbsence) {
         NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(5L) //5 is Absence Updated
                 .orElseThrow(() -> new RuntimeException("Notification type not found"));
 
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
-                savedAbsence.getUser().getSupervisor().getId(), // notification for supervisor
+                savedAbsence.getUser().getSupervisor().getId(),
                 "Absence is updated",
                 "Absence is updated. Employee " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " has changed their absence. Please review the changes.",
                 notificationType.getTypeName(),
@@ -326,6 +336,11 @@ public class AbsenceService {
         notificationService.createNotification(notificationDto);
     }
 
+    /**
+     * Sends a notification to the employee when the employer changes the absence status.
+     *
+     * @param savedAbsence the saved absence
+     */
     private void employerChangeAbsenceStatusNotification(Absence savedAbsence) {
         NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(3L) //3 is Absence Status Updated
                 .orElseThrow(() -> new RuntimeException("Notification type not found"));
