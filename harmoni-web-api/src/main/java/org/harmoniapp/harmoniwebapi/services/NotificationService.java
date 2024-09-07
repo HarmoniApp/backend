@@ -8,6 +8,7 @@ import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.NotificationDto;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ import java.util.List;
 @ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class NotificationService {
     private final RepositoryCollector repositoryCollector;
+    private final SimpMessagingTemplate messagingTemplate;
 
     /**
      * Retrieves all notifications by user ID.
@@ -62,10 +64,14 @@ public class NotificationService {
 
         NotificationType type = repositoryCollector.getNotificationTypes().findByTypeName(notificationDto.typeName());
 
-
         Notification notification = notificationDto.toEntity(user, type);
         notification.setCreatedAt(LocalDateTime.now());
         Notification savedNotification = repositoryCollector.getNotifications().save(notification);
+
+        messagingTemplate.convertAndSend("/client/notifications/" + savedNotification.getUser().getId(),
+                NotificationDto.fromEntity(savedNotification));
+
+
         return NotificationDto.fromEntity(savedNotification);
     }
 
