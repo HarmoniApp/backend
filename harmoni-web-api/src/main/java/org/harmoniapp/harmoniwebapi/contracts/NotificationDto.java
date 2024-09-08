@@ -37,7 +37,7 @@ public record NotificationDto(
         String message,
 
         @NotNull(message = "Type name cannot be null")
-        @JsonProperty("type_id") String typeName,
+        @JsonProperty("type_name") String typeName,
 
         boolean read,
 
