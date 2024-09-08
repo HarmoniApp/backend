@@ -68,9 +68,7 @@ public class NotificationService {
         notification.setCreatedAt(LocalDateTime.now());
         Notification savedNotification = repositoryCollector.getNotifications().save(notification);
 
-        messagingTemplate.convertAndSend("/client/notifications/" + savedNotification.getUser().getId(),
-                NotificationDto.fromEntity(savedNotification));
-
+        messagingTemplate.convertAndSend("/client/notifications/" + user.getId(), NotificationDto.fromEntity(savedNotification));
 
         return NotificationDto.fromEntity(savedNotification);
     }
