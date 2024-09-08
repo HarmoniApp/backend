@@ -52,7 +52,9 @@ public record AbsenceDto(
 
         @JsonProperty("working_days") Long workingDays,
 
-        boolean archived) {
+        boolean archived,
+
+        @JsonProperty("employee_id") String employeeId) {
 
     /**
      * Converts an Absence entity to an AbsenceDto.
@@ -71,7 +73,8 @@ public record AbsenceDto(
                 absence.getSubmission(),
                 absence.getUpdated(),
                 absence.getWorkingDays(),
-                absence.isArchived()
+                absence.isArchived(),
+                absence.getUser().getEmployeeId()
         );
     }
 
