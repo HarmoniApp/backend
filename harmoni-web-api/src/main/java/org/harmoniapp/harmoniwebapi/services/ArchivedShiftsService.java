@@ -37,6 +37,10 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 
+/**
+ * Service class for managing archived shifts.
+ * Provides methods to generate PDFs and retrieve archived shifts.
+ */
 @Service
 @RequiredArgsConstructor
 @ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
@@ -44,13 +48,25 @@ public class ArchivedShiftsService {
 
     private final RepositoryCollector repositoryCollector;
 
+    /**
+     * Retrieves a list of all archived shifts.
+     *
+     * @return a list of ArchivedShiftDto containing details of all archived shifts
+     */
     public List<ArchivedShiftDto> getAllArchivedShifts() {
         List<ArchivedShift> archivedShifts = repositoryCollector.getArchivedShifts().findAll();
+
         return archivedShifts.stream()
                 .map(ArchivedShiftDto::fromEntity)
                 .toList();
     }
 
+    /**
+     * Retrieves a specific archived shift PDF by its ID.
+     *
+     * @param id the ID of the archived shift to retrieve
+     * @return ResponseEntity containing the archived shift PDF as InputStreamResource
+     */
     public ResponseEntity<InputStreamResource> getArchivedShift(long id) {
         ArchivedShift archivedShift = repositoryCollector.getArchivedShifts().findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Archived Shift not found"));
@@ -61,9 +77,11 @@ public class ArchivedShiftsService {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(new InputStreamResource(bis));
-
     }
 
+    /**
+     * Archives the shifts from the previous week by generating a PDF and saving it to the database.
+     */
     @Transactional
     public void archivePreviousWeekShifts() {
         LocalDate today = LocalDate.now();
@@ -77,10 +95,21 @@ public class ArchivedShiftsService {
             String fileTitle = startOfPreviousWeek + " - " + endOfPreviousWeek;
             byte[] pdfData = generatePdf(shifts, fileTitle);
 
-            savePdfToDatabase(fileTitle, pdfData);
+            ArchivedShift archivedShift = new ArchivedShift();
+            archivedShift.setFileTitle(fileTitle);
+            archivedShift.setPdfData(pdfData);
+
+            repositoryCollector.getArchivedShifts().save(archivedShift);
         }
     }
 
+    /**
+     * Generates a PDF report based on the provided list of shifts and date range.
+     *
+     * @param shifts    the list of shifts to include in the PDF
+     * @param dateRange the date range represented in the report
+     * @return a byte array representing the generated PDF
+     */
     private byte[] generatePdf(List<Shift> shifts, String dateRange) {
         Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -151,21 +180,20 @@ public class ArchivedShiftsService {
         return out.toByteArray();
     }
 
-    private void savePdfToDatabase(String fileTitle, byte[] pdfData) {
-        ArchivedShift archivedShift = new ArchivedShift();
-        archivedShift.setFileTitle(fileTitle);
-        archivedShift.setPdfData(pdfData);
-
-        repositoryCollector.getArchivedShifts().save(archivedShift);
-
-        System.out.println("PDF saved to database with title: " + fileTitle);
-    }
-
+    /**
+     * Schedules the archiving of shifts from the previous week to occur every Monday at midnight.
+     */
     @Scheduled(cron = "0 0 0 * * MON")
     public void scheduleWeeklyShiftArchival() {
         archivePreviousWeekShifts();
     }
 
+    /**
+     * Generates a PDF report for shifts in a specific week based on the provided start date.
+     *
+     * @param startOfWeek the start date of the week for which the report is generated
+     * @return ResponseEntity containing the generated PDF as InputStreamResource
+     */
     public ResponseEntity<InputStreamResource> generatePdfForWeek(LocalDate startOfWeek) {
         LocalDate endDate = startOfWeek.plusDays(6);
 
