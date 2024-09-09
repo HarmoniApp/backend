@@ -64,7 +64,6 @@ public record UserDto(
         AddressDto residence,
 
         @NotNull(message = "Work address cannot be null")
-        @Valid
         @JsonProperty("work_address") AddressDto workAddress,
 
         @JsonProperty("supervisor_id") Long supervisorId,
