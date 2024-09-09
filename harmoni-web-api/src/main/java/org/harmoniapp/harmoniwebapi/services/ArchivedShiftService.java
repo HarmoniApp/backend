@@ -25,7 +25,6 @@ import com.lowagie.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.ArchivedShift;
 import org.harmoniapp.harmonidata.entities.Shift;
-import org.harmoniapp.harmonidata.repositories.ArchivedShiftRepository;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.ArchivedShiftDto;
 import org.springframework.context.annotation.ComponentScan;
@@ -44,7 +43,7 @@ import jakarta.transaction.Transactional;
 @Service
 @RequiredArgsConstructor
 @ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
-public class ArchivedShiftsService {
+public class ArchivedShiftService {
 
     private final RepositoryCollector repositoryCollector;
 

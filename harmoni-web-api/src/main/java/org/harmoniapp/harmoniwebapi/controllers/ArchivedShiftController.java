@@ -2,7 +2,7 @@ package org.harmoniapp.harmoniwebapi.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.ArchivedShiftDto;
-import org.harmoniapp.harmoniwebapi.services.ArchivedShiftsService;
+import org.harmoniapp.harmoniwebapi.services.ArchivedShiftService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +18,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/archived-shifts")
 @CrossOrigin(origins = "http://localhost:3000")
-public class ArchivedShiftsController {
-    private final ArchivedShiftsService archivedShiftsService;
+public class ArchivedShiftController {
+    private final ArchivedShiftService archivedShiftService;
 
     /**
      * Generates a PDF report for the shifts that occurred in the specified week.
@@ -29,7 +29,7 @@ public class ArchivedShiftsController {
      */
     @GetMapping("/generate-pdf")
     public ResponseEntity<InputStreamResource> generatePdfForWeek(@RequestParam("startOfWeek") LocalDate startOfWeek) {
-        return archivedShiftsService.generatePdfForWeek(startOfWeek);
+        return archivedShiftService.generatePdfForWeek(startOfWeek);
     }
 
     /**
@@ -39,7 +39,7 @@ public class ArchivedShiftsController {
      */
     @GetMapping
     public List<ArchivedShiftDto> getAllArchivedShifts() {
-        return archivedShiftsService.getAllArchivedShifts();
+        return archivedShiftService.getAllArchivedShifts();
     }
 
     /**
@@ -50,6 +50,6 @@ public class ArchivedShiftsController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<InputStreamResource> getArchivedShift(@PathVariable long id) {
-        return archivedShiftsService.getArchivedShift(id);
+        return archivedShiftService.getArchivedShift(id);
     }
 }
