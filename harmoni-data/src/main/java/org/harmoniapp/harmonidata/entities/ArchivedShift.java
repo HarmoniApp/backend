@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
+import org.hibernate.annotations.JdbcTypeCode;
+import java.sql.Types;
 
 @Entity
 @Table(name = "archived_shifts")
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ArchivedShifts {
+public class ArchivedShift {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,7 +22,7 @@ public class ArchivedShifts {
     @Column(name = "file_title", nullable = false)
     private String fileTitle;
 
-    @Lob
+    @JdbcTypeCode(Types.BINARY)
     @Column(name = "pdf_data")
     private byte[] pdfData;
 }
