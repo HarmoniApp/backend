@@ -34,8 +34,8 @@ public class ShiftController {
     /**
      * Retrieves a list of ShiftDto within the specified date range.
      *
-     * @param start the start date and time in ISO-8601 string format
-     * @param end   the end date and time in ISO-8601 string format
+     * @param start the start date and time
+     * @param end   the end date and time
      * @return a list of ShiftDto within the specified date range
      */
     @GetMapping("/range")

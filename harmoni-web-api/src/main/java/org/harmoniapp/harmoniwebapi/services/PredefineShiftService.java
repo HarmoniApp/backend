@@ -5,6 +5,7 @@ import org.harmoniapp.harmonidata.entities.PredefineShift;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.PredefineShiftDto;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +48,7 @@ public class PredefineShiftService {
      */
     public List<PredefineShiftDto> getAllPredefineShifts() {
         try {
-            var predefineShifts = repositoryCollector.getPredefineShifts().findAll();
+            var predefineShifts = repositoryCollector.getPredefineShifts().findAll(Sort.by(Sort.Direction.ASC, "name"));
             return predefineShifts.stream()
                     .map(PredefineShiftDto::fromEntity)
                     .collect(Collectors.toList());

@@ -32,6 +32,17 @@ public class RoleController {
     }
 
     /**
+     * Retrieves a list of RoleDto for a specific user by their ID.
+     *
+     * @param id the ID of the user whose roles are being retrieved
+     * @return a list of RoleDto objects representing the user's roles
+     */
+    @GetMapping("/user/{id}")
+    public List<RoleDto> getUserRoles(@PathVariable long id) {
+        return roleService.getUserRoles(id);
+    }
+
+    /**
      * Retrieves a list of all RoleDto.
      *
      * @return a list of RoleDto containing the details of all roles
