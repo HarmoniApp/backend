@@ -65,7 +65,6 @@ public class NotificationService {
         NotificationType type = repositoryCollector.getNotificationTypes().findByTypeName(notificationDto.typeName());
 
         Notification notification = notificationDto.toEntity(user, type);
-        notification.setCreatedAt(LocalDateTime.now());
         Notification savedNotification = repositoryCollector.getNotifications().save(notification);
 
         messagingTemplate.convertAndSend("/client/notifications/" + user.getId(), NotificationDto.fromEntity(savedNotification));
