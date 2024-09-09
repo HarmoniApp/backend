@@ -95,7 +95,7 @@ public class UserService {
         Address residence = addressService.saveAddressEntity(userDto.residence());
         user.setResidence(residence);
 
-        Address workAddress = addressService.saveAddressEntity(userDto.workAddress());
+        Address workAddress = userDto.workAddress().toEntity();
         user.setWorkAddress(workAddress);
 
         user.setLanguages(
@@ -132,8 +132,15 @@ public class UserService {
         User supervisor = repositoryCollector.getUsers().findById(userDto.supervisorId())
                 .orElse(null);
 
+        existingUser.setFirstname(userDto.firstname());
+        existingUser.setSurname(userDto.surname());
+        existingUser.setEmail(userDto.email());
         existingUser.setContractType(contractType);
         existingUser.setSupervisor(supervisor);
+        existingUser.setContractSignature(userDto.contractSignature());
+        existingUser.setContractExpiration(userDto.contractExpiration());
+        existingUser.setPhoneNumber(userDto.phoneNumber());
+        existingUser.setEmployeeId(userDto.employeeId());
 
         Address residence = existingUser.getResidence();
         residence = addressService.updateAddress(residence, userDto.residence());
