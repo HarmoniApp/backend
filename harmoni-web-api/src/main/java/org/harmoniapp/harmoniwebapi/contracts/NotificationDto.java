@@ -41,7 +41,6 @@ public record NotificationDto(
 
         boolean read,
 
-        @NotNull(message = "Creation date cannot be null")
         @JsonProperty("created_at")LocalDateTime createdAt
         ) {
 
