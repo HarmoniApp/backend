@@ -69,7 +69,7 @@ public record UserDto(
         @JsonProperty("supervisor_id") Long supervisorId,
 
         @NotEmpty(message = "Phone number cannot be empty")
-        @Pattern(regexp = "^[+]?\\d{1,3}[ ]?(\\d[ ]?){8,14}$", message = "Phone number must be between 9 and 15 digits, and can contain spaces and a leading '+'")
+        @Pattern(regexp = "^(\\+?\\d{1,3}[-\\s]?)?(\\d[-\\s]?){9,15}$", message = "Phone number must be between 9 and 15 digits, and can contain spaces and a leading '+'")
         @JsonProperty("phone_number") String phoneNumber,
 
         @NotEmpty(message = "Employee ID cannot be empty")
