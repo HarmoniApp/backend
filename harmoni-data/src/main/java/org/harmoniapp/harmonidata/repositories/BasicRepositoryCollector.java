@@ -14,6 +14,8 @@ public class BasicRepositoryCollector implements RepositoryCollector {
     private final AvailabilityRepository availabilities;
     private final ContractTypeRepository contractTypes;
     private final LanguageRepository languages;
+    private final NotificationRepository notifications;
+    private final NotificationTypeRepository notificationTypes;
     private final PredefineShiftRepository predefineShifts;
     private final RoleRepository roles;
     private final ShiftRepository shifts;

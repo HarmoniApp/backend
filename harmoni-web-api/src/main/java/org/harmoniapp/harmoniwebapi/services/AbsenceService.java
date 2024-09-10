@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.*;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.AbsenceDto;
+import org.harmoniapp.harmoniwebapi.contracts.NotificationDto;
 import org.harmoniapp.harmoniwebapi.utils.HolidayCalculator;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.List;
 @ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class AbsenceService {
     private final RepositoryCollector repositoryCollector;
+    private final NotificationService notificationService;
 
     /**
      * Retrieves all Absences by user ID.
@@ -32,6 +34,21 @@ public class AbsenceService {
      */
     public List<AbsenceDto> getAbsenceByUserId(long id) {
         List<Absence> userAbsences = repositoryCollector.getAbsences().findByUserId(id);
+
+        return userAbsences.stream()
+                .map(AbsenceDto::fromEntity)
+                .toList();
+    }
+
+    /**
+     * Retrieves a list of absences for a specific user based on their archived status.
+     *
+     * @param id       the ID of the user whose absences are to be retrieved
+     * @param archived a boolean indicating whether to retrieve archived or non-archived absences
+     * @return a list of AbsenceDto objects representing the user's absences with the specified archived status
+     */
+    public List<AbsenceDto> getAbsenceByUserIdAndArchive(long id, boolean archived) {
+        List<Absence> userAbsences = repositoryCollector.getAbsences().findByUserIdAndArchived(id, archived);
 
         return userAbsences.stream()
                 .map(AbsenceDto::fromEntity)
@@ -105,7 +122,7 @@ public class AbsenceService {
     }
 
     /**
-     * Creates a new Absence.
+     * Creates a new Absence and sends a notification to the supervisor.
      *
      * @param absenceDto the AbsenceDto containing the details of the absence to create
      * @return the created AbsenceDto
@@ -139,11 +156,14 @@ public class AbsenceService {
         absence.setUpdated(LocalDate.now());
         absence.setWorkingDays(HolidayCalculator.calculateWorkingDays(absence.getStart(), absence.getEnd()));
         Absence savedAbsence = repositoryCollector.getAbsences().save(absence);
+
+        newAbsenceCreatedNotification(savedAbsence);
+
         return AbsenceDto.fromEntity(savedAbsence);
     }
 
     /**
-     * Updates an existing Absence or creates a new one if it doesn't exist.
+     * Updates an existing Absence or creates a new one if it doesn't exist and sends a notification.
      * IMPORTANT it is updated by employee
      *
      * @param id the ID of the absence to update
@@ -183,6 +203,9 @@ public class AbsenceService {
                 Absence newAbsence = absenceDto.toEntity(user, absenceType, status);
                 newAbsence.setWorkingDays(HolidayCalculator.calculateWorkingDays(newAbsence.getStart(), newAbsence.getEnd()));
                 Absence savedAbsence = repositoryCollector.getAbsences().save(newAbsence);
+
+                employeeUpdatedAbsenceNotification(savedAbsence);
+
                 return AbsenceDto.fromEntity(savedAbsence);
             } else {
                 existingAbsence.setStart(absenceDto.start());
@@ -194,6 +217,9 @@ public class AbsenceService {
                 existingAbsence.setUpdated(absenceDto.updated());
                 existingAbsence.setWorkingDays(HolidayCalculator.calculateWorkingDays(existingAbsence.getStart(), existingAbsence.getEnd()));
                 Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
+
+                employeeUpdatedAbsenceNotification(updatedAbsence);
+
                 return AbsenceDto.fromEntity(updatedAbsence);
             }
         } catch (Exception e) {
@@ -202,7 +228,7 @@ public class AbsenceService {
     }
 
     /**
-     * Updates the status of an existing Absence.
+     * Updates the status of an existing Absence and sends a notification to the employee.
      * IMPORTANT it is updated by employer
      *
      * @param id the ID of the absence to update
@@ -235,9 +261,104 @@ public class AbsenceService {
             }
 
             Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
+
+            employerChangeAbsenceStatusNotification(updatedAbsence);
+
             return AbsenceDto.fromEntity(updatedAbsence);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update absence status: " + e.getMessage(), e);
         }
     }
+
+    /**
+     * Updates the archived status of an existing absence.
+     *
+     * @param id       the ID of the absence to update
+     * @param archived a boolean indicating the new archived status to set
+     * @return the updated AbsenceDto object representing the absence with the modified archived status
+     * @throws RuntimeException if the absence does not exist or if an error occurs during the update process
+     */
+    @Transactional
+    public AbsenceDto updateAbsenceArchived(long id, boolean archived) {
+        try {
+            Absence existingAbsence = repositoryCollector.getAbsences().findById(id)
+                    .orElseThrow(() -> new RuntimeException("You can only change archived if absence exists"));
+
+            existingAbsence.setArchived(archived);
+            Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
+            return AbsenceDto.fromEntity(updatedAbsence);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update absence status: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Sends a notification to the supervisor when a new absence is created.
+     *
+     * @param savedAbsence the saved absence
+     */
+    private void newAbsenceCreatedNotification(Absence savedAbsence) {
+        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(2L) //2 is Awaiting Absence
+                .orElseThrow(() -> new RuntimeException("Notification type not found"));
+
+        NotificationDto notificationDto = new NotificationDto(
+                0L, // id is set automatically by the database
+                savedAbsence.getUser().getSupervisor().getId(),
+                "New Absence Awaiting",
+                "New absence awaiting. Employee " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " requested for absence.",
+                notificationType.getTypeName(),
+                false,
+                LocalDateTime.now()
+        );
+
+        notificationService.createNotification(notificationDto);
+    }
+
+    /**
+     * Sends a notification to the supervisor when an employee updates an absence.
+     *
+     * @param savedAbsence the saved absence
+     */
+    private void employeeUpdatedAbsenceNotification(Absence savedAbsence) {
+        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(5L) //5 is Absence Updated
+                .orElseThrow(() -> new RuntimeException("Notification type not found"));
+
+        NotificationDto notificationDto = new NotificationDto(
+                0L, // id is set automatically by the database
+                savedAbsence.getUser().getSupervisor().getId(),
+                "Absence is updated",
+                "Absence is updated. Employee " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " has changed their absence. Please review the changes.",
+                notificationType.getTypeName(),
+                false,
+                LocalDateTime.now()
+        );
+
+        notificationService.createNotification(notificationDto);
+    }
+
+    /**
+     * Sends a notification to the employee when the employer changes the absence status.
+     *
+     * @param savedAbsence the saved absence
+     */
+    private void employerChangeAbsenceStatusNotification(Absence savedAbsence) {
+        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(3L) //3 is Absence Status Updated
+                .orElseThrow(() -> new RuntimeException("Notification type not found"));
+
+        NotificationDto notificationDto = new NotificationDto(
+                0L, // id is set automatically by the database
+                savedAbsence.getUser().getId(),
+                "Absence Status is updated",
+                "Absence status is updated. Status for absence " +
+                        savedAbsence.getStart() + "-" + savedAbsence.getEnd() +
+                        " is " + savedAbsence.getStatus().getName() +
+                        " Please review the changes.",
+                notificationType.getTypeName(),
+                false,
+                LocalDateTime.now()
+        );
+
+        notificationService.createNotification(notificationDto);
+    }
+
 }

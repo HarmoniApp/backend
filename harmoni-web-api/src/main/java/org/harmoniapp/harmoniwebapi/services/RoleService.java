@@ -2,6 +2,7 @@ package org.harmoniapp.harmoniwebapi.services;
 
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.Role;
+import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.RoleDto;
 import org.springframework.context.annotation.ComponentScan;
@@ -37,6 +38,22 @@ public class RoleService {
             } catch (Exception e) {
                 throw new RuntimeException("An error occurred: " + e.getMessage(), e);
             }
+    }
+
+    /**
+     * Retrieves a list of RoleDto associated with a specific user.
+     *
+     * @param id the ID of the user whose roles are being retrieved
+     * @return a list of RoleDto objects representing the user's roles
+     * @throws IllegalArgumentException if the user with the specified ID is not found
+     */
+    public List<RoleDto> getUserRoles(long id) {
+        User user = repositoryCollector.getUsers().findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        return user.getRoles().stream()
+                .map(RoleDto::fromEntity)
+                .toList();
     }
 
     /**
@@ -89,6 +106,7 @@ public class RoleService {
                     .map(role -> {
                         role.setName(newRole.getName());
                         role.setSup(newRole.isSup());
+                        role.setColor(newRole.getColor());
                         Role updatedRole = repositoryCollector.getRoles().save(role);
                         return RoleDto.fromEntity(updatedRole);
                     })

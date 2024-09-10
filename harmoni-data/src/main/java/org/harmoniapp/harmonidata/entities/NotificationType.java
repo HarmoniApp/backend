@@ -10,23 +10,18 @@ import org.hibernate.proxy.HibernateProxy;
 import java.util.Objects;
 
 @Entity
-@Table(name = "role")
+@Table(name = "notification_type")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role {
-
+public class NotificationType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
-    @Column(name = "is_sup")
-    private boolean isSup;
-
-    private String color;
+    @Column(name = "type_name")
+    private String typeName;
 
     @Override
     public final boolean equals(Object o) {
@@ -37,8 +32,9 @@ public class Role {
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ?
                 ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Role role = (Role) o;
-        return getId() != null && Objects.equals(getId(), role.getId());    }
+        NotificationType notificationType = (NotificationType) o;
+        return getId() != null && Objects.equals(getId(), notificationType.getId());
+    }
 
     @Override
     public final int hashCode() {
