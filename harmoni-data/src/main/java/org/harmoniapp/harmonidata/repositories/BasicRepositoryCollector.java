@@ -10,6 +10,7 @@ public class BasicRepositoryCollector implements RepositoryCollector {
     private final AbsenceRepository absences;
     private final AbsenceTypeRepository absenceTypes;
     private final AddressRepository addresses;
+    private final ArchivedShiftRepository archivedShifts;
     private final AvailabilityRepository availabilities;
     private final ContractTypeRepository contractTypes;
     private final LanguageRepository languages;

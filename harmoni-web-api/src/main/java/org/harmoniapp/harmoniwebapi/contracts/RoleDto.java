@@ -17,7 +17,7 @@ public record RoleDto(
         long id,
 
         @NotEmpty(message = "Role name cannot be empty")
-        @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Role name must contain only letters and digits")
+        @Pattern(regexp = "^[a-zA-Z0-9 ]+$", message = "Role name must contain only letters, digits, and spaces")
         String name,
 
         @JsonProperty("is_sup") boolean isSup,
