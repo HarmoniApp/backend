@@ -27,20 +27,25 @@ public record AddressDto(
 
         @NotEmpty(message = "City cannot be empty")
         @Size(max = 50, message = "City must be less than or equal to 50 characters")
+        @Pattern(regexp = "^[a-zA-Z ]+$", message = "City must contain only letters and spaces")
         String city,
 
         @NotEmpty(message = "Street cannot be empty")
         @Size(max = 100, message = "Street must be less than or equal to 100 characters")
+        @Pattern(regexp = "^[a-zA-Z ]+$", message = "Street must contain only letters and spaces")
         String street,
 
         @NotEmpty(message = "Building number cannot be empty")
-        @Pattern(regexp = "^[a-zA-Z0-9\\-]+$", message = "Building number must contain only alphanumeric characters and dashes")
+        @Size(min = 1, max = 10, message = "Building number must be between 1 and 10 characters")
+        @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Building number must contain only alphanumeric characters")
         @JsonProperty("building_number") String buildingNumber,
 
         @Size(max = 10, message = "Apartment number must be less than or equal to 10 characters")
+        @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Apartment number must contain only alphanumeric characters")
         String apartment,
 
         @Size(max = 100, message = "Department name must be less than or equal to 100 characters")
+        @Pattern(regexp = "^[a-zA-Z0-9 ]+$", message = "Department name must contain only letters, numbers, and spaces")
         @JsonProperty("department_name") String departmentName) {
 
     /**
