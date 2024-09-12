@@ -81,6 +81,10 @@ public class UserService {
      */
     @Transactional
     public UserDto add(UserDto userDto) {
+        if (userDto.contractExpiration().isBefore(userDto.contractSignature())) {
+            throw new IllegalArgumentException("Contract expiration date must be after the contract signature date.");
+        }
+
         User user = userDto.toEntity();
 
         ContractType contractType = repositoryCollector.getContractTypes()
@@ -122,6 +126,10 @@ public class UserService {
      */
     @Transactional
     public UserDto update(long id, UserDto userDto) {
+        if (userDto.contractExpiration().isBefore(userDto.contractSignature())) {
+            throw new IllegalArgumentException("Contract expiration date must be after the contract signature date.");
+        }
+
         var existingUser = repositoryCollector.getUsers().findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User with ID " + id + " not found"));
 

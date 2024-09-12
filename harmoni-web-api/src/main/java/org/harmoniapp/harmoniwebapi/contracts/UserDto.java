@@ -58,7 +58,7 @@ public record UserDto(
         @JsonProperty("contract_signature") LocalDate contractSignature,
 
         @NotNull(message = "Contract expiration date cannot be null")
-        @JsonProperty("contract_expiration") LocalDate contractExpiration, //TODO: must be after signature
+        @JsonProperty("contract_expiration") LocalDate contractExpiration,
 
         @NotNull(message = "Residence cannot be null")
         @Valid
