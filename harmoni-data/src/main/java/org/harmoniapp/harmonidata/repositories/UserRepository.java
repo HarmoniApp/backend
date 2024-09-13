@@ -9,6 +9,7 @@ import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
@@ -43,4 +44,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
         select u from User u left join u.roles roles
         where roles.isSup = true""")
     List<User> findSupervisors();
+
+    Optional<User> findByEmail(String email);
 }

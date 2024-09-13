@@ -57,7 +57,7 @@ public class User {
     @Column(name = "employee_id")
     private String employeeId;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
