@@ -13,9 +13,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("!prod")
+@Profile("prod")
 @RequiredArgsConstructor
-public class HarmoniUserPasswordAuthenticationProvider implements AuthenticationProvider {
+public class HarmoniProdUserPasswordAuthenticationProvider implements AuthenticationProvider {
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
@@ -24,7 +24,12 @@ public class HarmoniUserPasswordAuthenticationProvider implements Authentication
         String username = authentication.getName();
         String password = authentication.getCredentials().toString();
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
+
+        if(passwordEncoder.matches(password, userDetails.getPassword())) {
+            return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
+        } else {
+            throw new BadCredentialsException("Invalid password");
+        }
     }
 
     @Override

@@ -3,10 +3,7 @@ package org.harmoniapp.harmoniwebapi.configuration;
 import jakarta.servlet.http.HttpServletRequest;
 import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomAccessDeniedHandler;
 import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomBasicAuthenticationEntryPoint;
-import org.harmoniapp.harmoniwebapi.filter.AuthoritiesLoggingAfterFilter;
-import org.harmoniapp.harmoniwebapi.filter.CsrfCookieFilter;
-import org.harmoniapp.harmoniwebapi.filter.JWTTokenGeneratorFilter;
-import org.harmoniapp.harmoniwebapi.filter.JWTTokenValidationFilter;
+import org.harmoniapp.harmoniwebapi.filter.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -29,8 +26,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
-@Profile("!prod")
-public class ProjectSecurityConfig {
+@Profile("prod")
+public class ProjectSecurityProdConfig {
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -123,8 +120,8 @@ public class ProjectSecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
                                                        PasswordEncoder passwordEncoder) {
-        HarmoniUserPasswordAuthenticationProvider authenticationProvider =
-                new HarmoniUserPasswordAuthenticationProvider(userDetailsService, passwordEncoder);
+        HarmoniProdUserPasswordAuthenticationProvider authenticationProvider =
+                new HarmoniProdUserPasswordAuthenticationProvider(userDetailsService, passwordEncoder);
         ProviderManager providerManager = new ProviderManager(authenticationProvider);
         providerManager.setEraseCredentialsAfterAuthentication(false);
         return providerManager;
