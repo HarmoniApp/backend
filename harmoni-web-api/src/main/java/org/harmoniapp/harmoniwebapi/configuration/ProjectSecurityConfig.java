@@ -1,11 +1,16 @@
 package org.harmoniapp.harmoniwebapi.configuration;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.harmoniapp.harmoniwebapi.filter.CsrfCookieFilter;
+import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomAccessDeniedHandler;
+import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomBasicAuthenticationEntryPoint;
+import org.harmoniapp.harmoniwebapi.filter.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -26,8 +31,7 @@ public class ProjectSecurityConfig {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         CsrfTokenRequestAttributeHandler csrfTokenRequestHandler = new CsrfTokenRequestAttributeHandler();
 
-        http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()); //Only HTTP
-//        http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()); //Only HTTPS
+        http.sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
             @Override
@@ -44,11 +48,18 @@ public class ProjectSecurityConfig {
         }));
 
         http.csrf(csrfConfig -> csrfConfig.csrfTokenRequestHandler(csrfTokenRequestHandler)
-//                        .ignoringRequestMatchers("/pub") //public endpoints
+                        .ignoringRequestMatchers("/login") //public endpoints
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
+                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+//                .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JWTTokenValidationFilter(), BasicAuthenticationFilter.class);
 
-        http.authorizeHttpRequests(request -> request
+        http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()); //Only HTTP
+//        http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()); //Only HTTPS
+
+        http.authorizeHttpRequests(request -> request.requestMatchers("/login").permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/absence", "POST"),
                                 new AntPathRequestMatcher("/absence/{id}", "PUT"),
                                 new AntPathRequestMatcher("/absence/archive/{id}", "PATCH")).hasRole("USER")
@@ -65,17 +76,18 @@ public class ProjectSecurityConfig {
                         .requestMatchers("/shift/range").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/shift/**").hasRole("ADMIN")
                         .requestMatchers("/status").hasAnyRole("USER", "ADMIN")
-//                        .requestMatchers("/user/simple/**").hasRole("ADMIN")
-                        .requestMatchers("/user/supervisor").hasRole("ADMIN")
+                        .requestMatchers("/user/simple/**").hasRole("ADMIN")
+//                        .requestMatchers("/user/supervisor").hasRole("ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/user/{id}", "PATCH"),
                                 new AntPathRequestMatcher("/user/{id}", "DELETE")).hasRole("ADMIN")
                         .requestMatchers("/user/{id}").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/user/**").hasRole("ADMIN")
                         .requestMatchers("/calendar/**").hasAnyRole("USER", "ADMIN")
-                )
-                .formLogin(Customizer.withDefaults())
-                .httpBasic(Customizer.withDefaults());
 
+                )
+//                .formLogin(Customizer.withDefaults())
+                .httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()))
+                .exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
 
         return http.build();
     }
@@ -101,5 +113,15 @@ public class ProjectSecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
+                                                       PasswordEncoder passwordEncoder) {
+        HarmoniUserPasswordAuthenticationProvider authenticationProvider =
+                new HarmoniUserPasswordAuthenticationProvider(userDetailsService, passwordEncoder);
+        ProviderManager providerManager = new ProviderManager(authenticationProvider);
+        providerManager.setEraseCredentialsAfterAuthentication(false);
+        return providerManager;
     }
 }
