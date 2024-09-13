@@ -17,7 +17,6 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("address")
-@CrossOrigin(origins = "http://localhost:3000")
 public class AddressController {
     private final AddressService service;
 

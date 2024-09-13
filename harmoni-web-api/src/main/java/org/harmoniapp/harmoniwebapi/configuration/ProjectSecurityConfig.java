@@ -1,5 +1,6 @@
 package org.harmoniapp.harmoniwebapi.configuration;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.harmoniapp.harmoniwebapi.filter.CsrfCookieFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,11 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 public class ProjectSecurityConfig {
@@ -22,6 +28,20 @@ public class ProjectSecurityConfig {
 
         http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()); //Only HTTP
 //        http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()); //Only HTTPS
+
+        http.cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
+            @Override
+            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                CorsConfiguration config = new CorsConfiguration();
+                config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                config.setAllowedMethods(Collections.singletonList("*"));
+                config.setAllowCredentials(true);
+                config.setAllowedHeaders(Collections.singletonList("*"));
+                config.setExposedHeaders(Arrays.asList("Authorization"));
+                config.setMaxAge(3600L);
+                return config;
+            }
+        }));
 
         http.csrf(csrfConfig -> csrfConfig.csrfTokenRequestHandler(csrfTokenRequestHandler)
 //                        .ignoringRequestMatchers("/pub") //public endpoints

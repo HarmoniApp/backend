@@ -16,7 +16,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/role")
-@CrossOrigin(origins = "http://localhost:3000")
 public class RoleController {
     private final RoleService roleService;
 

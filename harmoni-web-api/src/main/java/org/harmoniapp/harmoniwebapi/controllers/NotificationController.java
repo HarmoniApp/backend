@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("notification")
-@CrossOrigin(origins = "http://localhost:3000")
 public class NotificationController {
     private final NotificationService notificationService;
 

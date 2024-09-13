@@ -17,7 +17,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/absence")
-@CrossOrigin(origins = "http://localhost:3000")
 public class AbsenceController {
     private final AbsenceService absenceService;
 
