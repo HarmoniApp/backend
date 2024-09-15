@@ -6,8 +6,10 @@ import org.harmoniapp.harmonidata.entities.ContractType;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
+import org.harmoniapp.harmoniwebapi.utils.PasswordManager;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
 public class UserService {
     private final RepositoryCollector repositoryCollector;
     private final AddressService addressService;
+    private final PasswordManager passwordManager;
+    private final PasswordEncoder passwordEncoder;
 
 
     /**
@@ -109,8 +113,12 @@ public class UserService {
                         .collect(Collectors.toSet())
         );
 
+        String rawPwd = passwordManager.generateCommonTextPassword();
+        String hashedPwd = passwordEncoder.encode(rawPwd);
+        user.setPassword(hashedPwd);
+
         User response = repositoryCollector.getUsers().save(user);
-        return UserDto.fromEntity(response);
+        return UserDto.fromEntityWithPassword(response, rawPwd);
     }
 
     /**

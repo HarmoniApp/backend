@@ -110,6 +110,33 @@ public record UserDto(
     }
 
     /**
+     * Converts a User entity to a UserDto.
+     *
+     * @param user The User entity to be converted.
+     * @param password The user password in plain text
+     * @return A UserDto representing the User entity.
+     */
+    public static UserDto fromEntityWithPassword(User user, String password) {
+        return new UserDto(
+                user.getId(),
+                user.getFirstname(),
+                user.getSurname(),
+                user.getEmail(),
+                password,
+                user.getContractType(),
+                user.getContractSignature(),
+                user.getContractExpiration(),
+                AddressDto.fromEntity(user.getResidence()),
+                AddressDto.fromEntity(user.getWorkAddress()),
+                (user.getSupervisor() != null) ? user.getSupervisor().getId() : null,
+                user.getPhoneNumber(),
+                user.getEmployeeId(),
+                user.getRoles().stream().toList(),
+                user.getLanguages().stream().map(p -> new LanguageDto(p.getId(), p.getName())).toList()
+        );
+    }
+
+    /**
      * Converts this UserDto to a User entity.
      *
      * @return A User entity representing this UserDto.
