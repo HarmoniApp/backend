@@ -21,7 +21,7 @@ public class LoginController {
     @PostMapping
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
         String jwt = service.login(loginRequestDTO);
-        return ResponseEntity.status(HttpStatus.OK).header(JWTConstant.JWT_HEADER, jwt)
+        return ResponseEntity.status(HttpStatus.OK).header(JWTConstant.JWT_HEADER, "Bearer " + jwt)
                 .body(new LoginResponseDTO(HttpStatus.OK.getReasonPhrase(), jwt));
     }
 }
