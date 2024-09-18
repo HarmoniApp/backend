@@ -65,7 +65,7 @@ public class ProjectSecurityConfig {
         http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()); //Only HTTP
 //        http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()); //Only HTTPS
 
-        http.authorizeHttpRequests(request -> request.requestMatchers("/login").permitAll()
+        http.authorizeHttpRequests(request -> request.requestMatchers("/login", "/error").permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/absence", "POST"),
                                 new AntPathRequestMatcher("/absence/{id}", "PUT"),
                                 new AntPathRequestMatcher("/absence/archive/{id}", "PATCH")).hasRole("USER")
