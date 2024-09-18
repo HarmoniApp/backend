@@ -25,6 +25,8 @@ public class HarmoniProdUserPasswordAuthenticationProvider implements Authentica
         String password = authentication.getCredentials().toString();
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
+        //TODO: verify date of last password change
+
         if(passwordEncoder.matches(password, userDetails.getPassword())) {
             return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
         } else {

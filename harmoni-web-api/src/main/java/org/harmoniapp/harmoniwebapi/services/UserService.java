@@ -6,9 +6,11 @@ import org.harmoniapp.harmonidata.entities.ContractType;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
+import org.harmoniapp.harmoniwebapi.exception.EasyPasswordException;
 import org.harmoniapp.harmoniwebapi.utils.PasswordManager;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ public class UserService {
     private final AddressService addressService;
     private final PasswordManager passwordManager;
     private final PasswordEncoder passwordEncoder;
+    private final CompromisedPasswordChecker passwordChecker;
 
 
     /**
@@ -217,5 +220,38 @@ public class UserService {
         }
 
         return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
+    }
+
+    public String changePassword(long id, String pwd) {
+        if (passwordChecker.check(pwd).isCompromised()) {
+            throw new EasyPasswordException();
+        }
+
+        User user = repositoryCollector.getUsers().findById(id)
+                .orElseThrow(IllegalArgumentException::new);
+
+        String hashedPwd = passwordEncoder.encode(pwd);
+        user.setPassword(hashedPwd);
+
+        //TODO: set field (like) needChanged to FALSE and date of lats password change
+
+        repositoryCollector.getUsers().save(user);
+
+        return "Password changed successfully";
+    }
+
+    public String generateNewPassword(long id) {
+        User user = repositoryCollector.getUsers().findById(id)
+                .orElseThrow(IllegalArgumentException::new);
+
+        String pwd = passwordManager.generateCommonTextPassword();
+        String hashedPwd = passwordEncoder.encode(pwd);
+        user.setPassword(hashedPwd);
+
+        //TODO: set field (like) needChanged to TRUE and date of lats password change
+
+        repositoryCollector.getUsers().save(user);
+
+        return pwd;
     }
 }

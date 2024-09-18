@@ -9,12 +9,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
@@ -53,7 +55,6 @@ public class ProjectSecurityProdConfig {
                         .ignoringRequestMatchers("/login") //public endpoints
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-//                .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new JWTTokenValidationFilter(), BasicAuthenticationFilter.class);
@@ -80,41 +81,28 @@ public class ProjectSecurityProdConfig {
                         .requestMatchers("/status").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/user/simple/**").hasRole("ADMIN")
 //                        .requestMatchers("/user/supervisor").hasRole("ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/user/{id}/changePassword")).hasRole("USER")
                         .requestMatchers(new AntPathRequestMatcher("/user/{id}", "PATCH"),
-                                new AntPathRequestMatcher("/user/{id}", "DELETE")).hasRole("ADMIN")
+                                new AntPathRequestMatcher("/user/{id}", "DELETE"),
+                                new AntPathRequestMatcher("/user/{id}/generatePassword")).hasRole("ADMIN")
                         .requestMatchers("/user/{id}").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/user/**").hasRole("ADMIN")
                         .requestMatchers("/calendar/**").hasAnyRole("USER", "ADMIN")
-
                 )
-//                .formLogin(Customizer.withDefaults())
                 .httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()))
                 .exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
 
         return http.build();
     }
 
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//        UserDetails user = User.withDefaultPasswordEncoder()
-//                .username("user")
-//                .password("password")
-//                .roles("USER")
-//                .build();
-//
-//        UserDetails admin = User.withDefaultPasswordEncoder()
-//                .username("admin")
-//                .password("password")
-//                .roles("ADMIN")
-//                .build();
-//
-//
-//        return new InMemoryUserDetailsManager(user, admin);
-//    }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean
+    public CompromisedPasswordChecker compromisedPasswordChecker() {
+        return new HaveIBeenPwnedRestApiPasswordChecker();
     }
 
     @Bean
