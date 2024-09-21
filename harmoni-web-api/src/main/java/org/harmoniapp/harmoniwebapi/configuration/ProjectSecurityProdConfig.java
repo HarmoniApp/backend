@@ -1,6 +1,7 @@
 package org.harmoniapp.harmoniwebapi.configuration;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomAccessDeniedHandler;
 import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomBasicAuthenticationEntryPoint;
 import org.harmoniapp.harmoniwebapi.filter.*;
@@ -10,12 +11,14 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -29,7 +32,12 @@ import java.util.Collections;
 
 @Configuration
 @Profile("prod")
+@RequiredArgsConstructor
 public class ProjectSecurityProdConfig {
+
+    private final AuthorizationManager<RequestAuthorizationContext> adminOrOwnerAuthorizationManager;
+    private final AuthorizationManager<RequestAuthorizationContext> ownerAuthorizationManager;
+    private final AuthorizationManager<RequestAuthorizationContext> adminOrOwnerQueryParamAuthorizationManager;
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -59,35 +67,35 @@ public class ProjectSecurityProdConfig {
                 .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new JWTTokenValidationFilter(), BasicAuthenticationFilter.class);
 
-        http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()); //Only HTTP
-//        http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()); //Only HTTPS
+//        http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()); //Only HTTP
+        http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()); //Only HTTPS
 
-        http.authorizeHttpRequests(request -> request.requestMatchers("/login").permitAll()
+        http.authorizeHttpRequests(request -> request.requestMatchers("/login", "/error").permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/absence", "POST"),
                                 new AntPathRequestMatcher("/absence/{id}", "PUT"),
                                 new AntPathRequestMatcher("/absence/archive/{id}", "PATCH")).hasRole("USER")
+                        .requestMatchers("/absence/user/{id}/**").access(adminOrOwnerAuthorizationManager)
                         .requestMatchers("/absence/**").hasRole("ADMIN")
                         .requestMatchers("/absence-type/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/address/**").hasRole("ADMIN")
                         .requestMatchers("/archived-shifts/**").hasRole("ADMIN")
                         .requestMatchers("/contract-type/**").hasRole("ADMIN")
                         .requestMatchers("/language/**").hasRole("ADMIN")
-                        .requestMatchers("/notification/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/notification/user/{id}/**").access(ownerAuthorizationManager)
+                        .requestMatchers("/notification/**").authenticated()
                         .requestMatchers("/predefine-shift/**").hasRole("ADMIN")
                         .requestMatchers("/role/**").hasRole("ADMIN") // role/user/{id} only for admin?
-                        .requestMatchers("/shift/{id}").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/shift/range").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/shift/range").access(adminOrOwnerQueryParamAuthorizationManager)
+                        .requestMatchers(new AntPathRequestMatcher("/shift/{id}", "GET")).authenticated()
                         .requestMatchers("/shift/**").hasRole("ADMIN")
                         .requestMatchers("/status").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/user/simple/**").hasRole("ADMIN")
-//                        .requestMatchers("/user/supervisor").hasRole("ADMIN")
-                        .requestMatchers(new AntPathRequestMatcher("/user/{id}/changePassword")).hasRole("USER")
-                        .requestMatchers(new AntPathRequestMatcher("/user/{id}", "PATCH"),
-                                new AntPathRequestMatcher("/user/{id}", "DELETE"),
-                                new AntPathRequestMatcher("/user/{id}/generatePassword")).hasRole("ADMIN")
-                        .requestMatchers("/user/{id}").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/user/simple/**",
+                                "/user/supervisor",
+                                "/user/search").hasRole("ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/user/{id}/changePassword")).access(ownerAuthorizationManager)
+                        .requestMatchers(new AntPathRequestMatcher("/user/{id}", "GET")).access(adminOrOwnerAuthorizationManager)
                         .requestMatchers("/user/**").hasRole("ADMIN")
-                        .requestMatchers("/calendar/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/calendar/user/{id}/**").access(adminOrOwnerAuthorizationManager)
                 )
                 .httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()))
                 .exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));

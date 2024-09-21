@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.constant.JWTConstant;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,8 +19,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.stream.Collectors;
 
-
+@RequiredArgsConstructor
 public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -31,6 +33,8 @@ public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
                 SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
                 String jwt = Jwts.builder().issuer("HarmoniApp").subject("JWT Token")
                         .claim("username", authentication.getName())
+                        .claim("employeeId", user.getEmployeeId())
+                        .claim("id", user.getId())
                         .claim("authorities", authentication.getAuthorities().stream()
                                 .map(GrantedAuthority::getAuthority).collect(Collectors.joining(",")))
                         .issuedAt(new Date())

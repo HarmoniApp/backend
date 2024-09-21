@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.harmoniapp.harmoniwebapi.constant.JWTConstant;
+import org.harmoniapp.harmoniwebapi.configuration.Principle;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,7 +42,10 @@ public class JWTTokenValidationFilter extends OncePerRequestFilter {
                                 .build().parseSignedClaims(jwt).getPayload();
                         String username = String.valueOf(claims.get("username"));
                         String authorities = String.valueOf(claims.get("authorities"));
-                        Authentication authentication = new UsernamePasswordAuthenticationToken(username, null,
+                        String employeeId = String.valueOf(claims.get("employeeId"));
+                        Long id = Long.parseLong(String.valueOf(claims.get("id")));
+                        Principle principle = new Principle(id, employeeId, username);
+                        Authentication authentication = new UsernamePasswordAuthenticationToken(principle, null,
                                 AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
