@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
 
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -33,8 +32,8 @@ public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
                 SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
                 String jwt = Jwts.builder().issuer("HarmoniApp").subject("JWT Token")
                         .claim("username", authentication.getName())
-                        .claim("employeeId", user.getEmployeeId())
-                        .claim("id", user.getId())
+                        .claim("employeeId", "")
+                        .claim("id", "")
                         .claim("authorities", authentication.getAuthorities().stream()
                                 .map(GrantedAuthority::getAuthority).collect(Collectors.joining(",")))
                         .issuedAt(new Date())
