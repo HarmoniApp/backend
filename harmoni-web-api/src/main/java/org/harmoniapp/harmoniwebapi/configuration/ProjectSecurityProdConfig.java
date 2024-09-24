@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomAccessDeniedHandler;
 import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomBasicAuthenticationEntryPoint;
 import org.harmoniapp.harmoniwebapi.filter.*;
+import org.harmoniapp.harmoniwebapi.utils.JwtTokenUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -39,6 +40,9 @@ public class ProjectSecurityProdConfig {
     private final AuthorizationManager<RequestAuthorizationContext> ownerAuthorizationManager;
     private final AuthorizationManager<RequestAuthorizationContext> adminOrOwnerQueryParamAuthorizationManager;
 
+    private final JwtTokenUtil jwtTokenUtil;
+    private final HarmoniUserDetailsService harmoniUserDetailsService;
+
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         CsrfTokenRequestAttributeHandler csrfTokenRequestHandler = new CsrfTokenRequestAttributeHandler();
@@ -64,8 +68,8 @@ public class ProjectSecurityProdConfig {
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
-                .addFilterBefore(new JWTTokenValidationFilter(), BasicAuthenticationFilter.class);
+//                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JWTTokenValidationFilter(jwtTokenUtil, harmoniUserDetailsService), BasicAuthenticationFilter.class);
 
 //        http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()); //Only HTTP
         http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()); //Only HTTPS
