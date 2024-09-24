@@ -66,7 +66,7 @@ public class ProjectSecurityConfig {
         }));
 
         http.csrf(csrfConfig -> csrfConfig.csrfTokenRequestHandler(csrfTokenRequestHandler)
-                        .ignoringRequestMatchers("/login", "/**") //public endpoints
+                        .ignoringRequestMatchers("/login") //public endpoints
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
@@ -77,6 +77,7 @@ public class ProjectSecurityConfig {
 //        http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()); //Only HTTPS
 
         http.authorizeHttpRequests(request -> request.requestMatchers("/login", "/error").permitAll()
+                        .requestMatchers("csrf").authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/absence", "POST"),
                                 new AntPathRequestMatcher("/absence/{id}", "PUT"),
                                 new AntPathRequestMatcher("/absence/archive/{id}", "PATCH")).hasRole("USER")

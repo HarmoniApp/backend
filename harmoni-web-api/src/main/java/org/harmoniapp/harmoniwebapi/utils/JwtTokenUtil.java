@@ -66,6 +66,10 @@ public class JwtTokenUtil {
         return claims.getExpiration();
     }
 
+    public String getAuthorities(String token) {
+        return String.valueOf(decodeJWT(token).get("authorities"));
+    }
+
     public boolean isTokenValid(String token, UserDetails userDetails) {
         try {
             return decodeJWT(token).getSubject().equals(userDetails.getUsername()) && !isTokenExpired(token);
