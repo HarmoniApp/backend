@@ -7,7 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.harmoniwebapi.constant.JWTConstant;
+import org.harmoniapp.harmoniwebapi.utils.JwtTokenUtil;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -28,7 +29,7 @@ public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
         if (null != authentication) {
             Environment env = getEnvironment();
             if (null != env) {
-                String secret = env.getProperty(JWTConstant.JWT_SECRET_KEY, JWTConstant.JWT_SECRET_DEFAULT_VALUE);
+                String secret = jwtTokenUtil.getSECRET_KEY();
                 SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
                 String jwt = Jwts.builder().issuer("HarmoniApp").subject("JWT Token")
                         .claim("username", authentication.getName())
