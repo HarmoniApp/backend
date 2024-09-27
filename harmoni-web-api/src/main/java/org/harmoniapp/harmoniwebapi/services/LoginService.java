@@ -3,7 +3,7 @@ package org.harmoniapp.harmoniwebapi.services;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
-import org.harmoniapp.harmoniwebapi.contracts.LoginRequestDTO;
+import org.harmoniapp.harmoniwebapi.contracts.LoginRequestDto;
 import org.harmoniapp.harmoniwebapi.utils.JwtTokenUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,6 +13,13 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Service class responsible for handling user login logic and JWT token generation.
+ *
+ * @see RepositoryCollector
+ * @see AuthenticationManager
+ * @see JwtTokenUtil
+ */
 @Service
 @RequiredArgsConstructor
 public class LoginService {
@@ -20,8 +27,18 @@ public class LoginService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
 
-
-    public String login(LoginRequestDTO loginRequest) {
+    /**
+     * Authenticates the user and generates a JWT token upon successful login.
+     * <p>
+     * This method creates an authentication token based on the username and password provided in the {@link LoginRequestDto}.
+     * If the authentication succeeds, a JWT token is generated with the user's ID included as an extra claim.
+     * </p>
+     *
+     * @param loginRequest the login request containing the user's username and password.
+     * @return the generated JWT token if authentication is successful.
+     * @throws RuntimeException if the user is not found in the repository.
+     */
+    public String login(LoginRequestDto loginRequest) {
         String jwt = "";
         Authentication authentication = UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.username(),
                 loginRequest.password());

@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.utils.JwtTokenUtil;
 import org.springframework.core.env.Environment;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,10 +20,32 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+/**
+ * A filter that generates a JWT token after successful authentication.
+ * <p>
+ * This class extends {@link OncePerRequestFilter}, ensuring the JWT token is generated only once per request,
+ * specifically for the `/login` endpoint. After authentication, it generates a JWT token using the user’s
+ * details and adds it to the response headers.
+ * </p>
+ */
 @RequiredArgsConstructor
 public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
     private final JwtTokenUtil jwtTokenUtil;
 
+    /**
+     * Generates a JWT token after successful authentication and adds it to the response header.
+     * <p>
+     * This method retrieves the current {@link Authentication} from the {@link SecurityContextHolder}, generates
+     * a JWT token using the user's name and authorities, and sets it as a header in the response. The token is
+     * signed with the application's secret key and is valid for ~8 hours.
+     * </p>
+     *
+     * @param request the {@link HttpServletRequest} object that contains the client's request.
+     * @param response the {@link HttpServletResponse} object that contains the filter's response.
+     * @param filterChain the {@link FilterChain} used to invoke the next filter in the chain.
+     * @throws ServletException if the request cannot be handled.
+     * @throws IOException if an input or output error occurs during filtering.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -41,12 +64,19 @@ public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
                         .expiration(new Date((new Date()).getTime() + 30000000)) // ~8 hours
                         .signWith(secretKey)
                         .compact();
-                response.setHeader(JWTConstant.JWT_HEADER, jwt);
+                response.setHeader(jwtTokenUtil.getAUTH_HEADER(), jwt);
             }
         }
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * Specifies that this filter should only apply to the `/login` endpoint.
+     *
+     * @param request the {@link HttpServletRequest} object.
+     * @return {@code true} if the filter should be skipped for this request; {@code false} otherwise.
+     * @throws ServletException if an error occurs during filtering.
+     */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         return !request.getServletPath().equals("/login"); //login path

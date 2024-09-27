@@ -12,8 +12,20 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Authorization manager for checking if the authenticated user is an admin or the owner of a resource
+ * base on path param.
+ */
 @Component
 public class AdminOrOwnerAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
+
+    /**
+     * Checks if the authenticated user is an admin or the owner of a resource.
+     *
+     * @param authenticationSupplier the {@link Supplier} object containing the user's authentication details.
+     * @param ctx                    the {@link RequestAuthorizationContext} object containing the request context.
+     * @return an {@link AuthorizationDecision} object containing the authorization decision.
+     */
     @Override
     public AuthorizationDecision check(Supplier authenticationSupplier, RequestAuthorizationContext ctx) {
         try {
@@ -25,6 +37,14 @@ public class AdminOrOwnerAuthorizationManager implements AuthorizationManager<Re
         }
     }
 
+    /**
+     * Checks if the authenticated user has the necessary permissions.
+     *
+     * @param authentication the current authentication object
+     * @param id the ID of the user to verify ownership against
+     * @return {@code true} if the user is an admin or the owner, {@code false} otherwise
+     * @throws AccessDeniedException if access is denied
+     */
     private boolean hasUserId(Authentication authentication, Long id) throws AccessDeniedException {
         List<GrantedAuthority> authorities = (List<GrantedAuthority>) authentication.getAuthorities();
 

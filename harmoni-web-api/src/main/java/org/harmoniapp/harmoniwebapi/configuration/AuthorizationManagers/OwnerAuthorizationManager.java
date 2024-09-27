@@ -1,7 +1,6 @@
 package org.harmoniapp.harmoniwebapi.configuration.AuthorizationManagers;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.harmonidata.repositories.UserRepository;
 import org.harmoniapp.harmoniwebapi.configuration.Principle;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDecision;
@@ -14,11 +13,20 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Authorization manager for checking if the authenticated user is the owner of a resource.
+ */
 @Component
 @RequiredArgsConstructor
 public class OwnerAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
-    private final UserRepository repository;
 
+    /**
+     * Checks whether the authenticated user is the owner of the resource based on the user ID in the request context.
+     *
+     * @param authenticationSupplier supplier for the current authentication object
+     * @param ctx the context containing request variables like the user ID
+     * @return an {@link AuthorizationDecision} indicating whether access is granted or denied
+     */
     @Override
     public AuthorizationDecision check(Supplier authenticationSupplier, RequestAuthorizationContext ctx) {
 
@@ -31,6 +39,13 @@ public class OwnerAuthorizationManager implements AuthorizationManager<RequestAu
         }
     }
 
+    /**
+     * Determines whether the authenticated user matches the provided user ID.
+     *
+     * @param authentication the current authentication object
+     * @param id the ID of the user to check ownership against
+     * @return {@code true} if the user is authenticated and their ID matches, {@code false} otherwise
+     */
     private boolean hasUserId(Authentication authentication, Long id) throws AccessDeniedException {
         List<GrantedAuthority> authorities = (List<GrantedAuthority>) authentication.getAuthorities();
         if (authorities.getFirst().getAuthority().equals("ROLE_ANONYMOUS")) {

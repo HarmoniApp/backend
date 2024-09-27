@@ -6,7 +6,6 @@ import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomAccessDeniedHandler;
 import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomBasicAuthenticationEntryPoint;
 import org.harmoniapp.harmoniwebapi.filter.AuthoritiesLoggingAfterFilter;
 import org.harmoniapp.harmoniwebapi.filter.CsrfCookieFilter;
-import org.harmoniapp.harmoniwebapi.filter.JWTTokenGeneratorFilter;
 import org.harmoniapp.harmoniwebapi.filter.JWTTokenValidationFilter;
 import org.harmoniapp.harmoniwebapi.utils.JwtTokenUtil;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +33,16 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import java.util.Arrays;
 import java.util.Collections;
 
+/**
+ * Security configuration class for non-production environments.
+ *
+ * <p>This configuration is active only when the "prod" profile is not active.</p>
+ *
+ * @see AuthorizationManager
+ * @see JwtTokenUtil
+ * @see HarmoniUserDetailsService
+ * @see SecurityFilterChain
+ */
 @Configuration
 @Profile("!prod")
 @RequiredArgsConstructor
@@ -45,6 +54,20 @@ public class ProjectSecurityConfig {
     private final JwtTokenUtil jwtTokenUtil;
     private final HarmoniUserDetailsService harmoniUserDetailsService;
 
+    /**
+     * Configures the security filter chain for HTTP requests.
+     *
+     * <p>This includes session management, CORS configuration, CSRF protection, JWT token filters,
+     * and request authorization based on user roles and custom authorization managers. It also configures
+     * which requests are allowed or require authentication.</p>
+     *
+     * <p>Endpoints like "/login" and "/error" are publicly accessible, while other endpoints are restricted
+     * based on roles and custom access rules, such as admin or owner checks.</p>
+     *
+     * @param http the {@link HttpSecurity} to configure.
+     * @return the configured {@link SecurityFilterChain}.
+     * @throws Exception if there is a problem configuring the filter chain.
+     */
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         CsrfTokenRequestAttributeHandler csrfTokenRequestHandler = new CsrfTokenRequestAttributeHandler();
@@ -111,16 +134,34 @@ public class ProjectSecurityConfig {
         return http.build();
     }
 
+    /**
+     * Provides a default {@link PasswordEncoder} bean for encoding passwords.
+     *
+     * @return the password encoder.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+    /**
+     * Provides a {@link CompromisedPasswordChecker} bean for checking compromised passwords.
+     *
+     * @return the compromised password checker.
+     */
     @Bean
     public CompromisedPasswordChecker compromisedPasswordChecker() {
         return new HaveIBeenPwnedRestApiPasswordChecker();
     }
 
+    /**
+     * Configures and provides an {@link AuthenticationManager} using a custom
+     * {@link HarmoniUserPasswordAuthenticationProvider}.
+     *
+     * @param userDetailsService the service for loading user details.
+     * @param passwordEncoder    the encoder for checking user passwords.
+     * @return the configured {@link AuthenticationManager}.
+     */
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
                                                        PasswordEncoder passwordEncoder) {

@@ -43,6 +43,9 @@ public class NotificationController {
     /**
      * Marks a notification as read.
      *
+     * <p>This endpoint is protected by security measures, and will only allow the owner of the notification
+     * to mark it as read.</p>
+     *
      * @param id the ID of the notification to mark as read
      * @return the updated NotificationDto object representing the read notification
      */
@@ -65,6 +68,9 @@ public class NotificationController {
 
     /**
      * Deletes a notification by its ID.
+     *
+     * <p>This endpoint is protected by security measures, and will only allow the owner of the notification
+     *  to delete it.</p>
      *
      * @param id the ID of the notification to delete
      */

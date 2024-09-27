@@ -16,6 +16,13 @@ import java.util.Date;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Utility class for handling JWT token generation, validation, and decoding.
+ * <p>
+ * This component provides methods to create JWT tokens using user authentication data, decode tokens to extract claims,
+ * and validate tokens based on expiration and user details.
+ * </p>
+ */
 @Component
 @Getter
 public class JwtTokenUtil {
@@ -34,6 +41,13 @@ public class JwtTokenUtil {
         return generateToken(authentication, Map.of());
     }
 
+    /**
+     * Generates a JWT token for the authenticated user with extra claims.
+     *
+     * @param authentication the {@link Authentication} object containing user details.
+     * @param extraClaims additional claims to add to the token.
+     * @return a signed JWT token as a {@link String}.
+     */
     public String generateToken(Authentication authentication, Map<String, Object> extraClaims) {
         SecretKey secretKey = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
@@ -47,6 +61,12 @@ public class JwtTokenUtil {
                 .signWith(secretKey).compact();
     }
 
+    /**
+     * Decodes a JWT token and extracts the claims.
+     *
+     * @param token the JWT token to decode.
+     * @return a {@link Claims} object containing the token's claims.
+     */
     public Claims decodeJWT(String token) {
         SecretKey secretKey = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
@@ -54,22 +74,53 @@ public class JwtTokenUtil {
                 .build().parseSignedClaims(token).getPayload();
     }
 
+    /**
+     * Extracts the username from a JWT token.
+     *
+     * @param token the JWT token to decode.
+     * @return the username as a {@link String}.
+     */
     public String getUsername(String token) {
         return String.valueOf(decodeJWT(token).get("username"));
     }
 
+    /**
+     * Extracts the user ID from a JWT token.
+     *
+     * @param token the JWT token to decode.
+     * @return the user ID as a {@link Long}.
+     */
     public Long getUserId(String token) {
         return Long.parseLong(String.valueOf(decodeJWT(token).get("id")));
     }
 
-    public Date getExpiration(Claims claims) {
-        return claims.getExpiration();
+    /**
+     * Extracts the expiration date from a JWT token.
+     *
+     * @param token the JWT token to decode.
+     * @return the expiration date as a {@link Date}.
+     */
+    public Date getExpiration(String token) {
+        return decodeJWT(token).getExpiration();
     }
 
+    /**
+     * Extracts the authorities from a JWT token.
+     *
+     * @param token the JWT token to decode.
+     * @return the authorities as a {@link String}.
+     */
     public String getAuthorities(String token) {
         return String.valueOf(decodeJWT(token).get("authorities"));
     }
 
+    /**
+     * Validates a JWT token based on the user details and expiration data.
+     *
+     * @param token the JWT token to validate.
+     * @param userDetails the {@link UserDetails} object containing user details.
+     * @return {@code true} if the token is valid, {@code false} otherwise.
+     */
     public boolean isTokenValid(String token, UserDetails userDetails) {
         try {
             return decodeJWT(token).getSubject().equals(userDetails.getUsername()) && !isTokenExpired(token);
@@ -78,6 +129,12 @@ public class JwtTokenUtil {
         }
     }
 
+    /**
+     * Checks if a JWT token has expired.
+     *
+     * @param token the JWT token to check.
+     * @return {@code true} if the token has expired, {@code false} otherwise.
+     */
     public boolean isTokenExpired(String token) {
         try {
             return decodeJWT(token).getExpiration().before(new Date(System.currentTimeMillis()));

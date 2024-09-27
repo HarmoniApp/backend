@@ -23,6 +23,9 @@ public class ShiftController {
     /**
      * Retrieves a shift's information by shift ID.
      *
+     * <p>This endpoint is secured and only accessible by users with the 'ADMIN' role
+     * or the owner of the shift.</p>
+     *
      * @param id the ID of the shift to retrieve
      * @return a ShiftDto containing shift information
      */

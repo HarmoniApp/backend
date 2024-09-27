@@ -15,8 +15,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * Authorization manager for checking if the authenticated user is an admin or the owner of a resource
+ * based on query param.
+ */
 @Component
 public class AdminOrOwnerQueryParamAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
+
+    /**
+     * Checks whether the authenticated user is an admin or the owner of the resource based on the `user_id` query parameter.
+     *
+     * @param authenticationSupplier supplier for the current authentication object
+     * @param ctx the context containing the request and query parameters
+     * @return an {@link AuthorizationDecision} indicating whether access is granted
+     */
     @Override
     public AuthorizationDecision check(Supplier<Authentication> authenticationSupplier, RequestAuthorizationContext ctx) {
         String queryStr = ctx.getRequest().getQueryString();
@@ -35,6 +47,14 @@ public class AdminOrOwnerQueryParamAuthorizationManager implements Authorization
         return new AuthorizationDecision(hasUserId(authentication, userId));
     }
 
+    /**
+     * Verifies if the authenticated user is either an admin or the owner of the resource.
+     *
+     * @param authentication the current authentication object
+     * @param id the ID of the user to verify ownership against
+     * @return {@code true} if the user is an admin or the owner, {@code false} otherwise
+     * @throws AccessDeniedException if access is denied
+     */
     private boolean hasUserId(Authentication authentication, Long id) throws AccessDeniedException {
         List<GrantedAuthority> authorities = (List<GrantedAuthority>) authentication.getAuthorities();
 
