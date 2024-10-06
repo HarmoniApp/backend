@@ -40,7 +40,7 @@ public record UserDto(
 
         @NotEmpty(message = "Surname cannot be empty")
         @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
-        @Pattern(regexp = "^[a-zA-Z ]+$", message = "Surname must contain only letters and spaces")
+        @Pattern(regexp = "^[a-zA-Z -]+$", message = "Surname must contain only letters, spaces and dashes")
         String surname,
 
         @NotEmpty(message = "Email cannot be empty")

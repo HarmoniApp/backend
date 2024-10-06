@@ -27,12 +27,12 @@ public record AddressDto(
 
         @NotEmpty(message = "City cannot be empty")
         @Size(max = 50, message = "City must be less than or equal to 50 characters")
-        @Pattern(regexp = "^[a-zA-Z ]+$", message = "City must contain only letters and spaces")
+        @Pattern(regexp = "^[a-zA-Z -]+$", message = "City must contain only letters, spaces and dashes")
         String city,
 
         @NotEmpty(message = "Street cannot be empty")
         @Size(max = 100, message = "Street must be less than or equal to 100 characters")
-        @Pattern(regexp = "^[a-zA-Z ]+$", message = "Street must contain only letters and spaces")
+        @Pattern(regexp = "^[a-zA-Z ,-]+$", message = "Street must contain only letters, spaces, commas and dashes")
         String street,
 
         @NotEmpty(message = "Building number cannot be empty")

@@ -99,7 +99,9 @@ public class UserService {
         Address residence = addressService.saveAddressEntity(userDto.residence());
         user.setResidence(residence);
 
-        Address workAddress = userDto.workAddress().toEntity();
+        Address workAddress = repositoryCollector.getAddresses().findById(userDto.workAddress().toEntity().getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Department with ID " + userDto.workAddress().id() + " not found"));
+
         user.setWorkAddress(workAddress);
 
         user.setLanguages(
