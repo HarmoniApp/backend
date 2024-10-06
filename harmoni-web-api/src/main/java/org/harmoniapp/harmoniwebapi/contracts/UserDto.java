@@ -40,11 +40,12 @@ public record UserDto(
 
         @NotEmpty(message = "Surname cannot be empty")
         @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
-        @Pattern(regexp = "^[a-zA-Z]+$", message = "Surname must contain only letters")
+        @Pattern(regexp = "^[a-zA-Z -]+$", message = "Surname must contain only letters, spaces and dashes")
         String surname,
 
         @NotEmpty(message = "Email cannot be empty")
         @Email(message = "Email should be valid")
+        @Size(max = 320, message = "Email must be less than or equal to 320 characters")
         String email,
 
         //TODO: validation?
@@ -64,17 +65,17 @@ public record UserDto(
         AddressDto residence,
 
         @NotNull(message = "Work address cannot be null")
-        @Valid
         @JsonProperty("work_address") AddressDto workAddress,
 
         @JsonProperty("supervisor_id") Long supervisorId,
 
         @NotEmpty(message = "Phone number cannot be empty")
-        @Pattern(regexp = "^[+]?\\d{1,3}[ ]?(\\d[ ]?){9,15}$", message = "Phone number must be between 9 and 15 digits, and can contain spaces and a leading '+'")
+        @Pattern(regexp = "^(\\+?\\d{1,3}[\\s]?)?(\\d[\\s]?){9,15}$", message = "Phone number must be between 9 and 15 digits, and can contain spaces and a leading '+'")
         @JsonProperty("phone_number") String phoneNumber,
 
         @NotEmpty(message = "Employee ID cannot be empty")
         @Size(max = 20, message = "Employee ID must be less than or equal to 20 characters")
+        @Pattern(regexp = "^[a-zA-Z0-9-]+$", message = "Employee ID must contain only letters, numbers, and dashes")
         @JsonProperty("employee_id") String employeeId,
 
         @NotEmpty(message = "Roles cannot be null or empty")
