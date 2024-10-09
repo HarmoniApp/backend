@@ -54,6 +54,7 @@ public class UserService {
             users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contracts, roles, languages, sort);
         }
         return users.stream()
+                .filter(user -> !user.isActive())
                 .map(UserDto::fromEntity)
                 .toList();
     }
@@ -177,17 +178,22 @@ public class UserService {
     }
 
     /**
-     * Deletes a user by their ID.
+     * Marks a user as inactive (soft delete) by their ID.
      *
-     * @param id The ID of the user to delete.
+     * @param id The ID of the user to deactivate.
      * @throws IllegalArgumentException if the user with the specified ID is not found.
+     * @throws IllegalStateException if the user is already deactivated.
      */
     public void delete(long id) {
-        var userOptional = repositoryCollector.getUsers().findById(id);
-        if (userOptional.isEmpty()) {
-            throw new IllegalArgumentException();
+        var user = repositoryCollector.getUsers().findById(id)
+                .orElseThrow(IllegalArgumentException::new);
+
+        if (!user.isActive()) {
+            throw new IllegalStateException("User is already deactivated.");
         }
-        repositoryCollector.getUsers().deleteById(id);
+
+        user.setActive(false);
+        repositoryCollector.getUsers().save(user);
     }
 
     /**

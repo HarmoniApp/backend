@@ -1,11 +1,13 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.harmoniapp.harmonidata.entities.ContractType;
 import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.User;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -78,6 +80,14 @@ public record UserDto(
         @Pattern(regexp = "^[a-zA-Z0-9-]+$", message = "Employee ID must contain only letters, numbers, and dashes")
         @JsonProperty("employee_id") String employeeId,
 
+        String photo,
+
+        @JsonProperty("last_password_change") LocalDate lastPasswordChange,
+
+        @JsonProperty("is_password_generated") boolean isPasswordGenerated,
+
+        @JsonProperty("is_active") boolean isActive,
+
         @NotEmpty(message = "Roles cannot be null or empty")
         List<Role> roles,
 
@@ -105,8 +115,12 @@ public record UserDto(
                 (user.getSupervisor() != null) ? user.getSupervisor().getId() : null,
                 user.getPhoneNumber(),
                 user.getEmployeeId(),
+                user.getPhoto(),
+                user.getLastPasswordChange(),
+                user.isPasswordGenerated(),
+                user.isActive(),
                 user.getRoles().stream().toList(),
-                user.getLanguages().stream().map(p -> new LanguageDto(p.getId(), p.getName())).toList()
+                user.getLanguages().stream().map(p -> new LanguageDto(p.getId(), p.getName(), p.getCode())).toList()
         );
     }
 
@@ -130,6 +144,10 @@ public record UserDto(
                 null,
                 this.phoneNumber,
                 this.employeeId,
+                this.photo,
+                this.lastPasswordChange,
+                this.isPasswordGenerated,
+                this.isActive,
                 null,
                 null
         );

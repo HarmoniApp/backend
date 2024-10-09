@@ -14,7 +14,9 @@ public record LanguageDto(
 
         @NotEmpty(message = "Language name cannot be empty")
         @Pattern(regexp = "^[a-zA-Z]+$", message = "Language name must contain only letters")
-        String name) {
+        String name,
+        @Pattern(regexp = "^[a-zA-Z]{2}$", message = "Code must contain only two letters")
+        String code) {
 
     /**
      * Converts a {@link Language} entity to a {@link LanguageDto}.
@@ -23,7 +25,7 @@ public record LanguageDto(
      * @return a {@link LanguageDto} representing the entity.
      */
     public static LanguageDto fromEntity(final Language entity) {
-        return new LanguageDto(entity.getId(), entity.getName());
+        return new LanguageDto(entity.getId(), entity.getName(), entity.getCode());
     }
 
     /**
@@ -32,6 +34,6 @@ public record LanguageDto(
      * @return a {@link Language} entity representing this DTO.
      */
     public Language toEntity() {
-        return new Language(id, name);
+        return new Language(id, name, code);
     }
 }

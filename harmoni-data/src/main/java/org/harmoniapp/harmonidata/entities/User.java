@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDate;
@@ -56,6 +54,17 @@ public class User {
 
     @Column(name = "employee_id")
     private String employeeId;
+
+    private String photo;
+
+    @Column(name = "last_password_change")
+    private LocalDate lastPasswordChange;
+
+    @Column(name = "is_password_generated")
+    private boolean isPasswordGenerated;
+
+    @Column(name = "is_active")
+    private boolean isActive;
 
     @ManyToMany
     @JoinTable(
