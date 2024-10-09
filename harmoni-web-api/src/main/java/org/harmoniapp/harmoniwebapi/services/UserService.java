@@ -195,7 +195,6 @@ public class UserService {
 
         user.setActive(false);
         repositoryCollector.getUsers().save(user);
-
     }
 
     /**
