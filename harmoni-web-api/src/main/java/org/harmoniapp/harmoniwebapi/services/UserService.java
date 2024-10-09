@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,7 @@ public class UserService {
             users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contracts, roles, languages, sort);
         }
         return users.stream()
+                .filter(User::isActive)
                 .map(UserDto::fromEntity)
                 .toList();
     }
@@ -103,6 +105,9 @@ public class UserService {
                         .orElseThrow(() -> new IllegalArgumentException("Department with ID " + userDto.workAddress().id() + " not found"));
 
         user.setWorkAddress(workAddress);
+        user.setLastPasswordChange(LocalDate.now());
+        user.setPasswordGenerated(true);
+        user.setActive(true);
 
         user.setLanguages(
                 userDto.languages().stream()
@@ -177,17 +182,22 @@ public class UserService {
     }
 
     /**
-     * Deletes a user by their ID.
+     * Marks a user as inactive (soft delete) by their ID.
      *
-     * @param id The ID of the user to delete.
+     * @param id The ID of the user to deactivate.
      * @throws IllegalArgumentException if the user with the specified ID is not found.
+     * @throws IllegalStateException if the user is already deactivated.
      */
     public void delete(long id) {
-        var userOptional = repositoryCollector.getUsers().findById(id);
-        if (userOptional.isEmpty()) {
-            throw new IllegalArgumentException();
+        var user = repositoryCollector.getUsers().findById(id)
+                .orElseThrow(IllegalArgumentException::new);
+
+        if (!user.isActive()) {
+            throw new IllegalStateException("User is already deactivated.");
         }
-        repositoryCollector.getUsers().deleteById(id);
+
+        user.setActive(false);
+        repositoryCollector.getUsers().save(user);
     }
 
     /**

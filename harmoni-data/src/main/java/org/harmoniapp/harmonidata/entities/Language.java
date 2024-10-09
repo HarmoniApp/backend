@@ -23,6 +23,8 @@ public class Language {
 
     private String name;
 
+    private String code;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

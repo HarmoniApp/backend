@@ -24,7 +24,7 @@ public record PartialUserDto(long id,
                 user.getFirstname(),
                 user.getSurname(),
                 user.getLanguages().stream()
-                        .map(p -> new LanguageDto(p.getId(), p.getName()))
+                        .map(p -> new LanguageDto(p.getId(), p.getName(), p.getCode()))
                         .collect(Collectors.toSet())
         );
     }
