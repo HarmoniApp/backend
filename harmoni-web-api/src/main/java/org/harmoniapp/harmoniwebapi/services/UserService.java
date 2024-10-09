@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,6 +62,7 @@ public class UserService {
             users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contracts, roles, languages, sort);
         }
         return users.stream()
+                .filter(User::isActive)
                 .map(UserDto::fromEntity)
                 .toList();
     }
@@ -88,6 +90,10 @@ public class UserService {
      */
     @Transactional
     public UserDto add(UserDto userDto) {
+        if (userDto.contractExpiration().isBefore(userDto.contractSignature())) {
+            throw new IllegalArgumentException("Contract expiration date must be after the contract signature date.");
+        }
+
         User user = userDto.toEntity();
 
         ContractType contractType = repositoryCollector.getContractTypes()
@@ -102,8 +108,13 @@ public class UserService {
         Address residence = addressService.saveAddressEntity(userDto.residence());
         user.setResidence(residence);
 
-        Address workAddress = addressService.saveAddressEntity(userDto.workAddress());
+        Address workAddress = repositoryCollector.getAddresses().findById(userDto.workAddress().toEntity().getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Department with ID " + userDto.workAddress().id() + " not found"));
+
         user.setWorkAddress(workAddress);
+        user.setLastPasswordChange(LocalDate.now());
+        user.setPasswordGenerated(true);
+        user.setActive(true);
 
         user.setLanguages(
                 userDto.languages().stream()
@@ -133,68 +144,71 @@ public class UserService {
      */
     @Transactional
     public UserDto update(long id, UserDto userDto) {
-        var existingUser = repositoryCollector.getUsers().findById(id);
+        if (userDto.contractExpiration().isBefore(userDto.contractSignature())) {
+            throw new IllegalArgumentException("Contract expiration date must be after the contract signature date.");
+        }
 
-        User user = userDto.toEntity();
-
-        user.setId(
-                existingUser.map(User::getId).orElse(null)
-        );
+        var existingUser = repositoryCollector.getUsers().findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User with ID " + id + " not found"));
 
         ContractType contractType = repositoryCollector.getContractTypes()
                 .findById(userDto.contractType().getId())
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new IllegalArgumentException("Contract Type with ID " + id + " not found"));
 
-        user.setContractType(contractType);
+        User supervisor = repositoryCollector.getUsers().findById(userDto.supervisorId())
+                .orElse(null);
 
-        User supervisor = repositoryCollector.getUsers().findById(userDto.supervisorId()).orElse(null);
-        user.setSupervisor(supervisor);
+        existingUser.setFirstname(userDto.firstname());
+        existingUser.setSurname(userDto.surname());
+        existingUser.setEmail(userDto.email());
+        existingUser.setContractType(contractType);
+        existingUser.setSupervisor(supervisor);
+        existingUser.setContractSignature(userDto.contractSignature());
+        existingUser.setContractExpiration(userDto.contractExpiration());
+        existingUser.setPhoneNumber(userDto.phoneNumber());
+        existingUser.setEmployeeId(userDto.employeeId());
 
-        Address residence;
-        if (existingUser.isPresent()) {
-            residence = existingUser.get().getResidence();
-            residence = addressService.updateAddress(residence, userDto.residence());
-        } else {
-            residence = addressService.saveAddressEntity(userDto.residence());
-        }
-        user.setResidence(residence);
+        Address residence = existingUser.getResidence();
+        residence = addressService.updateAddress(residence, userDto.residence());
+        existingUser.setResidence(residence);
 
-        Address workAddress;
-        if (existingUser.isPresent()) {
-            workAddress = existingUser.get().getWorkAddress();
-            workAddress = addressService.updateAddress(workAddress, userDto.workAddress());
-        } else {
-            workAddress = addressService.saveAddressEntity(userDto.workAddress());
-        }
-        user.setWorkAddress(workAddress);
+        Long newDepartmentId = userDto.workAddress().id();
+        Address newDepartment = repositoryCollector.getAddresses().findById(newDepartmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Department with ID " + id + " not found"));
+        existingUser.setWorkAddress(newDepartment);
 
-        user.setLanguages(
+        existingUser.setLanguages(
                 userDto.languages().stream()
                         .map(p -> repositoryCollector.getLanguages().findById(p.id()).get())
                         .collect(Collectors.toSet()));
 
-        user.setRoles(
+        existingUser.setRoles(
                 userDto.roles().stream()
                         .map(p -> repositoryCollector.getRoles().findById(p.getId()).get())
                         .collect(Collectors.toSet())
         );
 
-        User response = repositoryCollector.getUsers().save(user);
+        User response = repositoryCollector.getUsers().save(existingUser);
         return UserDto.fromEntity(response);
     }
 
     /**
-     * Deletes a user by their ID.
+     * Marks a user as inactive (soft delete) by their ID.
      *
-     * @param id The ID of the user to delete.
+     * @param id The ID of the user to deactivate.
      * @throws IllegalArgumentException if the user with the specified ID is not found.
+     * @throws IllegalStateException if the user is already deactivated.
      */
     public void delete(long id) {
-        var userOptional = repositoryCollector.getUsers().findById(id);
-        if (userOptional.isEmpty()) {
-            throw new IllegalArgumentException();
+        var user = repositoryCollector.getUsers().findById(id)
+                .orElseThrow(IllegalArgumentException::new);
+
+        if (!user.isActive()) {
+            throw new IllegalStateException("User is already deactivated.");
         }
-        repositoryCollector.getUsers().deleteById(id);
+
+        user.setActive(false);
+        repositoryCollector.getUsers().save(user);
     }
 
     /**

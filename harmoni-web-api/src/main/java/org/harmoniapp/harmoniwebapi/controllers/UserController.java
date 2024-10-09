@@ -80,7 +80,7 @@ public class UserController {
      * @param userDto The UserDto object containing the updated user data.
      * @return The updated UserDto object.
      */
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto updateUser(@PathVariable long id,@Valid @RequestBody UserDto userDto) {
         return service.update(id, userDto);
