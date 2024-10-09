@@ -104,6 +104,7 @@ public class UserService {
                         .orElseThrow(() -> new IllegalArgumentException("Department with ID " + userDto.workAddress().id() + " not found"));
 
         user.setWorkAddress(workAddress);
+        user.setActive(true);
 
         user.setLanguages(
                 userDto.languages().stream()
@@ -194,6 +195,7 @@ public class UserService {
 
         user.setActive(false);
         repositoryCollector.getUsers().save(user);
+
     }
 
     /**
