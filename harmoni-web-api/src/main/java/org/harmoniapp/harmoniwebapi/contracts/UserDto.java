@@ -82,10 +82,6 @@ public record UserDto(
 
         String photo,
 
-        @JsonProperty("last_password_change") LocalDate lastPasswordChange,
-
-        @JsonProperty("is_password_generated") boolean isPasswordGenerated,
-
         @JsonProperty("is_active") boolean isActive,
 
         @NotEmpty(message = "Roles cannot be null or empty")
@@ -116,8 +112,6 @@ public record UserDto(
                 user.getPhoneNumber(),
                 user.getEmployeeId(),
                 user.getPhoto(),
-                user.getLastPasswordChange(),
-                user.isPasswordGenerated(),
                 user.isActive(),
                 user.getRoles().stream().toList(),
                 user.getLanguages().stream().map(p -> new LanguageDto(p.getId(), p.getName(), p.getCode())).toList()
@@ -145,8 +139,8 @@ public record UserDto(
                 this.phoneNumber,
                 this.employeeId,
                 this.photo,
-                this.lastPasswordChange,
-                this.isPasswordGenerated,
+                null,
+                true,
                 this.isActive,
                 null,
                 null

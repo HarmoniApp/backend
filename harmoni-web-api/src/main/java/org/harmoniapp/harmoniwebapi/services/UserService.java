@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,7 +55,7 @@ public class UserService {
             users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contracts, roles, languages, sort);
         }
         return users.stream()
-                .filter(user -> !user.isActive())
+                .filter(User::isActive)
                 .map(UserDto::fromEntity)
                 .toList();
     }
@@ -104,6 +105,8 @@ public class UserService {
                         .orElseThrow(() -> new IllegalArgumentException("Department with ID " + userDto.workAddress().id() + " not found"));
 
         user.setWorkAddress(workAddress);
+        user.setLastPasswordChange(LocalDate.now());
+        user.setPasswordGenerated(true);
         user.setActive(true);
 
         user.setLanguages(
