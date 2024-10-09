@@ -1,16 +1,13 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.harmoniapp.harmonidata.entities.ContractType;
 import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.User;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 /**
