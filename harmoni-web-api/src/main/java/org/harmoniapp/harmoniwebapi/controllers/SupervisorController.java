@@ -1,11 +1,10 @@
 package org.harmoniapp.harmoniwebapi.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.harmoniapp.harmoniwebapi.contracts.SupervisorDto;
 import org.harmoniapp.harmoniwebapi.services.SupervisorService;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * REST controller for managing supervisors.
@@ -19,12 +18,15 @@ public class SupervisorController {
     private final SupervisorService service;
 
     /**
-     * Retrieves all supervisors.
+     * Retrieves a paginated list of all supervisors.
      *
-     * @return a list of {@link SupervisorDto} representing all supervisors.
+     * @param pageNumber the page number to retrieve, defaults to 0 if not specified
+     * @param pageSize   the number of items per page, defaults to 20 if not specified
+     * @return a PageDto containing a list of SupervisorDto objects representing all supervisors
      */
     @GetMapping
-    public List<SupervisorDto> getAllSupervisors() {
-        return service.getAllSupervisors();
+    public PageDto<SupervisorDto> getAllSupervisors(@RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+                                                    @RequestParam(name = "pageSize", required = false, defaultValue = "20") int pageSize) {
+        return service.getAllSupervisors(pageNumber, pageSize);
     }
 }

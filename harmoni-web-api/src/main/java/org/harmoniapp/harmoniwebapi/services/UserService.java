@@ -5,8 +5,12 @@ import org.harmoniapp.harmonidata.entities.Address;
 import org.harmoniapp.harmonidata.entities.ContractType;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
+import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,36 +32,37 @@ public class UserService {
 
 
     /**
-     * Retrieves a list of UserDto objects based on specified criteria.
+     * Retrieves a paginated list of UserDto objects based on specified criteria.
      *
-     * @param roles     List of role IDs to filter users by roles.
-     * @param contracts List of contract IDs to filter users by contracts.
-     * @param languages List of language IDs to filter users by languages.
-     * @param sortBy    Field name by which the results should be sorted.
-     * @param order     Sort order for the results. Can be "asc" for ascending or "desc" for descending. Defaults to "asc" if null or empty.
-     * @return A list of UserDto objects matching the specified criteria, sorted as requested.
+     * @param roles      List of role IDs to filter users by roles.
+     * @param contracts  List of contract IDs to filter users by contracts.
+     * @param languages  List of language IDs to filter users by languages.
+     * @param pageNumber The page number to retrieve.
+     * @param pageSize   The number of records per page.
+     * @param sortBy     Field name by which the results should be sorted.
+     * @param order      Sort order for the results. Can be "asc" for ascending or "desc" for descending. Defaults to "asc" if null or empty.
+     * @return A PageDto containing a list of UserDto objects matching the specified criteria, sorted as requested.
      */
-    public List<UserDto> getUsers(List<Long> roles, List<Long> contracts, List<Long> languages, String sortBy, String order) {
+    public PageDto<UserDto> getUsers(List<Long> roles, List<Long> contracts, List<Long> languages, int pageNumber, int pageSize, String sortBy, String order) {
         Sort.Direction sortDirection;
         if (order == null || order.isEmpty() || order.equalsIgnoreCase("asc")) {
             sortDirection = Sort.Direction.ASC;
         } else {
             sortDirection = Sort.Direction.DESC;
         }
-        Sort sort = Sort.by(sortDirection, sortBy);
-
-        List<User> users;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy));
+        Page<User> users;
         if ((roles == null || roles.isEmpty())
                 && (contracts == null || contracts.isEmpty())
                 && (languages == null || languages.isEmpty())) {
-            users = repositoryCollector.getUsers().findAll(sort);
+            users = repositoryCollector.getUsers().findAll(pageable);
         } else {
-            users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contracts, roles, languages, sort);
+            users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contracts, roles, languages, pageable);
         }
-        return users.stream()
-                .filter(User::isActive)
-                .map(UserDto::fromEntity)
-                .toList();
+        return new PageDto<>(users.stream().map(UserDto::fromEntity).toList(),
+                users.getSize(),
+                users.getNumber(),
+                users.getTotalPages());
     }
 
     /**
@@ -102,7 +107,7 @@ public class UserService {
         user.setResidence(residence);
 
         Address workAddress = repositoryCollector.getAddresses().findById(userDto.workAddress().toEntity().getId())
-                        .orElseThrow(() -> new IllegalArgumentException("Department with ID " + userDto.workAddress().id() + " not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Department with ID " + userDto.workAddress().id() + " not found"));
 
         user.setWorkAddress(workAddress);
         user.setLastPasswordChange(LocalDate.now());
@@ -186,7 +191,7 @@ public class UserService {
      *
      * @param id The ID of the user to deactivate.
      * @throws IllegalArgumentException if the user with the specified ID is not found.
-     * @throws IllegalStateException if the user is already deactivated.
+     * @throws IllegalStateException    if the user is already deactivated.
      */
     public void delete(long id) {
         var user = repositoryCollector.getUsers().findById(id)

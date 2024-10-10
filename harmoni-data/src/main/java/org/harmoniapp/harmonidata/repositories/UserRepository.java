@@ -1,6 +1,8 @@
 package org.harmoniapp.harmonidata.repositories;
 
 import org.harmoniapp.harmonidata.entities.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -17,10 +19,10 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
             where (u.contractType.id in ?1 or ?1 is null) and
                   (roles.id in ?2 or ?2 is null) and
                   (languages.id in ?3 or ?3 is null)""")
-    List<User> findAllByContractAndRoleAndLanguage(@Nullable Collection<Long> contract,
+    Page<User> findAllByContractAndRoleAndLanguage(@Nullable Collection<Long> contract,
                                                    @Nullable Collection<Long> role,
                                                    @Nullable Collection<Long> language,
-                                                   Sort sort);
+                                                   Pageable pageable);
 
     @Query("""
             select u from User u left join u.roles roles left join u.languages languages
@@ -42,5 +44,5 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Query("""
         select u from User u left join u.roles roles
         where roles.isSup = true""")
-    List<User> findSupervisors();
+    Page<User> findSupervisors(Pageable pageable);
 }

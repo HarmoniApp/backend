@@ -3,11 +3,14 @@ package org.harmoniapp.harmoniwebapi.services;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
+import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.harmoniapp.harmoniwebapi.contracts.SupervisorDto;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * Service class for managing supervisors.
@@ -20,15 +23,20 @@ public class SupervisorService {
     private final RepositoryCollector repositories;
 
     /**
-     * Retrieves all supervisors.
+     * Retrieves a paginated list of all supervisors.
      * It fetches supervisors from the repository and converts them to {@link SupervisorDto}.
      *
-     * @return a list of {@link SupervisorDto} representing all supervisors.
+     * @param pageNumber the page number to retrieve.
+     * @param pageSize   the number of supervisors per page.
+     * @return a PageDto containing a list of {@link SupervisorDto} representing all supervisors.
      */
-    public List<SupervisorDto> getAllSupervisors(){
-        List<User> users = repositories.getUsers().findSupervisors();
-        return users.stream()
-                .map(SupervisorDto::fromEntity)
-                .toList();
+    public PageDto<SupervisorDto> getAllSupervisors(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("firstname", "surname"));
+        Page<User> users = repositories.getUsers().findSupervisors(pageable);
+
+        return new PageDto<>(users.stream().map(SupervisorDto::fromEntity).toList(),
+                users.getSize(),
+                users.getNumber(),
+                users.getTotalPages());
     }
 }
