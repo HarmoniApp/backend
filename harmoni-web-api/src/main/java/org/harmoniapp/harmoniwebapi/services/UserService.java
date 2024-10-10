@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -105,7 +106,7 @@ public class UserService {
                         .orElseThrow(() -> new IllegalArgumentException("Department with ID " + userDto.workAddress().id() + " not found"));
 
         user.setWorkAddress(workAddress);
-        user.setLastPasswordChange(LocalDate.now());
+        user.setLastPasswordChange(LocalDateTime.now());
         user.setPasswordGenerated(true);
         user.setActive(true);
 
