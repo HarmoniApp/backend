@@ -5,6 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.harmonidata.entities.User;
+import org.harmoniapp.harmonidata.repositories.UserRepository;
 import org.harmoniapp.harmoniwebapi.configuration.HarmoniUserDetailsService;
 import org.harmoniapp.harmoniwebapi.configuration.Principle;
 import org.harmoniapp.harmoniwebapi.utils.JwtTokenUtil;
@@ -29,6 +31,7 @@ import java.io.IOException;
 public class JWTTokenValidationFilter extends OncePerRequestFilter {
     private final JwtTokenUtil jwtTokenUtil;
     private final HarmoniUserDetailsService userDetailsService;
+    private final UserRepository userRepository;
 
     /**
      * Validates the JWT token received in the request header.
@@ -57,7 +60,9 @@ public class JWTTokenValidationFilter extends OncePerRequestFilter {
             username = jwtTokenUtil.getUsername(jwt);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            if (jwtTokenUtil.isTokenValid(jwt, userDetails)) {
+            User user = userRepository.findByEmail(username).orElseThrow(IllegalArgumentException::new);
+
+            if (jwtTokenUtil.isTokenValid(jwt, userDetails, user.getLastPasswordChange())) {
                 Long id = jwtTokenUtil.getUserId(jwt);
                 Principle principle = new Principle(id, username);
                 Authentication authentication = new UsernamePasswordAuthenticationToken(principle, null,

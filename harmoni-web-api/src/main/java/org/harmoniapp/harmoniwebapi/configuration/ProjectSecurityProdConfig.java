@@ -2,6 +2,7 @@ package org.harmoniapp.harmoniwebapi.configuration;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.harmonidata.repositories.UserRepository;
 import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomAccessDeniedHandler;
 import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomBasicAuthenticationEntryPoint;
 import org.harmoniapp.harmoniwebapi.filter.*;
@@ -52,6 +53,7 @@ public class ProjectSecurityProdConfig {
 
     private final JwtTokenUtil jwtTokenUtil;
     private final HarmoniUserDetailsService harmoniUserDetailsService;
+    private final UserRepository userRepository;
 
     /**
      * Configures the security filter chain for HTTP requests.
@@ -93,7 +95,7 @@ public class ProjectSecurityProdConfig {
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
 //                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
-                .addFilterBefore(new JWTTokenValidationFilter(jwtTokenUtil, harmoniUserDetailsService), BasicAuthenticationFilter.class);
+                .addFilterBefore(new JWTTokenValidationFilter(jwtTokenUtil, harmoniUserDetailsService, userRepository), BasicAuthenticationFilter.class);
 
 //        http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()); //Only HTTP
         http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()); //Only HTTPS

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.LoginRequestDto;
+import org.harmoniapp.harmoniwebapi.exception.InactiveAccountException;
 import org.harmoniapp.harmoniwebapi.utils.JwtTokenUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -50,6 +51,10 @@ public class LoginService {
             if (user == null) {
                 throw new RuntimeException("User not found!");
             }
+            if (!user.isActive()) {
+                throw new InactiveAccountException();
+            }
+            //TODO: Add a check to see if the password is a one-time use
 
             Map<String, Object> extraClaims = new HashMap<>();
             extraClaims.put("id", user.getId());

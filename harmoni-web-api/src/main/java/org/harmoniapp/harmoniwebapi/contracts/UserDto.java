@@ -47,7 +47,6 @@ public record UserDto(
         @Size(max = 320, message = "Email must be less than or equal to 320 characters")
         String email,
 
-        //TODO: validation?
         String password,
 
         @NotNull(message = "Contract type cannot be null")

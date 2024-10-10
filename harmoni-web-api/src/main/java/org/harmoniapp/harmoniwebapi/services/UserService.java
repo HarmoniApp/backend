@@ -246,8 +246,8 @@ public class UserService {
 
         String hashedPwd = passwordEncoder.encode(pwd);
         user.setPassword(hashedPwd);
-
-        //TODO: set field (like) needChanged to FALSE and date of lats password change
+        user.setPasswordGenerated(false);
+        user.setLastPasswordChange(LocalDate.now());
 
         repositoryCollector.getUsers().save(user);
 
@@ -261,8 +261,8 @@ public class UserService {
         String pwd = passwordManager.generateCommonTextPassword();
         String hashedPwd = passwordEncoder.encode(pwd);
         user.setPassword(hashedPwd);
-
-        //TODO: set field (like) needChanged to TRUE and date of lats password change
+        user.setPasswordGenerated(true);
+        user.setLastPasswordChange(LocalDate.now());
 
         repositoryCollector.getUsers().save(user);
 

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -121,9 +123,11 @@ public class JwtTokenUtil {
      * @param userDetails the {@link UserDetails} object containing user details.
      * @return {@code true} if the token is valid, {@code false} otherwise.
      */
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, UserDetails userDetails, LocalDate lastPassChange) {
         try {
-            return decodeJWT(token).getSubject().equals(userDetails.getUsername()) && !isTokenExpired(token);
+            return decodeJWT(token).getSubject().equals(userDetails.getUsername())
+                    && !isTokenExpired(token)
+                    && !isTokenCreatedBeforeLastPassChange(token, lastPassChange);
         } catch (Exception e) {
             return false;
         }
@@ -140,6 +144,15 @@ public class JwtTokenUtil {
             return decodeJWT(token).getExpiration().before(new Date(System.currentTimeMillis()));
         } catch (Exception e) {
             return true;
+        }
+    }
+
+    public boolean isTokenCreatedBeforeLastPassChange(String token, LocalDate lastPassChange) {
+        //TODO: Change LocalDate to LocalDateTime
+        try {
+            return decodeJWT(token).getIssuedAt().before(Date.from(lastPassChange.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+        } catch (Exception e) {
+            return false;
         }
     }
 }
