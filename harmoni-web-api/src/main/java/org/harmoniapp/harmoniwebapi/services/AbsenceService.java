@@ -32,28 +32,28 @@ public class AbsenceService {
      * @param id the ID of the user whose absences are to be retrieved
      * @return a list of AbsenceDto corresponding to the user's absences
      */
-    public List<AbsenceDto> getAbsenceByUserId(long id) {
-        List<Absence> userAbsences = repositoryCollector.getAbsences().findByUserId(id);
+    public List<AbsenceDto> getAbsenceByUserId(long id) { //only avaiting or approved
+        List<Absence> userAbsences = repositoryCollector.getAbsences().findAwaitingOrApprovedAbsenceByUserId(id);
 
         return userAbsences.stream()
                 .map(AbsenceDto::fromEntity)
                 .toList();
     }
 
-    /**
-     * Retrieves a list of absences for a specific user based on their archived status.
-     *
-     * @param id       the ID of the user whose absences are to be retrieved
-     * @param archived a boolean indicating whether to retrieve archived or non-archived absences
-     * @return a list of AbsenceDto objects representing the user's absences with the specified archived status
-     */
-    public List<AbsenceDto> getAbsenceByUserIdAndArchive(long id, boolean archived) {
-        List<Absence> userAbsences = repositoryCollector.getAbsences().findByUserIdAndArchived(id, archived);
-
-        return userAbsences.stream()
-                .map(AbsenceDto::fromEntity)
-                .toList();
-    }
+//    /**
+//     * Retrieves a list of absences for a specific user based on their archived status.
+//     *
+//     * @param id       the ID of the user whose absences are to be retrieved
+//     * @param archived a boolean indicating whether to retrieve archived or non-archived absences
+//     * @return a list of AbsenceDto objects representing the user's absences with the specified archived status
+//     */
+//    public List<AbsenceDto> getAbsenceByUserIdAndArchive(long id, boolean archived) {
+//        List<Absence> userAbsences = repositoryCollector.getAbsences().findByUserIdAndArchived(id, archived);
+//
+//        return userAbsences.stream()
+//                .map(AbsenceDto::fromEntity)
+//                .toList();
+//    }
 
     /**
      * Retrieves all Absences by status name.
@@ -175,7 +175,7 @@ public class AbsenceService {
     @Transactional
     public AbsenceDto updateAbsence(long id, AbsenceDto absenceDto) {
         try {
-            if(absenceDto.status().getId() != 1L && absenceDto.status().getId() != 3L){ // Employee can only change absence if the status is awaiting or cancelled
+            if(absenceDto.status().getId() != 1L ){ // Employee can only change absence if the status is awaiting
                 throw new RuntimeException("An error occurred: You are not allowed to update the status of the absence");
             }
 
