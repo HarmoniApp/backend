@@ -71,6 +71,7 @@ public class UserService {
     public UserDto getUser(long id) {
         User user = repositoryCollector.getUsers()
                 .findById(id)
+                .filter(User::isActive)
                 .orElseThrow(IllegalArgumentException::new);
 
         return UserDto.fromEntity(user);
