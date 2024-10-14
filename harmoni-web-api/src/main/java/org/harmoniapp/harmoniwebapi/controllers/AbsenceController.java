@@ -141,4 +141,8 @@ public class AbsenceController {
         return absenceService.updateAbsenceArchived(id, archived);
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteAbsence(@PathVariable long id) {
+        absenceService.deleteAbsence(id);
+    }
 }

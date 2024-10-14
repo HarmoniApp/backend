@@ -361,4 +361,7 @@ public class AbsenceService {
         notificationService.createNotification(notificationDto);
     }
 
+    public void deleteAbsence(long id) {
+        repositoryCollector.getAbsences().deleteById(id);
+    }
 }
