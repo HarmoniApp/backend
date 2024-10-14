@@ -367,16 +367,16 @@ public class AbsenceService {
      * @param id the ID of the Absence to be deleted
      * @throws RuntimeException if an error occurs during deletion
      */
-    public void deleteAbsence(long id) {
+    public void deleteAbsence(long id, long statusId) {
         try {
-            deleteAbsenceNotification(id);
+            deleteAbsenceNotification(id, statusId);
             repositoryCollector.getAbsences().deleteById(id);
         } catch (Exception e) {
             throw new RuntimeException("An error occurred: " + e.getMessage(), e);
         }
     }
 
-    private void deleteAbsenceNotification(long absenceId) {
+    private void deleteAbsenceNotification(long absenceId, long statusId) {
         NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(5L) //5 is Absence Updated
                         .orElseThrow(() -> new RuntimeException("Notification type not found"));
 
@@ -385,11 +385,11 @@ public class AbsenceService {
 
         String message;
         User user;
-        if(absence.getStatus().getId() == 3){ // employer gets notification
+        if(statusId == 3){ // employer gets notification
             user = absence.getUser().getSupervisor();
             message = "Employee " + absence.getUser().getFirstname() + " "
                     + absence.getUser().getSurname() + " cancelled absence";
-        } else if (absence.getStatus().getId() == 4) { // employee gets notification
+        } else if (statusId == 4) { // employee gets notification
             user = absence.getUser();
             message = "Absence " + absence.getStart() + " - " + absence.getEnd() + " is rejected";
         } else {

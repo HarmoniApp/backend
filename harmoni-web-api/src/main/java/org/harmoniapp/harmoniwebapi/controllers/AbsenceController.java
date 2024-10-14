@@ -146,8 +146,8 @@ public class AbsenceController {
      *
      * @param id the ID of the absence to be deleted
      */
-    @DeleteMapping("/{id}")
-    public void deleteAbsence(@PathVariable long id) {
-        absenceService.deleteAbsence(id);
+    @DeleteMapping("/{id}/{statusId}")
+    public void deleteAbsence(@PathVariable long id, @PathVariable long statusId) {
+        absenceService.deleteAbsence(id, statusId);
     }
 }
