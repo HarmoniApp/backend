@@ -195,6 +195,12 @@ public class ShiftService {
         notificationService.createNotification(notificationDto);
     }
 
+    /**
+     * Sends a notification to the user when a shift is deleted.
+     *
+     * @param shift the deleted shift object
+     * @throws RuntimeException if the shift or notification type is not found
+     */
     private void deletedShiftNotification(Shift shift) {
         NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(6L) //6 is Shift Deleted
                 .orElseThrow(() -> new RuntimeException("Notification type not found"));

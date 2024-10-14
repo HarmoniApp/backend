@@ -376,6 +376,13 @@ public class AbsenceService {
         }
     }
 
+    /**
+     * Sends a notification to the appropriate user when an absence is deleted.
+     *
+     * @param absenceId the ID of the deleted absence
+     * @param statusId the ID of the status to determine who gets the notification
+     * @throws RuntimeException if the absence or notification type is not found
+     */
     private void deleteAbsenceNotification(long absenceId, long statusId) {
         NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(5L) //5 is Absence Updated
                         .orElseThrow(() -> new RuntimeException("Notification type not found"));
