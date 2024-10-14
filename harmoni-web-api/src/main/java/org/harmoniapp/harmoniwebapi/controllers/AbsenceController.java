@@ -32,17 +32,17 @@ public class AbsenceController {
         return absenceService.getAbsenceByUserId(id);
     }
 
-    /**
-     * Retrieves a list of absences for a specific user, filtered by archived status.
-     *
-     * @param id       the ID of the user whose absences are to be retrieved
-     * @param archived a boolean indicating whether to filter by archived absences
-     * @return a list of AbsenceDto objects representing the user's absences
-     */
-    @GetMapping("user/{id}/archived")
-    public List<AbsenceDto> getAbsenceByUserId(@PathVariable long id, @RequestParam boolean archived){
-        return absenceService.getAbsenceByUserIdAndArchive(id, archived);
-    }
+//    /**
+//     * Retrieves a list of absences for a specific user, filtered by archived status.
+//     *
+//     * @param id       the ID of the user whose absences are to be retrieved
+//     * @param archived a boolean indicating whether to filter by archived absences
+//     * @return a list of AbsenceDto objects representing the user's absences
+//     */
+//    @GetMapping("user/{id}/archived")
+//    public List<AbsenceDto> getAbsenceByUserId(@PathVariable long id, @RequestParam boolean archived){
+//        return absenceService.getAbsenceByUserIdAndArchive(id, archived);
+//    }
 
     /**
      * Retrieves a list of Absences with the specified status name.
@@ -141,4 +141,13 @@ public class AbsenceController {
         return absenceService.updateAbsenceArchived(id, archived);
     }
 
+    /**
+     * Deletes an absence by its ID.
+     *
+     * @param id the ID of the absence to be deleted
+     */
+    @DeleteMapping("/{id}/status/{statusId}")
+    public void deleteAbsence(@PathVariable long id, @PathVariable long statusId) {
+        absenceService.deleteAbsence(id, statusId);
+    }
 }

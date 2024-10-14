@@ -32,7 +32,7 @@ public class NotificationService {
      * @return a list of NotificationDto objects representing all notifications for the user
      */
     public List<NotificationDto> getAllNotificationsByUserId(Long userId) {
-        List<Notification> notifications = repositoryCollector.getNotifications().findAllByUserId(userId);
+        List<Notification> notifications = repositoryCollector.getNotifications().findAllByUserIdOrderByCreatedAtDesc(userId);
         return notifications.stream()
                 .map(NotificationDto::fromEntity)
                 .toList();
@@ -45,7 +45,7 @@ public class NotificationService {
      * @return a list of NotificationDto objects representing unread notifications for the user
      */
     public List<NotificationDto> getAllUnreadNotificationsByUserId(Long userId) {
-        List<Notification> notifications = repositoryCollector.getNotifications().findAllUnreadByUserId(userId);
+        List<Notification> notifications = repositoryCollector.getNotifications().findAllUnreadByUserIdOrderByCreatedAtDesc(userId);
         return notifications.stream()
                 .map(NotificationDto::fromEntity)
                 .toList();
@@ -96,7 +96,7 @@ public class NotificationService {
      */
     @Transactional
     public List<NotificationDto> markAllNotificationsAsRead(Long userId) {
-        List<Notification> notifications = repositoryCollector.getNotifications().findAllUnreadByUserId(userId);
+        List<Notification> notifications = repositoryCollector.getNotifications().findAllUnreadByUserIdOrderByCreatedAtDesc(userId);
         notifications.forEach(notification -> notification.setRead(true));
         repositoryCollector.getNotifications().saveAll(notifications);
 
