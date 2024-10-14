@@ -141,6 +141,11 @@ public class AbsenceController {
         return absenceService.updateAbsenceArchived(id, archived);
     }
 
+    /**
+     * Deletes an absence by its ID.
+     *
+     * @param id the ID of the absence to be deleted
+     */
     @DeleteMapping("/{id}")
     public void deleteAbsence(@PathVariable long id) {
         absenceService.deleteAbsence(id);

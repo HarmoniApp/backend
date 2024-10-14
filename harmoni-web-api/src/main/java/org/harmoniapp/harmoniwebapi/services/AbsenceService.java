@@ -361,7 +361,17 @@ public class AbsenceService {
         notificationService.createNotification(notificationDto);
     }
 
+    /**
+     * Deletes an absence by its ID.
+     *
+     * @param id the ID of the Absence to be deleted
+     * @throws RuntimeException if an error occurs during deletion
+     */
     public void deleteAbsence(long id) {
-        repositoryCollector.getAbsences().deleteById(id);
+        try {
+            repositoryCollector.getAbsences().deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
+        }
     }
 }
