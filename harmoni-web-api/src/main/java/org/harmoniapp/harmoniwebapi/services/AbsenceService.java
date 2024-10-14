@@ -369,9 +369,43 @@ public class AbsenceService {
      */
     public void deleteAbsence(long id) {
         try {
+            deleteAbsenceNotification(id);
             repositoryCollector.getAbsences().deleteById(id);
         } catch (Exception e) {
             throw new RuntimeException("An error occurred: " + e.getMessage(), e);
         }
+    }
+
+    private void deleteAbsenceNotification(long absenceId) {
+        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(5L) //5 is Absence Updated
+                        .orElseThrow(() -> new RuntimeException("Notification type not found"));
+
+        Absence absence = repositoryCollector.getAbsences().findById(absenceId)
+                .orElseThrow(() -> new RuntimeException("Absence not found"));
+
+        String message;
+        User user;
+        if(absence.getStatus().getId() == 3){ // employer gets notification
+            user = absence.getUser().getSupervisor();
+            message = "Employee " + absence.getUser().getFirstname() + " "
+                    + absence.getUser().getSurname() + " cancelled absence";
+        } else if (absence.getStatus().getId() == 4) { // employee gets notification
+            user = absence.getUser();
+            message = "Absence " + absence.getStart() + " - " + absence.getEnd() + " is rejected";
+        } else {
+            throw new RuntimeException("Invalid status for notification");
+        }
+
+        NotificationDto notificationDto = new NotificationDto(
+                                0L, // id is set automatically by the database
+                                user.getId(),
+                                "Absence update",
+                                message,
+                                notificationType.getTypeName(),
+                                false,
+                                LocalDateTime.now()
+                        );
+
+        notificationService.createNotification(notificationDto);
     }
 }
