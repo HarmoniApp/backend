@@ -14,6 +14,7 @@ import org.harmoniapp.harmonidata.entities.User;
 public record PartialUserWithEmpIdDto(long id,
                                       String firstname,
                                       String surname,
+                                      String photo,
                                       @JsonProperty("employee_id") String employeeId) {
 
     /**
@@ -27,6 +28,7 @@ public record PartialUserWithEmpIdDto(long id,
                 user.getId(),
                 user.getFirstname(),
                 user.getSurname(),
+                user.getPhoto(),
                 user.getEmployeeId()
         );
     }
