@@ -2,10 +2,12 @@ package org.harmoniapp.harmoniwebapi.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.harmoniapp.harmoniwebapi.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -84,6 +86,12 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto updateUser(@PathVariable long id,@Valid @RequestBody UserDto userDto) {
         return service.update(id, userDto);
+    }
+
+    @PatchMapping("/{id}/upload-photo")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDto uploadPhoto(@PathVariable long id, @RequestParam("file") MultipartFile file) {
+        return service.uploadPhoto(id, file);
     }
 
     /**

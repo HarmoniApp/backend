@@ -10,7 +10,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -110,6 +116,7 @@ public class UserService {
         user.setLastPasswordChange(LocalDateTime.now());
         user.setPasswordGenerated(true);
         user.setActive(true);
+        user.setPhoto("default.jpg");
 
         user.setLanguages(
                 userDto.languages().stream()
@@ -181,6 +188,38 @@ public class UserService {
 
         User response = repositoryCollector.getUsers().save(existingUser);
         return UserDto.fromEntity(response);
+    }
+
+    public UserDto uploadPhoto(long id, MultipartFile file) {
+        User user = repositoryCollector.getUsers().findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User with ID " + id + " not found"));
+
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || !(originalFilename.endsWith(".jpg") || originalFilename.endsWith(".png"))) {
+            throw new IllegalArgumentException("File must be a JPG or PNG image");
+        }
+
+        String uploadDirectory = new File("./harmoni-web-api/src/main/resources/static/userPhoto/").getAbsolutePath();
+
+        File directory = new File(uploadDirectory);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        try {
+            String newFileName = user.getId() + "_" + originalFilename;
+            Path path = Paths.get(uploadDirectory, newFileName);
+
+            Files.write(path, file.getBytes());
+
+            user.setPhoto(newFileName);
+            repositoryCollector.getUsers().save(user);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save file", e);
+        }
+
+        return UserDto.fromEntity(user);
     }
 
     /**
