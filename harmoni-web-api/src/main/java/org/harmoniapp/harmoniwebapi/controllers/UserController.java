@@ -88,6 +88,13 @@ public class UserController {
         return service.update(id, userDto);
     }
 
+    /**
+     * Uploads a photo for a specific user.
+     *
+     * @param id   The ID of the user for whom the photo is being uploaded.
+     * @param file The MultipartFile representing the uploaded photo. Must be either JPG or PNG format.
+     * @return The updated UserDto object with the new photo path.
+     */
     @PatchMapping("/{id}/upload-photo")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto uploadPhoto(@PathVariable long id, @RequestParam("file") MultipartFile file) {

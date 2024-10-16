@@ -190,6 +190,14 @@ public class UserService {
         return UserDto.fromEntity(response);
     }
 
+    /**
+     * Uploads a photo for a specific user and saves it to the disk.
+     *
+     * @param id   The ID of the user to associate the photo with.
+     * @param file The photo file to be uploaded (must be in JPG or PNG format).
+     * @return The updated UserDto object after saving the photo information.
+     * @throws IllegalArgumentException if the user is not found or the file format is not supported.
+     */
     public UserDto uploadPhoto(long id, MultipartFile file) {
         User user = repositoryCollector.getUsers().findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User with ID " + id + " not found"));
