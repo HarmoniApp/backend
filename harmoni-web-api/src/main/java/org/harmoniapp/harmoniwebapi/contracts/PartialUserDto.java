@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public record PartialUserDto(long id,
                              String firstname,
                              String surname,
+                             String photo,
                              Set<LanguageDto> languages) {
 
     public static PartialUserDto fromEntity(User user) {
@@ -23,6 +24,7 @@ public record PartialUserDto(long id,
                 user.getId(),
                 user.getFirstname(),
                 user.getSurname(),
+                user.getPhoto(),
                 user.getLanguages().stream()
                         .map(p -> new LanguageDto(p.getId(), p.getName(), p.getCode()))
                         .collect(Collectors.toSet())

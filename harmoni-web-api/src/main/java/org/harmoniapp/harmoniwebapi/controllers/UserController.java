@@ -7,6 +7,7 @@ import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.harmoniapp.harmoniwebapi.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -89,6 +90,32 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto updateUser(@PathVariable long id, @Valid @RequestBody UserDto userDto) {
         return service.update(id, userDto);
+    }
+
+    /**
+     * Uploads a photo for a specific user.
+     *
+     * @param id   The ID of the user for whom the photo is being uploaded.
+     * @param file The MultipartFile representing the uploaded photo. Must be either JPG or PNG format.
+     * @return The updated UserDto object with the new photo path.
+     */
+    @PatchMapping("/{id}/upload-photo")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDto uploadPhoto(@PathVariable long id, @RequestParam("file") MultipartFile file) {
+        return service.uploadPhoto(id, file);
+    }
+
+    /**
+     * Sets the user's photo to the default photo.
+     *
+     * @param id The ID of the user whose photo is to be set to default.
+     * @return The updated UserDto object with the default photo.
+     * @throws IllegalArgumentException if the user with the specified ID is not found.
+     * @throws RuntimeException         if there is an error deleting the old photo file.
+     */
+    @PatchMapping("/{id}/default-photo")
+    public UserDto setDefaultPhoto(@PathVariable long id) {
+        return service.setDefaultPhoto(id);
     }
 
     /**
