@@ -44,13 +44,16 @@ public class UserService {
      * @return A PageDto containing a list of UserDto objects matching the specified criteria, sorted as requested.
      */
     public PageDto<UserDto> getUsers(List<Long> roles, List<Long> contracts, List<Long> languages, int pageNumber, int pageSize, String sortBy, String order) {
+        assert pageNumber > 0;
+        assert pageSize > 0;
+
         Sort.Direction sortDirection;
         if (order == null || order.isEmpty() || order.equalsIgnoreCase("asc")) {
             sortDirection = Sort.Direction.ASC;
         } else {
             sortDirection = Sort.Direction.DESC;
         }
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy));
+        Pageable pageable = PageRequest.of(pageNumber-1, pageSize, Sort.by(sortDirection, sortBy));
         Page<User> users;
         if ((roles == null || roles.isEmpty())
                 && (contracts == null || contracts.isEmpty())
@@ -61,7 +64,7 @@ public class UserService {
         }
         return new PageDto<>(users.stream().map(UserDto::fromEntity).toList(),
                 users.getSize(),
-                users.getNumber(),
+                users.getNumber()+1,
                 users.getTotalPages());
     }
 

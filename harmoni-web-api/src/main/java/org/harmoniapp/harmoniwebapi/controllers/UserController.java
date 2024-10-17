@@ -27,8 +27,8 @@ public class UserController {
      * @param roles      Optional list of role IDs to filter users by roles.
      * @param contracts  Optional list of contract IDs to filter users by contracts.
      * @param language   Optional list of language IDs to filter users by languages.
-     * @param pageNumber Optional page number to retrieve, defaults to 0 if not specified.
-     * @param pageSize   Optional number of items per page, defaults to 10 if not specified.
+     * @param pageNumber Optional page number to retrieve (optional, default is 1).
+     * @param pageSize   Optional number of items per page (optional, default is 10).
      * @param sortBy     Optional field name by which the results should be sorted. Defaults to "firstname" if not provided.
      * @param order      Optional sort order for the results. Can be "asc" for ascending or "desc" for descending. Defaults to "asc" if not provided.
      * @return A PageDto containing a list of UserDto objects matching the specified criteria, sorted as requested.
@@ -37,7 +37,7 @@ public class UserController {
     public PageDto<UserDto> getAllUsers(@RequestParam(name = "role", required = false) List<Long> roles,
                                         @RequestParam(name = "contract", required = false) List<Long> contracts,
                                         @RequestParam(name = "language", required = false) List<Long> language,
-                                        @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+                                        @RequestParam(name = "pageNumber", required = false, defaultValue = "1") int pageNumber,
                                         @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize,
                                         @RequestParam(name = "sortBy", required = false, defaultValue = "firstname") String sortBy,
                                         @RequestParam(name = "order", required = false, defaultValue = "asc") String order) {

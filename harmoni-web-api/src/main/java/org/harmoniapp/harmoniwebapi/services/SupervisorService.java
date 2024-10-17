@@ -31,12 +31,15 @@ public class SupervisorService {
      * @return a PageDto containing a list of {@link SupervisorDto} representing all supervisors.
      */
     public PageDto<SupervisorDto> getAllSupervisors(int pageNumber, int pageSize) {
+        assert pageNumber > 0;
+        assert pageSize > 0;
+
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("firstname", "surname"));
         Page<User> users = repositories.getUsers().findSupervisors(pageable);
 
         return new PageDto<>(users.stream().map(SupervisorDto::fromEntity).toList(),
                 users.getSize(),
-                users.getNumber(),
+                users.getNumber()+1,
                 users.getTotalPages());
     }
 }

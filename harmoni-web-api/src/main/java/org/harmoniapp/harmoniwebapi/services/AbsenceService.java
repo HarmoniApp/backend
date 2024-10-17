@@ -40,12 +40,15 @@ public class AbsenceService {
      * @return a PageDto containing the user's absences
      */
     public PageDto<AbsenceDto> getAbsenceByUserId(long id, int pageNumber, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createAt").descending());
+        assert pageNumber > 0;
+        assert pageSize > 0;
+
+        Pageable pageable = PageRequest.of(pageNumber-1, pageSize, Sort.by("createAt").descending());
         Page<Absence> userAbsences = repositoryCollector.getAbsences().findAwaitingOrApprovedAbsenceByUserId(id, pageable);
 
         return new PageDto<>(userAbsences.stream().map(AbsenceDto::fromEntity).toList(),
                 userAbsences.getSize(),
-                userAbsences.getNumber(),
+                userAbsences.getNumber()+1,
                 userAbsences.getTotalPages());
     }
 
@@ -77,12 +80,15 @@ public class AbsenceService {
      * @return a PageDto containing the absences with the specified status
      */
     public PageDto<AbsenceDto> getAbsenceByStatus(long statusId, int pageNumber, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("updated").descending());
+        assert pageNumber > 0;
+        assert pageSize > 0;
+
+        Pageable pageable = PageRequest.of(pageNumber-1, pageSize, Sort.by("updated").descending());
 
         Page<Absence> absencesWithStatus = repositoryCollector.getAbsences().findAbsenceByStatusId(statusId, pageable);
         return new PageDto<>(absencesWithStatus.stream().map(AbsenceDto::fromEntity).toList(),
                 absencesWithStatus.getSize(),
-                absencesWithStatus.getNumber(),
+                absencesWithStatus.getNumber()+1,
                 absencesWithStatus.getTotalPages());
 
     }
@@ -131,12 +137,15 @@ public class AbsenceService {
      * @throws RuntimeException if an error occurs while retrieving absences
      */
     public PageDto<AbsenceDto> getAllAbsences(int pageNumber, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("updated").descending());
+        assert pageNumber > 0;
+        assert pageSize > 0;
+
+        Pageable pageable = PageRequest.of(pageNumber-1, pageSize, Sort.by("updated").descending());
 
         var absence = repositoryCollector.getAbsences().findAll(pageable);
         return new PageDto<>(absence.stream().map(AbsenceDto::fromEntity).toList(),
                 absence.getSize(),
-                absence.getNumber(),
+                absence.getNumber()+1,
                 absence.getTotalPages());
 
     }

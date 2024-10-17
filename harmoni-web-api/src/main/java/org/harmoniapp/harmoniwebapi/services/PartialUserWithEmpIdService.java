@@ -30,12 +30,15 @@ public class PartialUserWithEmpIdService {
      * @return a PageDto containing a list of PartialUserWithEmpIdDto objects representing partial user data, including their employee ID.
      */
     public PageDto<PartialUserWithEmpIdDto> getAllPartialUsers(int pageNumber, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("firstname", "surname"));
+        assert pageNumber > 0;
+        assert pageSize > 0;
+
+        Pageable pageable = PageRequest.of(pageNumber-1, pageSize, Sort.by("firstname", "surname"));
         Page<User> users = repositoryCollector.getUsers().findAllByIsActive(true, pageable);
 
         return new PageDto<>(users.stream().map(PartialUserWithEmpIdDto::fromEntity).toList(),
                 users.getSize(),
-                users.getNumber(),
+                users.getNumber()+1,
                 users.getTotalPages());
     }
 }

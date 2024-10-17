@@ -26,13 +26,13 @@ public class AbsenceController {
      * Retrieves a paginated list of AbsenceDto for a specific user by their ID.
      *
      * @param id         the ID of the user whose absences are to be retrieved
-     * @param pageNumber the page number to retrieve (optional, default is 0)
+     * @param pageNumber the page number to retrieve (optional, default is 1)
      * @param pageSize   the number of items per page (optional, default is 50)
      * @return a PageDto containing a list of AbsenceDto corresponding to the user's absences
      */
     @GetMapping("user/{id}")
     public PageDto<AbsenceDto> getAbsenceByUserId(@PathVariable long id,
-                                                  @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+                                                  @RequestParam(name = "pageNumber", required = false, defaultValue = "1") int pageNumber,
                                                   @RequestParam(name = "pageSize", required = false, defaultValue = "50") int pageSize) {
         return absenceService.getAbsenceByUserId(id, pageNumber, pageSize);
     }
@@ -58,13 +58,13 @@ public class AbsenceController {
      * Retrieves a paginated list of AbsenceDto filtered by the specified status ID.
      *
      * @param id         the ID of the status to filter absences by
-     * @param pageNumber the page number to retrieve (optional, default is 0)
+     * @param pageNumber the page number to retrieve (optional, default is 1)
      * @param pageSize   the number of items per page (optional, default is 50)
      * @return a PageDto containing a list of AbsenceDto representing the absences with the specified status ID
      */
     @GetMapping("status/{id}")
     public PageDto<AbsenceDto> getAbsenceByStatus(@PathVariable long id,
-                                                  @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+                                                  @RequestParam(name = "pageNumber", required = false, defaultValue = "1") int pageNumber,
                                                   @RequestParam(name = "pageSize", required = false, defaultValue = "50") int pageSize) {
         return absenceService.getAbsenceByStatus(id, pageNumber, pageSize);
     }
@@ -102,12 +102,12 @@ public class AbsenceController {
     /**
      * Retrieves a paginated list of all absences.
      *
-     * @param pageNumber the page number to retrieve (optional, default is 0)
+     * @param pageNumber the page number to retrieve (optional, default is 1)
      * @param pageSize   the number of items per page (optional, default is 50)
      * @return a PageDto containing a list of AbsenceDto representing all absences
      */
     @GetMapping
-    public PageDto<AbsenceDto> getAllAbsences(@RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+    public PageDto<AbsenceDto> getAllAbsences(@RequestParam(name = "pageNumber", required = false, defaultValue = "1") int pageNumber,
                                               @RequestParam(name = "pageSize", required = false, defaultValue = "50") int pageSize) {
         return absenceService.getAllAbsences(pageNumber, pageSize);
     }

@@ -20,12 +20,12 @@ public class SupervisorController {
     /**
      * Retrieves a paginated list of all supervisors.
      *
-     * @param pageNumber the page number to retrieve, defaults to 0 if not specified
-     * @param pageSize   the number of items per page, defaults to 20 if not specified
+     * @param pageNumber the page number to retrieve (optional, default is 1).
+     * @param pageSize   the number of items per page (optional, default is 20).
      * @return a PageDto containing a list of SupervisorDto objects representing all supervisors
      */
     @GetMapping
-    public PageDto<SupervisorDto> getAllSupervisors(@RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+    public PageDto<SupervisorDto> getAllSupervisors(@RequestParam(name = "pageNumber", required = false, defaultValue = "1") int pageNumber,
                                                     @RequestParam(name = "pageSize", required = false, defaultValue = "20") int pageSize) {
         return service.getAllSupervisors(pageNumber, pageSize);
     }

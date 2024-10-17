@@ -52,6 +52,9 @@ public class PartialUserService {
      * @return a {@link PageDto} containing a list of {@link PartialUserDto} objects that match the specified criteria.
      */
     public PageDto<PartialUserDto> getUsers(List<Long> roles, List<Long> contracts, List<Long> languages, int pageNumber, int pageSize, String sortBy, String order) {
+        assert pageNumber > 0;
+        assert pageSize > 0;
+
         Sort.Direction sortDirection;
         if (order == null || order.isEmpty() || order.equalsIgnoreCase("asc")) {
             sortDirection = Sort.Direction.ASC;
@@ -59,7 +62,7 @@ public class PartialUserService {
             sortDirection = Sort.Direction.DESC;
         }
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy));
+        Pageable pageable = PageRequest.of(pageNumber-1, pageSize, Sort.by(sortDirection, sortBy));
 
         Page<User> users;
         if ((roles == null || roles.isEmpty())
@@ -73,7 +76,7 @@ public class PartialUserService {
         return new PageDto<PartialUserDto>(
                 users.stream().map(PartialUserDto::fromEntity).toList(),
                 users.getSize(),
-                users.getNumber(),
+                users.getNumber()+1,
                 users.getTotalPages());
     }
 
