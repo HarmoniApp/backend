@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final RepositoryCollector repositoryCollector;
     private final AddressService addressService;
+    private final String photoDirPath = "./harmoni-web-api/src/main/resources/static/userPhoto/";
 
 
     /**
@@ -50,7 +51,7 @@ public class UserService {
      * @return A PageDto containing a list of UserDto objects matching the specified criteria, sorted as requested.
      */
     public PageDto<UserDto> getUsers(List<Long> roles, List<Long> contracts, List<Long> languages, int pageNumber, int pageSize, String sortBy, String order) {
-        pageNumber = (pageNumber < 1) ? 0 : pageNumber-1;
+        pageNumber = (pageNumber < 1) ? 0 : pageNumber - 1;
         pageSize = (pageSize < 1) ? 10 : pageSize;
 
         Sort.Direction sortDirection;
@@ -70,7 +71,7 @@ public class UserService {
         }
         return new PageDto<>(users.stream().map(UserDto::fromEntity).toList(),
                 users.getSize(),
-                users.getNumber()+1,
+                users.getNumber() + 1,
                 users.getTotalPages());
     }
 
@@ -215,7 +216,7 @@ public class UserService {
             throw new IllegalArgumentException("File must be a JPG or PNG image");
         }
 
-        String uploadDirectory = new File("./harmoni-web-api/src/main/resources/static/userPhoto/").getAbsolutePath();
+        String uploadDirectory = new File(photoDirPath).getAbsolutePath();
 
         File directory = new File(uploadDirectory);
         if (!directory.exists()) {
@@ -237,6 +238,42 @@ public class UserService {
             if (!defaultPhotos.contains(oldPhoto) && Files.exists(oldPhotoPath)) {
                 Files.delete(oldPhotoPath);
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save file", e);
+        }
+
+        return UserDto.fromEntity(user);
+    }
+
+    /**
+     * Sets the user's photo to the default photo.
+     *
+     * @param id The ID of the user whose photo is to be set to default.
+     * @return The updated UserDto object with the default photo.
+     * @throws IllegalArgumentException if the user with the specified ID is not found.
+     * @throws RuntimeException         if there is an error deleting the old photo file.
+     */
+    public UserDto setDefaultPhoto(long id) {
+        User user = repositoryCollector.getUsers().findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User with ID " + id + " not found"));
+
+        String oldPhoto = user.getPhoto();
+        if (oldPhoto.equals("default.jpg")) {
+            return UserDto.fromEntity(user);
+        }
+
+        String uploadDirectory = new File(photoDirPath).getAbsolutePath();
+        File directory = new File(uploadDirectory);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        try {
+            Path oldPhotoPath = Paths.get(uploadDirectory, oldPhoto);
+            Files.delete(oldPhotoPath);
+
+            user.setPhoto("default.jpg");
+            repositoryCollector.getUsers().save(user);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save file", e);
         }

@@ -106,6 +106,19 @@ public class UserController {
     }
 
     /**
+     * Sets the user's photo to the default photo.
+     *
+     * @param id The ID of the user whose photo is to be set to default.
+     * @return The updated UserDto object with the default photo.
+     * @throws IllegalArgumentException if the user with the specified ID is not found.
+     * @throws RuntimeException         if there is an error deleting the old photo file.
+     */
+    @PatchMapping("/{id}/default-photo")
+    public UserDto setDefaultPhoto(@PathVariable long id) {
+        return service.setDefaultPhoto(id);
+    }
+
+    /**
      * Deletes a user by their ID.
      *
      * @param id The ID of the user to delete.
