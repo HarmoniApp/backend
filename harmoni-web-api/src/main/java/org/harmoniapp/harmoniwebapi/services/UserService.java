@@ -44,8 +44,8 @@ public class UserService {
      * @return A PageDto containing a list of UserDto objects matching the specified criteria, sorted as requested.
      */
     public PageDto<UserDto> getUsers(List<Long> roles, List<Long> contracts, List<Long> languages, int pageNumber, int pageSize, String sortBy, String order) {
-        assert pageNumber > 0;
-        assert pageSize > 0;
+        pageNumber = (pageNumber < 1) ? 0 : pageNumber-1;
+        pageSize = (pageSize < 1) ? 10 : pageSize;
 
         Sort.Direction sortDirection;
         if (order == null || order.isEmpty() || order.equalsIgnoreCase("asc")) {
@@ -53,7 +53,7 @@ public class UserService {
         } else {
             sortDirection = Sort.Direction.DESC;
         }
-        Pageable pageable = PageRequest.of(pageNumber-1, pageSize, Sort.by(sortDirection, sortBy));
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy));
         Page<User> users;
         if ((roles == null || roles.isEmpty())
                 && (contracts == null || contracts.isEmpty())

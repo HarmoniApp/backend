@@ -31,8 +31,8 @@ public class SupervisorService {
      * @return a PageDto containing a list of {@link SupervisorDto} representing all supervisors.
      */
     public PageDto<SupervisorDto> getAllSupervisors(int pageNumber, int pageSize) {
-        assert pageNumber > 0;
-        assert pageSize > 0;
+        pageNumber = (pageNumber < 1) ? 0 : pageNumber-1;
+        pageSize = (pageSize < 1) ? 20 : pageSize;
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("firstname", "surname"));
         Page<User> users = repositories.getUsers().findSupervisors(pageable);
