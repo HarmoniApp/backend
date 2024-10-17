@@ -199,6 +199,8 @@ public class UserService {
      * @throws IllegalArgumentException if the user is not found or the file format is not supported.
      */
     public UserDto uploadPhoto(long id, MultipartFile file) {
+        List<String> defaultPhotos = List.of("default.jpg", "man.jpg", "women.jpg");
+
         User user = repositoryCollector.getUsers().findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User with ID " + id + " not found"));
 
@@ -215,6 +217,9 @@ public class UserService {
         }
 
         try {
+            String oldPhoto = user.getPhoto();
+            Path oldPhotoPath = Paths.get(uploadDirectory, oldPhoto);
+
             String newFileName = user.getId() + "_" + originalFilename;
             Path path = Paths.get(uploadDirectory, newFileName);
 
@@ -223,6 +228,9 @@ public class UserService {
             user.setPhoto(newFileName);
             repositoryCollector.getUsers().save(user);
 
+            if (!defaultPhotos.contains(oldPhoto) && Files.exists(oldPhotoPath)) {
+                Files.delete(oldPhotoPath);
+            }
         } catch (IOException e) {
             throw new RuntimeException("Failed to save file", e);
         }
