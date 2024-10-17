@@ -31,7 +31,7 @@ public class PartialUserWithEmpIdService {
      */
     public PageDto<PartialUserWithEmpIdDto> getAllPartialUsers(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("firstname", "surname"));
-        Page<User> users = repositoryCollector.getUsers().findAll(pageable);
+        Page<User> users = repositoryCollector.getUsers().findAllByIsActive(true, pageable);
 
         return new PageDto<>(users.stream().map(PartialUserWithEmpIdDto::fromEntity).toList(),
                 users.getSize(),

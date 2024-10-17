@@ -33,7 +33,7 @@ public class PartialUserService {
      * @throws IllegalArgumentException if no user with the specified ID is found.
      */
     public PartialUserDto getUser(long id) {
-        User user = repositoryCollector.getUsers().findById(id).orElseThrow(IllegalArgumentException::new);
+        User user = repositoryCollector.getUsers().findByIdAndIsActive(id, true).orElseThrow(IllegalArgumentException::new);
 
         return PartialUserDto.fromEntity(user);
     }
@@ -65,9 +65,9 @@ public class PartialUserService {
         if ((roles == null || roles.isEmpty())
                 && (contracts == null || contracts.isEmpty())
                 && (languages == null || languages.isEmpty())) {
-            users = repositoryCollector.getUsers().findAll(pageable);
+            users = repositoryCollector.getUsers().findAllByIsActive(true, pageable);
         } else {
-            users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contracts, roles, languages, pageable);
+            users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguageAndIsActive(contracts, roles, languages, true, pageable);
         }
 
         return new PageDto<PartialUserDto>(
@@ -95,9 +95,9 @@ public class PartialUserService {
 
         List<User> users;
         if (qSplit.size() > 1) {
-            users = repositoryCollector.getUsers().findAllBySearchName(qSplit);
+            users = repositoryCollector.getUsers().findAllBySearchName(qSplit, true);
         } else {
-            users = repositoryCollector.getUsers().FindAllBySearch(q);
+            users = repositoryCollector.getUsers().FindAllBySearch(q, true);
         }
 
         return users.stream().map(PartialUserDto::fromEntity).collect(Collectors.toList());

@@ -41,7 +41,7 @@ public record AddressDto(
         @JsonProperty("building_number") String buildingNumber,
 
         @Size(max = 10, message = "Apartment number must be less than or equal to 10 characters")
-        @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Apartment number must contain only alphanumeric characters")
+        @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "Apartment number must contain only alphanumeric characters")
         String apartment,
 
         @Size(max = 100, message = "Department name must be less than or equal to 100 characters")

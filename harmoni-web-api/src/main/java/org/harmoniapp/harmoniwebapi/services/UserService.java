@@ -15,7 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,9 +55,9 @@ public class UserService {
         if ((roles == null || roles.isEmpty())
                 && (contracts == null || contracts.isEmpty())
                 && (languages == null || languages.isEmpty())) {
-            users = repositoryCollector.getUsers().findAll(pageable);
+            users = repositoryCollector.getUsers().findAllByIsActive(true, pageable);
         } else {
-            users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contracts, roles, languages, pageable);
+            users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguageAndIsActive(contracts, roles, languages, true, pageable);
         }
         return new PageDto<>(users.stream().map(UserDto::fromEntity).toList(),
                 users.getSize(),
@@ -74,7 +74,7 @@ public class UserService {
      */
     public UserDto getUser(long id) {
         User user = repositoryCollector.getUsers()
-                .findById(id)
+                .findByIdAndIsActive(id, true)
                 .orElseThrow(IllegalArgumentException::new);
 
         return UserDto.fromEntity(user);
@@ -110,7 +110,7 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Department with ID " + userDto.workAddress().id() + " not found"));
 
         user.setWorkAddress(workAddress);
-        user.setLastPasswordChange(LocalDate.now());
+        user.setLastPasswordChange(LocalDateTime.now());
         user.setPasswordGenerated(true);
         user.setActive(true);
 
@@ -222,9 +222,9 @@ public class UserService {
 
         List<User> users;
         if (qSplit.size() > 1) {
-            users = repositoryCollector.getUsers().findAllBySearchName(qSplit);
+            users = repositoryCollector.getUsers().findAllBySearchName(qSplit, true);
         } else {
-            users = repositoryCollector.getUsers().FindAllBySearch(q);
+            users = repositoryCollector.getUsers().FindAllBySearch(q, true);
         }
 
         return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());

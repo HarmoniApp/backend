@@ -9,8 +9,9 @@ import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    List<Notification> findAllByUserId(long userId);
+    List<Notification> findAllByUserIdOrderByCreatedAtDesc(long userId);
 
-    @Query("SELECT n FROM Notification n WHERE n.user.id = :userId AND n.read = false")
-    List<Notification> findAllUnreadByUserId(@Param("userId") long userId);
+
+    @Query("SELECT n FROM Notification n WHERE n.user.id = :userId AND n.read = false ORDER BY n.createdAt DESC")
+    List<Notification> findAllUnreadByUserIdOrderByCreatedAtDesc(@Param("userId") long userId);
 }

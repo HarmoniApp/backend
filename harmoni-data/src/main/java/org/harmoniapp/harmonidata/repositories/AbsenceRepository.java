@@ -13,8 +13,10 @@ import java.util.List;
 public interface AbsenceRepository extends JpaRepository<Absence, Long> {
     Page<Absence> findByUserId(long userId, Pageable pageable);
 
-    Page<Absence> findByUserIdAndArchived(long userId, boolean archived, Pageable pageable);
+//    Page<Absence> findByUserIdAndArchived(long userId, boolean archived, Pageable pageable);
 
+    @Query("SELECT a FROM Absence a WHERE a.user.id = :userId AND (a.status.name = 'awaiting' OR a.status.name = 'approved')")
+    Page<Absence> findAwaitingOrApprovedAbsenceByUserId(@Param("userId") long userId, Pageable pageable);
 
     @Query("SELECT a FROM Absence a WHERE a.status.id = :statusId")
     Page<Absence> findAbsenceByStatusId(@Param("statusId") long statusId, Pageable pageable);

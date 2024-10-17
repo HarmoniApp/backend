@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
@@ -58,7 +59,7 @@ public class User {
     private String photo;
 
     @Column(name = "last_password_change")
-    private LocalDate lastPasswordChange;
+    private LocalDateTime lastPasswordChange;
 
     @Column(name = "is_password_generated")
     private boolean isPasswordGenerated;
