@@ -34,14 +34,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
             select u from User u left join u.roles roles left join u.languages languages
             where u.isActive = ?2 and
                   (
-                  upper(u.firstname) like upper(concat('%', ?1, '%')) or
-                  upper(u.surname) like upper(concat('%', ?1, '%')) or
-                  upper(u.email) like upper(concat('%', ?1, '%')) or
-                  upper(u.contractType.name) like upper(concat('%', ?1, '%')) or
-                  upper(u.residence.city) like upper(concat('%', ?1, '%')) or
-                  upper(u.workAddress.city) like upper(concat('%', ?1, '%')) or
-                  upper(roles.name) like upper(concat('%', ?1, '%')) or
-                  upper(languages.name) like upper(concat('%', ?1, '%'))
+                  upper(u.firstname) like concat(?1, '%') or
+                  upper(u.surname) like concat(?1, '%')
                   )""")
     List<User> FindAllBySearch(String search, boolean active);
 
