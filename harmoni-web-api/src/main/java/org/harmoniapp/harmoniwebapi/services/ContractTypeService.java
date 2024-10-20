@@ -2,6 +2,7 @@ package org.harmoniapp.harmoniwebapi.services;
 
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.ContractType;
+import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.ContractTypeDto;
 import org.springframework.context.annotation.ComponentScan;
@@ -49,6 +50,24 @@ public class ContractTypeService {
             return contractTypes.stream()
                     .map(ContractTypeDto::fromEntity)
                     .toList();
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
+        }
+    }
+
+    public ContractTypeDto createContractType(ContractTypeDto contractTypeDto) {
+        try {
+            ContractType contractType = contractTypeDto.toEntity();
+            ContractType contractTypeSaved = repositoryCollector.getContractTypes().save(contractType);
+            return ContractTypeDto.fromEntity(contractTypeSaved);
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
+        }
+    }
+
+    public void deleteContractType(long id) {
+        try {
+            repositoryCollector.getContractTypes().deleteById(id);
         } catch (Exception e) {
             throw new RuntimeException("An error occurred: " + e.getMessage(), e);
         }
