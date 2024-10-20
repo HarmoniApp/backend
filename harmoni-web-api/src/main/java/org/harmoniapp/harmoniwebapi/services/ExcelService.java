@@ -6,7 +6,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.harmoniapp.harmonidata.entities.Language;
+import org.harmoniapp.harmonidata.entities.Role;
+import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
+import org.harmoniapp.harmoniwebapi.contracts.LanguageDto;
 import org.harmoniapp.harmoniwebapi.contracts.ShiftDto;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.springframework.context.annotation.ComponentScan;
@@ -20,9 +24,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,11 +43,15 @@ public class ExcelService {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Users");
 
+            String[] headersCell = {"Employee ID", "First Name", "Surname", "Email", "Phone number", "City", "Street",
+                    "Apartment", "Zip code", "Building number", "Roles", "Languages",
+                    "Contract type", "Contract signature", "Contract expiration",
+                    "Supervisor employee ID", "Department name"};
+
             Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("Employee ID");
-            headerRow.createCell(1).setCellValue("First Name");
-            headerRow.createCell(2).setCellValue("Surname");
-            headerRow.createCell(3).setCellValue("Email");
+            for (int i = 0; i < headersCell.length; i++) {
+                headerRow.createCell(i).setCellValue(headersCell[i]);
+            }
 
             int rowIdx = 1;
             for (UserDto user : users) {
@@ -52,6 +60,32 @@ public class ExcelService {
                 row.createCell(1).setCellValue(user.firstname());
                 row.createCell(2).setCellValue(user.surname());
                 row.createCell(3).setCellValue(user.email());
+                row.createCell(4).setCellValue(user.phoneNumber());
+                row.createCell(5).setCellValue(user.residence().city());
+                row.createCell(6).setCellValue(user.residence().street());
+                row.createCell(7).setCellValue(user.residence().apartment());
+                row.createCell(8).setCellValue(user.residence().zipCode());
+                row.createCell(9).setCellValue(user.residence().buildingNumber());
+                row.createCell(10).setCellValue(
+                        user.roles().stream()
+                                .map(Role::getName)
+                                .collect(Collectors.joining(", "))
+                );
+                row.createCell(11).setCellValue(
+                        user.languages().stream()
+                                .map(LanguageDto::name)
+                                .collect(Collectors.joining(", "))
+                );
+                row.createCell(12).setCellValue(user.contractType().getName());
+                row.createCell(13).setCellValue(user.contractSignature().toString());
+                row.createCell(14).setCellValue(user.contractExpiration().toString());
+                String supervisorEmployeeId = repositoryCollector.getUsers()
+                        .findById(user.supervisorId())
+                        .map(User::getEmployeeId)
+                        .orElse("");
+
+                row.createCell(15).setCellValue(supervisorEmployeeId);
+                row.createCell(16).setCellValue(user.workAddress().departmentName());
             }
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
