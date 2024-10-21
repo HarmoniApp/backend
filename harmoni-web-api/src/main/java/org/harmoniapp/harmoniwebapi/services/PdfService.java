@@ -23,18 +23,14 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.harmonidata.entities.ArchivedShift;
 import org.harmoniapp.harmonidata.entities.Shift;
+import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
-import org.harmoniapp.harmoniwebapi.contracts.ArchivedShiftDto;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
 
 /**
  * Service class for managing archived shifts.
@@ -43,64 +39,63 @@ import jakarta.transaction.Transactional;
 @Service
 @RequiredArgsConstructor
 @ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
-public class ArchivedShiftService {
-
+public class PdfService {
     private final RepositoryCollector repositoryCollector;
 
-    /**
-     * Retrieves a list of all archived shifts.
-     *
-     * @return a list of ArchivedShiftDto containing details of all archived shifts
-     */
-    public List<ArchivedShiftDto> getAllArchivedShifts() {
-        List<ArchivedShift> archivedShifts = repositoryCollector.getArchivedShifts().findAll();
+//    /**
+//     * Retrieves a list of all archived shifts.
+//     *
+//     * @return a list of ArchivedShiftDto containing details of all archived shifts
+//     */
+//    public List<ArchivedShiftDto> getAllArchivedShifts() {
+//        List<ArchivedShift> archivedShifts = repositoryCollector.getArchivedShifts().findAll();
+//
+//        return archivedShifts.stream()
+//                .map(ArchivedShiftDto::fromEntity)
+//                .toList();
+//    }
 
-        return archivedShifts.stream()
-                .map(ArchivedShiftDto::fromEntity)
-                .toList();
-    }
+//    /**
+//     * Retrieves a specific archived shift PDF by its ID.
+//     *
+//     * @param id the ID of the archived shift to retrieve
+//     * @return ResponseEntity containing the archived shift PDF as InputStreamResource
+//     */
+//    public ResponseEntity<InputStreamResource> getArchivedShift(long id) {
+//        ArchivedShift archivedShift = repositoryCollector.getArchivedShifts().findById(id)
+//                .orElseThrow(() -> new IllegalArgumentException("Archived Shift not found"));
+//
+//        byte[] pdfData = archivedShift.getPdfData();
+//        ByteArrayInputStream bis = new ByteArrayInputStream(pdfData);
+//
+//        return ResponseEntity.ok()
+//                .contentType(MediaType.APPLICATION_PDF)
+//                .body(new InputStreamResource(bis));
+//    }
 
-    /**
-     * Retrieves a specific archived shift PDF by its ID.
-     *
-     * @param id the ID of the archived shift to retrieve
-     * @return ResponseEntity containing the archived shift PDF as InputStreamResource
-     */
-    public ResponseEntity<InputStreamResource> getArchivedShift(long id) {
-        ArchivedShift archivedShift = repositoryCollector.getArchivedShifts().findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Archived Shift not found"));
-
-        byte[] pdfData = archivedShift.getPdfData();
-        ByteArrayInputStream bis = new ByteArrayInputStream(pdfData);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(new InputStreamResource(bis));
-    }
-
-    /**
-     * Archives the shifts from the previous week by generating a PDF and saving it to the database.
-     */
-    @Transactional
-    public void archivePreviousWeekShifts() {
-        LocalDate today = LocalDate.now();
-        LocalDate startOfPreviousWeek = today.minusWeeks(1).with(DayOfWeek.MONDAY);
-        LocalDate endOfPreviousWeek = startOfPreviousWeek.plusDays(6);
-
-        List<Shift> shifts = repositoryCollector.getShifts()
-                .findAllByDateRange(startOfPreviousWeek.atStartOfDay(), endOfPreviousWeek.atTime(23, 59, 59));
-
-        if (!shifts.isEmpty()) {
-            String fileTitle = startOfPreviousWeek + " - " + endOfPreviousWeek;
-            byte[] pdfData = generatePdf(shifts, fileTitle);
-
-            ArchivedShift archivedShift = new ArchivedShift();
-            archivedShift.setFileTitle(fileTitle);
-            archivedShift.setPdfData(pdfData);
-
-            repositoryCollector.getArchivedShifts().save(archivedShift);
-        }
-    }
+//    /**
+//     * Archives the shifts from the previous week by generating a PDF and saving it to the database.
+//     */
+//    @Transactional
+//    public void archivePreviousWeekShifts() {
+//        LocalDate today = LocalDate.now();
+//        LocalDate startOfPreviousWeek = today.minusWeeks(1).with(DayOfWeek.MONDAY);
+//        LocalDate endOfPreviousWeek = startOfPreviousWeek.plusDays(6);
+//
+//        List<Shift> shifts = repositoryCollector.getShifts()
+//                .findAllByDateRange(startOfPreviousWeek.atStartOfDay(), endOfPreviousWeek.atTime(23, 59, 59));
+//
+//        if (!shifts.isEmpty()) {
+//            String fileTitle = startOfPreviousWeek + " - " + endOfPreviousWeek;
+//            byte[] pdfData = generatePdf(shifts, fileTitle);
+//
+//            ArchivedShift archivedShift = new ArchivedShift();
+//            archivedShift.setFileTitle(fileTitle);
+//            archivedShift.setPdfData(pdfData);
+//
+//            repositoryCollector.getArchivedShifts().save(archivedShift);
+//        }
+//    }
 
     /**
      * Generates a PDF report based on the provided list of shifts and date range.
@@ -109,7 +104,7 @@ public class ArchivedShiftService {
      * @param dateRange the date range represented in the report
      * @return a byte array representing the generated PDF
      */
-    private byte[] generatePdf(List<Shift> shifts, String dateRange) {
+    private byte[] generatePdfForShifts(List<Shift> shifts, String dateRange) {
         Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -179,13 +174,13 @@ public class ArchivedShiftService {
         return out.toByteArray();
     }
 
-    /**
-     * Schedules the archiving of shifts from the previous week to occur every Monday at midnight.
-     */
-    @Scheduled(cron = "0 0 0 * * MON")
-    public void scheduleWeeklyShiftArchival() {
-        archivePreviousWeekShifts();
-    }
+//    /**
+//     * Schedules the archiving of shifts from the previous week to occur every Monday at midnight.
+//     */
+//    @Scheduled(cron = "0 0 0 * * MON")
+//    public void scheduleWeeklyShiftArchival() {
+//        archivePreviousWeekShifts();
+//    }
 
     /**
      * Generates a PDF report for shifts in a specific week based on the provided start date.
@@ -204,7 +199,7 @@ public class ArchivedShiftService {
         }
 
         String dateRange = startOfWeek + " - " + endDate;
-        byte[] pdfData = generatePdf(shifts, dateRange);
+        byte[] pdfData = generatePdfForShifts(shifts, dateRange);
 
         ByteArrayInputStream bis = new ByteArrayInputStream(pdfData);
 
@@ -213,4 +208,50 @@ public class ArchivedShiftService {
                 .body(new InputStreamResource(bis));
     }
 
+    public ResponseEntity<InputStreamResource> generatePdfForAllEmployees() {
+        List<User> users = repositoryCollector.getUsers().findAll();
+
+        Document document = new Document(PageSize.A4.rotate());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            PdfWriter.getInstance(document, out);
+            document.open();
+
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, Color.BLACK);
+            Paragraph title = new Paragraph("Employees: ", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+            document.add(Chunk.NEWLINE);
+
+            PdfPTable table = new PdfPTable(3);
+            Stream.of("Employee ID", "Firstname", "Surname").forEach(headerTitle -> {
+                PdfPCell header = new PdfPCell();
+                Font headFont = FontFactory.getFont(FontFactory.HELVETICA);
+                header.setBackgroundColor(Color.ORANGE);
+                header.setHorizontalAlignment(Element.ALIGN_CENTER);
+                header.setBorderWidth(2);
+                header.setPhrase(new Phrase(headerTitle, headFont));
+                table.addCell(header);
+            });
+
+            for (User user : users) {
+                table.addCell(new PdfPCell(new Phrase(user.getEmployeeId())));
+                table.addCell(new PdfPCell(new Phrase(user.getFirstname())));
+                table.addCell(new PdfPCell(new Phrase(user.getSurname())));
+            }
+
+            document.add(table);
+            document.close();
+
+        } catch (DocumentException e) {
+            throw new RuntimeException("Error while generating PDF", e);
+        }
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(out.toByteArray());
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(bis));
+    }
 }
