@@ -6,6 +6,8 @@ import org.harmoniapp.harmoniwebapi.contracts.PartialUserWithEmpIdDto;
 import org.harmoniapp.harmoniwebapi.services.PartialUserWithEmpIdService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * REST controller for managing user employee ID.
  * Provides endpoints to retrieve user information and their employee ID.
@@ -28,5 +30,16 @@ public class PartialUserWithEmpIdController {
     public PageDto<PartialUserWithEmpIdDto> getAllPartialUsers(@RequestParam(name = "pageNumber", required = false, defaultValue = "1") int pageNumber,
                                                                @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
         return partialUserWithEmpIdService.getAllPartialUsers(pageNumber, pageSize);
+    }
+
+    /**
+     * Searches for users based on a query string and returns a list of partial user information, including their employee ID.
+     *
+     * @param q the search query string to filter users by. This can match against various user attributes.
+     * @return a list of PartialUserWithEmpIdDto objects that match the search query.
+     */
+    @GetMapping("/search")
+    public List<PartialUserWithEmpIdDto> getUsersSearch(@RequestParam String q) {
+        return partialUserWithEmpIdService.getUsersSearch(q);
     }
 }

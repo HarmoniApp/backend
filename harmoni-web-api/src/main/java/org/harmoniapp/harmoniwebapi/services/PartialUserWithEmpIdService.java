@@ -12,6 +12,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Service class for managing user employee ID.
  * Provides methods to retrieve user information and their associated employee ID.
@@ -40,5 +43,32 @@ public class PartialUserWithEmpIdService {
                 users.getSize(),
                 users.getNumber()+1,
                 users.getTotalPages());
+    }
+
+    /**
+     * Searches for users based on a query string. The query string is split into individual words
+     * and used to match against user attributes. If the query string is empty or null, an exception is thrown.
+     *
+     * @param q the search query string to filter users by. This can match against various user attributes.
+     * @return a list of {@link PartialUserWithEmpIdDto} objects that match the search query.
+     * @throws IllegalArgumentException if the query string is null or empty.
+     */
+    public List<PartialUserWithEmpIdDto> getUsersSearch(String q) {
+        if (q == null || q.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
+        q = q.toUpperCase();
+        List<String> qSplit = List.of(q.split(" "));
+
+        List<User> users;
+        if (qSplit.size() > 1) {
+            users = repositoryCollector.getUsers().findAllBySearchName(qSplit, true);
+        } else {
+            users = repositoryCollector.getUsers().FindAllBySearch(q, true);
+        }
+
+        return users.stream().map(PartialUserWithEmpIdDto::fromEntity
+        ).collect(Collectors.toList());
     }
 }
