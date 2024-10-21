@@ -159,6 +159,10 @@ public class ExcelService {
                 }
             }
 
+            for (int i = 0; i < headerRow.getLastCellNum(); i++) {
+                sheet.autoSizeColumn(i);
+            }
+
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             workbook.write(out);
             ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
