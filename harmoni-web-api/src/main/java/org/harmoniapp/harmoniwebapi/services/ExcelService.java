@@ -88,6 +88,10 @@ public class ExcelService {
                 row.createCell(16).setCellValue(user.workAddress().departmentName());
             }
 
+            for (int i = 0; i < headersCell.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             workbook.write(out);
 
