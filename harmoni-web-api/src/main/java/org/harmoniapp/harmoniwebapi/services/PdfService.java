@@ -23,6 +23,8 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.harmonidata.entities.Language;
+import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
@@ -224,8 +226,14 @@ public class PdfService {
             document.add(title);
             document.add(Chunk.NEWLINE);
 
-            PdfPTable table = new PdfPTable(3);
-            Stream.of("Employee ID", "Firstname", "Surname").forEach(headerTitle -> {
+            String[] headersCell = {"Employee ID", "First Name", "Surname", "Email", "Phone number", "City", "Street",
+                    "Apartment", "Zip code", "Building number", "Roles", "Languages",
+                    "Contract type", "Contract signature", "Contract expiration",
+                    "Supervisor employee ID", "Department name"};
+            PdfPTable table = new PdfPTable(headersCell.length);
+            table.setWidthPercentage(100);
+
+            Stream.of(headersCell).forEach(headerTitle -> {
                 PdfPCell header = new PdfPCell();
                 Font headFont = FontFactory.getFont(FontFactory.HELVETICA);
                 header.setBackgroundColor(Color.ORANGE);
@@ -239,6 +247,30 @@ public class PdfService {
                 table.addCell(new PdfPCell(new Phrase(user.getEmployeeId())));
                 table.addCell(new PdfPCell(new Phrase(user.getFirstname())));
                 table.addCell(new PdfPCell(new Phrase(user.getSurname())));
+                table.addCell(new PdfPCell(new Phrase(user.getEmail())));
+                table.addCell(new PdfPCell(new Phrase(user.getPhoneNumber())));
+                table.addCell(new PdfPCell(new Phrase(user.getResidence().getCity())));
+                table.addCell(new PdfPCell(new Phrase(user.getResidence().getStreet())));
+                table.addCell(new PdfPCell(new Phrase(user.getResidence().getApartment())));
+                table.addCell(new PdfPCell(new Phrase(user.getResidence().getZipCode())));
+                table.addCell(new PdfPCell(new Phrase(user.getResidence().getBuildingNumber())));
+                table.addCell(new PdfPCell(new Phrase(
+                        user.getRoles().stream()
+                                .map(Role::getName)
+                                .collect(Collectors.joining(", ")))));
+                table.addCell(new PdfPCell(new Phrase(
+                        user.getLanguages().stream()
+                                .map(Language::getName)
+                                .collect(Collectors.joining(", ")))));
+                table.addCell(new PdfPCell(new Phrase(user.getContractType().getName())));
+                table.addCell(new PdfPCell(new Phrase(user.getContractSignature().toString())));
+                table.addCell(new PdfPCell(new Phrase(user.getContractExpiration().toString())));
+                String supervisorEmployeeId = repositoryCollector.getUsers()
+                        .findById(user.getSupervisor().getId())
+                        .map(User::getEmployeeId)
+                        .orElse("");
+                table.addCell(new PdfPCell(new Phrase(supervisorEmployeeId)));
+                table.addCell(new PdfPCell(new Phrase(user.getWorkAddress().getDepartmentName())));
             }
 
             document.add(table);
