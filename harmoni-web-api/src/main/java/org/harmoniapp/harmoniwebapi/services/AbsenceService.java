@@ -5,8 +5,13 @@ import org.harmoniapp.harmonidata.entities.*;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.AbsenceDto;
 import org.harmoniapp.harmoniwebapi.contracts.NotificationDto;
+import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.harmoniapp.harmoniwebapi.utils.HolidayCalculator;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,46 +32,65 @@ public class AbsenceService {
     private final NotificationService notificationService;
 
     /**
-     * Retrieves all Absences by user ID.
+     * Retrieves a paginated list of absences for a specific user.
      *
-     * @param id the ID of the user whose absences are to be retrieved
-     * @return a list of AbsenceDto corresponding to the user's absences
+     * @param id         the ID of the user whose absences are to be retrieved
+     * @param pageNumber the page number to retrieve
+     * @param pageSize   the number of items per page
+     * @return a PageDto containing the user's absences
      */
-    public List<AbsenceDto> getAbsenceByUserId(long id) { //only avaiting or approved
-        List<Absence> userAbsences = repositoryCollector.getAbsences().findAwaitingOrApprovedAbsenceByUserId(id);
+    public PageDto<AbsenceDto> getAbsenceByUserId(long id, int pageNumber, int pageSize) {
+        pageNumber = (pageNumber < 1) ? 0 : pageNumber-1;
+        pageSize = (pageSize < 1) ? 10 : pageSize;
 
-        return userAbsences.stream()
-                .map(AbsenceDto::fromEntity)
-                .toList();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("updated").descending());
+        Page<Absence> userAbsences = repositoryCollector.getAbsences().findAwaitingOrApprovedAbsenceByUserId(id, pageable);
+
+        return new PageDto<>(userAbsences.stream().map(AbsenceDto::fromEntity).toList(),
+                userAbsences.getSize(),
+                userAbsences.getNumber()+1,
+                userAbsences.getTotalPages());
     }
 
 //    /**
-//     * Retrieves a list of absences for a specific user based on their archived status.
+//     * Retrieves a paginated list of absences for a specific user based on their archived status.
 //     *
-//     * @param id       the ID of the user whose absences are to be retrieved
-//     * @param archived a boolean indicating whether to retrieve archived or non-archived absences
-//     * @return a list of AbsenceDto objects representing the user's absences with the specified archived status
+//     * @param id         the ID of the user whose absences are to be retrieved.
+//     * @param archived   a boolean indicating whether to retrieve archived or non-archived absences.
+//     * @param pageNumber the page number to retrieve.
+//     * @param pageSize   the number of items per page.
+//     * @return a PageDto containing the user's absences with the specified archived status.
 //     */
-//    public List<AbsenceDto> getAbsenceByUserIdAndArchive(long id, boolean archived) {
-//        List<Absence> userAbsences = repositoryCollector.getAbsences().findByUserIdAndArchived(id, archived);
+//    public PageDto<AbsenceDto> getAbsenceByUserIdAndArchive(long id, boolean archived, int pageNumber, int pageSize) {
+//        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("updated").descending());
+//        Page<Absence> userAbsences = repositoryCollector.getAbsences().findByUserIdAndArchived(id, archived, pageable);
 //
-//        return userAbsences.stream()
-//                .map(AbsenceDto::fromEntity)
-//                .toList();
+//        return new PageDto<>(userAbsences.stream().map(AbsenceDto::fromEntity).toList(),
+//                userAbsences.getSize(),
+//                userAbsences.getNumber(),
+//                userAbsences.getTotalPages());
 //    }
 
     /**
-     * Retrieves all Absences by status name.
+     * Retrieves a paginated list of absences filtered by status ID.
      *
-     * @param statusId the id of the status to filter absences by
-     * @return a list of AbsenceDto representing the absences with the specified status
+     * @param statusId   the ID of the status to filter absences by
+     * @param pageNumber the page number to retrieve
+     * @param pageSize   the number of items per page
+     * @return a PageDto containing the absences with the specified status
      */
-    public List<AbsenceDto> getAbsenceByStatus(long statusId) {
-        List<Absence> absencesWithStatus = repositoryCollector.getAbsences().findAbsenceByStatusId(statusId);
+    public PageDto<AbsenceDto> getAbsenceByStatus(long statusId, int pageNumber, int pageSize) {
+        pageNumber = (pageNumber < 1) ? 0 : pageNumber-1;
+        pageSize = (pageSize < 1) ? 10 : pageSize;
 
-        return absencesWithStatus.stream()
-                .map(AbsenceDto::fromEntity)
-                .toList();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("updated").descending());
+
+        Page<Absence> absencesWithStatus = repositoryCollector.getAbsences().findAbsenceByStatusId(statusId, pageable);
+        return new PageDto<>(absencesWithStatus.stream().map(AbsenceDto::fromEntity).toList(),
+                absencesWithStatus.getSize(),
+                absencesWithStatus.getNumber()+1,
+                absencesWithStatus.getTotalPages());
+
     }
 
     /**
@@ -105,20 +129,25 @@ public class AbsenceService {
     }
 
     /**
-     * Retrieves a list of all absences.
+     * Retrieves a paginated list of all absences.
      *
-     * @return a list of AbsenceDto containing the details of all absences
+     * @param pageNumber the page number to retrieve
+     * @param pageSize   the number of items per page
+     * @return a PageDto containing the details of all absences
      * @throws RuntimeException if an error occurs while retrieving absences
      */
-    public List<AbsenceDto> getAllAbsences() {
-        try {
-            var absence = repositoryCollector.getAbsences().findAll();
-            return absence.stream()
-                    .map(AbsenceDto::fromEntity)
-                    .toList();
-        } catch (Exception e) {
-            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
-        }
+    public PageDto<AbsenceDto> getAllAbsences(int pageNumber, int pageSize) {
+        pageNumber = (pageNumber < 1) ? 0 : pageNumber-1;
+        pageSize = (pageSize < 1) ? 10 : pageSize;
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("updated").descending());
+
+        var absence = repositoryCollector.getAbsences().findAll(pageable);
+        return new PageDto<>(absence.stream().map(AbsenceDto::fromEntity).toList(),
+                absence.getSize(),
+                absence.getNumber()+1,
+                absence.getTotalPages());
+
     }
 
     /**
@@ -127,7 +156,7 @@ public class AbsenceService {
      * @param absenceDto the AbsenceDto containing the details of the absence to create
      * @return the created AbsenceDto
      * @throws IllegalArgumentException if the user or absence type ID provided does not exist
-     * @throws RuntimeException if an error occurs during creation
+     * @throws RuntimeException         if an error occurs during creation
      */
     public AbsenceDto createAbsence(AbsenceDto absenceDto) { //TODO: change subbmision and updated to date anh hour
 
@@ -143,10 +172,10 @@ public class AbsenceService {
                 .findById(1L)    //Here status MUST be awaiting
                 .orElseThrow(IllegalArgumentException::new);
 
-        if(absenceDto.start().isBefore(LocalDate.now()) || absenceDto.end().isBefore(LocalDate.now())){
+        if (absenceDto.start().isBefore(LocalDate.now()) || absenceDto.end().isBefore(LocalDate.now())) {
             throw new RuntimeException("An error occurred: You can't start or end the absence in the past.");
         }
-        if(absenceDto.end().isBefore(absenceDto.start())){
+        if (absenceDto.end().isBefore(absenceDto.start())) {
             throw new RuntimeException("An error occurred: You can't end the absence before it starts.");
         }
         //TODO: add how many days left employee has to take absence
@@ -166,11 +195,11 @@ public class AbsenceService {
      * Updates an existing Absence or creates a new one if it doesn't exist and sends a notification.
      * IMPORTANT it is updated by employee
      *
-     * @param id the ID of the absence to update
+     * @param id         the ID of the absence to update
      * @param absenceDto the AbsenceDto containing the updated details of the absence
      * @return the updated or newly created AbsenceDto
      * @throws IllegalArgumentException if the user or absence type ID provided does not exist
-     * @throws RuntimeException if an error occurs during the update process
+     * @throws RuntimeException         if an error occurs during the update process
      */
     @Transactional
     public AbsenceDto updateAbsence(long id, AbsenceDto absenceDto) {
@@ -192,14 +221,14 @@ public class AbsenceService {
                     .findById(absenceDto.status().getId())
                     .orElseThrow(IllegalArgumentException::new);
 
-            if(absenceDto.start().isBefore(LocalDate.now()) || absenceDto.end().isBefore(LocalDate.now())){
+            if (absenceDto.start().isBefore(LocalDate.now()) || absenceDto.end().isBefore(LocalDate.now())) {
                 throw new RuntimeException("An error occurred: You can't start or end the absence in the past.");
             }
-            if(absenceDto.end().isBefore(absenceDto.start())){
+            if (absenceDto.end().isBefore(absenceDto.start())) {
                 throw new RuntimeException("An error occurred: You can't end the absence before it starts.");
             }
 
-            if(existingAbsence == null) {
+            if (existingAbsence == null) {
                 Absence newAbsence = absenceDto.toEntity(user, absenceType, status);
                 newAbsence.setWorkingDays(HolidayCalculator.calculateWorkingDays(newAbsence.getStart(), newAbsence.getEnd()));
                 Absence savedAbsence = repositoryCollector.getAbsences().save(newAbsence);
@@ -231,11 +260,11 @@ public class AbsenceService {
      * Updates the status of an existing Absence and sends a notification to the employee.
      * IMPORTANT it is updated by employer
      *
-     * @param id the ID of the absence to update
+     * @param id       the ID of the absence to update
      * @param statusId the ID of the new status to set for the absence
      * @return the updated AbsenceDto
      * @throws IllegalArgumentException if the provided status ID does not exist
-     * @throws RuntimeException if the absence does not exist or if an error occurs during the update process
+     * @throws RuntimeException         if the absence does not exist or if an error occurs during the update process
      */
     @Transactional
     public AbsenceDto updateAbsenceStatus(long id, long statusId) {
