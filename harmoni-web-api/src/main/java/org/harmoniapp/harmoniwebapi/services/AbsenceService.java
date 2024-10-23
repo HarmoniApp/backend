@@ -275,6 +275,7 @@ public class AbsenceService {
      */
     @Transactional
     public AbsenceDto updateAbsenceStatus(long id, long statusId) {
+        //TODO: we can only change status if the absence is in future
         try {
             Absence existingAbsence = repositoryCollector.getAbsences().findById(id)
                     .orElseThrow(() -> new RuntimeException("You can only change status if absence exists"));
@@ -310,6 +311,7 @@ public class AbsenceService {
         }
     }
 
+    //TODO: check if we need this?
     /**
      * Updates the archived status of an existing absence.
      *
