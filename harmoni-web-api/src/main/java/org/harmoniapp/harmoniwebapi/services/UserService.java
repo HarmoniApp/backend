@@ -124,6 +124,7 @@ public class UserService {
         user.setPasswordGenerated(true);
         user.setActive(true);
         user.setPhoto("default.jpg");
+        user.setAvailableAbsenceDays(contractType.getAbsenceDays());
 
         user.setLanguages(
                 userDto.languages().stream()
