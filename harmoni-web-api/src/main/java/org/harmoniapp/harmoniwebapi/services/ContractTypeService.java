@@ -10,6 +10,7 @@ import org.harmoniapp.harmoniwebapi.contracts.RoleDto;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -51,6 +52,7 @@ public class ContractTypeService {
             var contractTypes = repositoryCollector.getContractTypes().findAll();
             return contractTypes.stream()
                     .map(ContractTypeDto::fromEntity)
+                    .sorted(Comparator.comparing(ContractTypeDto::name))
                     .toList();
         } catch (Exception e) {
             throw new RuntimeException("An error occurred: " + e.getMessage(), e);
