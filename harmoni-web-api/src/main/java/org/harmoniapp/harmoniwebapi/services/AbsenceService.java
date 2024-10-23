@@ -43,7 +43,7 @@ public class AbsenceService {
         pageNumber = (pageNumber < 1) ? 0 : pageNumber-1;
         pageSize = (pageSize < 1) ? 10 : pageSize;
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createAt").descending());
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("updated").descending());
         Page<Absence> userAbsences = repositoryCollector.getAbsences().findAwaitingOrApprovedAbsenceByUserId(id, pageable);
 
         return new PageDto<>(userAbsences.stream().map(AbsenceDto::fromEntity).toList(),
