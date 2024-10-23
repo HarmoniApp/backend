@@ -1,11 +1,10 @@
 package org.harmoniapp.harmoniwebapi.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.harmoniapp.harmoniwebapi.contracts.PartialUserWithEmpIdDto;
 import org.harmoniapp.harmoniwebapi.services.PartialUserWithEmpIdService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,16 +15,31 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("user/simple/empId")
+@CrossOrigin(origins = "http://localhost:3000")
 public class PartialUserWithEmpIdController {
     private final PartialUserWithEmpIdService partialUserWithEmpIdService;
 
     /**
-     * Retrieves a list of partial user information, including their employee ID.
+     * Retrieves a paginated list of partial user information, including their employee ID.
      *
-     * @return a list of PartialUserWithEmpIdDto objects containing user details
+     * @param pageNumber the page number to retrieve (optional, default is 1).
+     * @param pageSize   the number of items per page (optional, default is 10).
+     * @return a PageDto containing a list of PartialUserWithEmpIdDto objects with user details
      */
     @GetMapping
-    public List<PartialUserWithEmpIdDto> getAllPartialUsers() {
-        return partialUserWithEmpIdService.getAllPartialUsers();
+    public PageDto<PartialUserWithEmpIdDto> getAllPartialUsers(@RequestParam(name = "pageNumber", required = false, defaultValue = "1") int pageNumber,
+                                                               @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
+        return partialUserWithEmpIdService.getAllPartialUsers(pageNumber, pageSize);
+    }
+
+    /**
+     * Searches for users based on a query string and returns a list of partial user information, including their employee ID.
+     *
+     * @param q the search query string to filter users by. This can match against various user attributes.
+     * @return a list of PartialUserWithEmpIdDto objects that match the search query.
+     */
+    @GetMapping("/search")
+    public List<PartialUserWithEmpIdDto> getUsersSearch(@RequestParam String q) {
+        return partialUserWithEmpIdService.getUsersSearch(q);
     }
 }

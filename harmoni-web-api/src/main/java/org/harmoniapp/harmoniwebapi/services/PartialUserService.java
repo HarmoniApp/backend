@@ -3,8 +3,12 @@ package org.harmoniapp.harmoniwebapi.services;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
+import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.harmoniapp.harmoniwebapi.contracts.PartialUserDto;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -29,41 +33,51 @@ public class PartialUserService {
      * @throws IllegalArgumentException if no user with the specified ID is found.
      */
     public PartialUserDto getUser(long id) {
-        User user = repositoryCollector.getUsers().findById(id).orElseThrow(IllegalArgumentException::new);
+        User user = repositoryCollector.getUsers().findByIdAndIsActive(id, true).orElseThrow(IllegalArgumentException::new);
 
         return PartialUserDto.fromEntity(user);
     }
 
     /**
-     * Retrieves a list of users based on the specified filtering and sorting criteria.
+     * /**
+     * Retrieves a paginated list of users based on the specified filtering and sorting criteria.
      *
-     * @param roles     an optional list of role IDs to filter the users by roles. If not specified, no role-based filtering is applied.
-     * @param contracts an optional list of contract IDs to filter the users by contracts. If not specified, no contract-based filtering is applied.
-     * @param languages an optional list of language IDs to filter the users by languages. If not specified, no language-based filtering is applied.
-     * @param sortBy    the field by which to sort the results. Default is "firstname".
-     * @param order     the order of sorting, either "asc" for ascending or "desc" for descending. Default is "asc".
-     * @return a list of {@link PartialUserDto} objects that match the specified criteria.
+     * @param roles      an optional list of role IDs to filter the users by roles. If not specified, no role-based filtering is applied.
+     * @param contracts  an optional list of contract IDs to filter the users by contracts. If not specified, no contract-based filtering is applied.
+     * @param languages  an optional list of language IDs to filter the users by languages. If not specified, no language-based filtering is applied.
+     * @param pageNumber the page number to retrieve.
+     * @param pageSize   the number of users per page.
+     * @param sortBy     the field by which to sort the results. Default is "firstname".
+     * @param order      the order of sorting, either "asc" for ascending or "desc" for descending. Default is "asc".
+     * @return a {@link PageDto} containing a list of {@link PartialUserDto} objects that match the specified criteria.
      */
-    public List<PartialUserDto> getUsers(List<Long> roles, List<Long> contracts, List<Long> languages, String sortBy, String order) {
+    public PageDto<PartialUserDto> getUsers(List<Long> roles, List<Long> contracts, List<Long> languages, int pageNumber, int pageSize, String sortBy, String order) {
+        pageNumber = (pageNumber < 1) ? 0 : pageNumber-1;
+        pageSize = (pageSize < 1) ? 10 : pageSize;
+
         Sort.Direction sortDirection;
         if (order == null || order.isEmpty() || order.equalsIgnoreCase("asc")) {
             sortDirection = Sort.Direction.ASC;
         } else {
             sortDirection = Sort.Direction.DESC;
         }
-        Sort sort = Sort.by(sortDirection, sortBy);
 
-        List<User> users;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy));
+
+        Page<User> users;
         if ((roles == null || roles.isEmpty())
                 && (contracts == null || contracts.isEmpty())
                 && (languages == null || languages.isEmpty())) {
-            users = repositoryCollector.getUsers().findAll(sort);
+            users = repositoryCollector.getUsers().findAllByIsActive(true, pageable);
         } else {
-            users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguage(contracts, roles, languages, sort);
+            users = repositoryCollector.getUsers().findAllByContractAndRoleAndLanguageAndIsActive(contracts, roles, languages, true, pageable);
         }
-        return users.stream()
-                .map(PartialUserDto::fromEntity)
-                .toList();
+
+        return new PageDto<PartialUserDto>(
+                users.stream().map(PartialUserDto::fromEntity).toList(),
+                users.getSize(),
+                users.getNumber()+1,
+                users.getTotalPages());
     }
 
     /**
@@ -84,9 +98,9 @@ public class PartialUserService {
 
         List<User> users;
         if (qSplit.size() > 1) {
-            users = repositoryCollector.getUsers().findAllBySearchName(qSplit);
+            users = repositoryCollector.getUsers().findAllBySearchName(qSplit, true);
         } else {
-            users = repositoryCollector.getUsers().FindAllBySearch(q);
+            users = repositoryCollector.getUsers().FindAllBySearch(q, true);
         }
 
         return users.stream().map(PartialUserDto::fromEntity).collect(Collectors.toList());
