@@ -178,12 +178,18 @@ public class AbsenceService {
         if (absenceDto.end().isBefore(absenceDto.start())) {
             throw new RuntimeException("An error occurred: You can't end the absence before it starts.");
         }
-        //TODO: add how many days left employee has to take absence
 
         Absence absence = absenceDto.toEntity(user, absenceType, status);
         absence.setSubmission(LocalDate.now());
         absence.setUpdated(LocalDate.now());
         absence.setWorkingDays(HolidayCalculator.calculateWorkingDays(absence.getStart(), absence.getEnd()));
+
+        if(absence.getWorkingDays() > user.getAvailableAbsenceDays()){
+            throw new RuntimeException("An error occurred: You can't take more days than available.");
+        } else {
+            user.setAvailableAbsenceDays(user.getAvailableAbsenceDays() - absence.getWorkingDays().intValue());
+        }
+
         Absence savedAbsence = repositoryCollector.getAbsences().save(absence);
 
         newAbsenceCreatedNotification(savedAbsence);
@@ -191,6 +197,7 @@ public class AbsenceService {
         return AbsenceDto.fromEntity(savedAbsence);
     }
 
+    //TODO: check if we are using this anywhere?
     /**
      * Updates an existing Absence or creates a new one if it doesn't exist and sends a notification.
      * IMPORTANT it is updated by employee
@@ -287,6 +294,10 @@ public class AbsenceService {
                         .findAllByDateRangeAndUserId(startDateTime, endDateTime, existingAbsence.getUser().getId());
 
                 repositoryCollector.getShifts().deleteAll(overlappingShifts);
+            } else if (statusId == 4) {
+                User user = existingAbsence.getUser();
+                user.setAvailableAbsenceDays(user.getAvailableAbsenceDays() + existingAbsence.getWorkingDays().intValue());
+                repositoryCollector.getUsers().save(user);
             }
 
             Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
@@ -398,6 +409,15 @@ public class AbsenceService {
      */
     public void deleteAbsence(long id, long statusId) {
         try {
+            Absence existingAbsence = repositoryCollector.getAbsences().findById(id)
+                    .orElseThrow(() -> new RuntimeException("Absence not found"));
+
+            User user = repositoryCollector.getUsers().findById(existingAbsence.getUser().getId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            user.setAvailableAbsenceDays(user.getAvailableAbsenceDays() + existingAbsence.getWorkingDays().intValue());
+            repositoryCollector.getUsers().save(user);
+
             deleteAbsenceNotification(id, statusId);
             repositoryCollector.getAbsences().deleteById(id);
         } catch (Exception e) {
