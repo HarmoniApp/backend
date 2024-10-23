@@ -74,7 +74,7 @@ public class LoginService {
 
             String path = null;
             if (isOTP) {
-                path = String.format("%s/users/%d/changePassword", contextPath, user.getId());
+                path = String.format("%s/user/%d/changePassword", contextPath, user.getId());
             }
 
             return new LoginResponseDto(HttpStatus.OK.getReasonPhrase(), jwt, path);
