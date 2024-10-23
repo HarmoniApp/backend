@@ -21,10 +21,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
     private final LoginService service;
 
+    /**
+     * Authenticates the user and returns a JWT token in the response.
+     *
+     * @param loginRequestDTO the login request containing the user's username and password.
+     * @return a {@link ResponseEntity} containing the {@link LoginResponseDto} with the JWT token and HTTP status.
+     */
     @PostMapping
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDTO) {
-        String jwt = service.login(loginRequestDTO);
-        return ResponseEntity.status(HttpStatus.OK).header("Authorization", "Bearer " + jwt)
-                .body(new LoginResponseDto(HttpStatus.OK.getReasonPhrase(), jwt));
+        LoginResponseDto response = service.login(loginRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("Authorization", "Bearer " + response.jwtToken())
+                .body(response);
     }
 }

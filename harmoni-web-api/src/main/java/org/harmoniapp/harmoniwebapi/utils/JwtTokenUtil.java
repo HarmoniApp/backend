@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
@@ -35,23 +37,25 @@ public class JwtTokenUtil {
     @Value("${jwt.secret-key}")
     private String SECRET_KEY;
 
-    @Value("${jwt.expiration}")
-    private Long EXPIRATION;
+    @Value("${jwt.default-expiration}")
+    private Long DEFAULT_EXPIRATION;
 
-
-    public String generateToken(Authentication authentication) {
-        return generateToken(authentication, Map.of());
-    }
+    @Value("${jwt.opt-expiration}")
+    private Long OTP_EXPIRATION;
 
     /**
      * Generates a JWT token for the authenticated user with extra claims.
      *
      * @param authentication the {@link Authentication} object containing user details.
      * @param extraClaims additional claims to add to the token.
+     * @param isOTP flag indicating if the token is a one-time password (OTP) token.
      * @return a signed JWT token as a {@link String}.
      */
-    public String generateToken(Authentication authentication, Map<String, Object> extraClaims) {
+    public String generateToken(Authentication authentication, Map<String, Object> extraClaims, boolean isOTP) {
         SecretKey secretKey = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+
+        long exp = isOTP ? OTP_EXPIRATION: DEFAULT_EXPIRATION;
+        Date expDate = new Date((new Date()).getTime() + exp);
 
         return Jwts.builder().issuer(JWT_ISSUER).subject(authentication.getName())
                 .claim("username", authentication.getName())
@@ -59,7 +63,7 @@ public class JwtTokenUtil {
                 .claim("authorities", authentication.getAuthorities().stream().map(
                         GrantedAuthority::getAuthority).collect(Collectors.joining(",")))
                 .issuedAt(new Date())
-                .expiration(new Date((new Date()).getTime() + EXPIRATION))
+                .expiration(expDate)
                 .signWith(secretKey).compact();
     }
 
@@ -123,11 +127,10 @@ public class JwtTokenUtil {
      * @param userDetails the {@link UserDetails} object containing user details.
      * @return {@code true} if the token is valid, {@code false} otherwise.
      */
-    public boolean isTokenValid(String token, UserDetails userDetails, LocalDate lastPassChange) {
+    public boolean isTokenValid(String token, UserDetails userDetails, LocalDateTime lastPassChange) {
         try {
             return decodeJWT(token).getSubject().equals(userDetails.getUsername())
-                    && !isTokenExpired(token)
-                    && !isTokenCreatedBeforeLastPassChange(token, lastPassChange);
+                    && !isTokenExpired(token);
         } catch (Exception e) {
             return false;
         }
@@ -141,18 +144,9 @@ public class JwtTokenUtil {
      */
     public boolean isTokenExpired(String token) {
         try {
-            return decodeJWT(token).getExpiration().before(new Date(System.currentTimeMillis()));
+            return getExpiration(token).before(new Date(System.currentTimeMillis()));
         } catch (Exception e) {
             return true;
-        }
-    }
-
-    public boolean isTokenCreatedBeforeLastPassChange(String token, LocalDate lastPassChange) {
-        //TODO: Change LocalDate to LocalDateTime
-        try {
-            return decodeJWT(token).getIssuedAt().before(Date.from(lastPassChange.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
-        } catch (Exception e) {
-            return false;
         }
     }
 }

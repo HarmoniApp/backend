@@ -44,7 +44,6 @@ public class UserService {
     private final CompromisedPasswordChecker passwordChecker;
     private final String photoDirPath = "./harmoni-web-api/src/main/resources/static/userPhoto/";
 
-
     /**
      * Retrieves a paginated list of UserDto objects based on specified criteria.
      *
@@ -347,7 +346,7 @@ public class UserService {
         String hashedPwd = passwordEncoder.encode(pwd);
         user.setPassword(hashedPwd);
         user.setPasswordGenerated(false);
-        user.setLastPasswordChange(LocalDate.now());
+        user.setLastPasswordChange(LocalDateTime.now().plusMonths(6));
 
         repositoryCollector.getUsers().save(user);
 
@@ -362,7 +361,7 @@ public class UserService {
         String hashedPwd = passwordEncoder.encode(pwd);
         user.setPassword(hashedPwd);
         user.setPasswordGenerated(true);
-        user.setLastPasswordChange(LocalDate.now());
+        user.setLastPasswordChange(LocalDateTime.now().plusMonths(6));
 
         repositoryCollector.getUsers().save(user);
 

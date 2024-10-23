@@ -4,13 +4,18 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.LoginRequestDto;
+import org.harmoniapp.harmoniwebapi.contracts.LoginResponseDto;
 import org.harmoniapp.harmoniwebapi.exception.InactiveAccountException;
+import org.harmoniapp.harmoniwebapi.exception.UnauthenticatedUserException;
 import org.harmoniapp.harmoniwebapi.utils.JwtTokenUtil;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +33,9 @@ public class LoginService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
 
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
+
     /**
      * Authenticates the user and generates a JWT token upon successful login.
      * <p>
@@ -38,8 +46,11 @@ public class LoginService {
      * @param loginRequest the login request containing the user's username and password.
      * @return the generated JWT token if authentication is successful.
      * @throws RuntimeException if the user is not found in the repository.
+     * @throws InactiveAccountException if the user's account is inactive.
+     * @throws UnauthenticatedUserException if the authentication fails due to invalid credentials.
      */
-    public String login(LoginRequestDto loginRequest) {
+    public LoginResponseDto login(LoginRequestDto loginRequest) {
+        //TODO: add calculation of invalid login attempts
         String jwt = "";
         Authentication authentication = UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.username(),
                 loginRequest.password());
@@ -54,13 +65,21 @@ public class LoginService {
             if (!user.isActive()) {
                 throw new InactiveAccountException();
             }
-            //TODO: Add a check to see if the password is a one-time use
 
             Map<String, Object> extraClaims = new HashMap<>();
             extraClaims.put("id", user.getId());
 
-            jwt = jwtTokenUtil.generateToken(authenticationResponse, extraClaims);
+            boolean isOTP = LocalDateTime.now().isAfter(user.getLastPasswordChange());
+            jwt= jwtTokenUtil.generateToken(authenticationResponse, extraClaims, isOTP);
+
+            String path = null;
+            if (isOTP) {
+                path = String.format("%s/users/%d/changePassword", contextPath, user.getId());
+            }
+
+            return new LoginResponseDto(HttpStatus.OK.getReasonPhrase(), jwt, path);
+        } else {
+            throw new UnauthenticatedUserException("Invalid credentials");
         }
-        return jwt;
     }
 }
