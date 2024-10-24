@@ -90,6 +90,13 @@ public class UserService {
         return UserDto.fromEntity(user);
     }
 
+    public int getUserAvailableAbsenceDays(long id) {
+        User user = repositoryCollector.getUsers().findById(id)
+                .orElseThrow(IllegalArgumentException::new);
+
+        return user.getAvailableAbsenceDays();
+    }
+
     /**
      * Adds a new user.
      *
@@ -124,6 +131,7 @@ public class UserService {
         user.setPasswordGenerated(true);
         user.setActive(true);
         user.setPhoto("default.jpg");
+        user.setAvailableAbsenceDays(contractType.getAbsenceDays());
 
         user.setLanguages(
                 userDto.languages().stream()

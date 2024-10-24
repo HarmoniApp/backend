@@ -39,4 +39,19 @@ public class ContractTypeController {
         return contractTypeService.getAllContractTypes();
     }
 
+    @PostMapping
+    public ContractTypeDto createContractType(@RequestBody ContractTypeDto contractTypeDto) {
+        return contractTypeService.createContractType(contractTypeDto);
+    }
+
+    @PutMapping("/{id}")
+    public ContractTypeDto updateContractType(@PathVariable long id, @RequestBody ContractTypeDto contractTypeDto) {
+        return contractTypeService.updateContractType(id, contractTypeDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteContractType(@PathVariable long id) {
+        contractTypeService.deleteContractType(id);
+    }
+
 }

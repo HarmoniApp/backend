@@ -84,6 +84,8 @@ public record UserDto(
 
         @JsonProperty("is_active") boolean isActive,
 
+        @JsonProperty("available_absence_days") int availableAbsenceDays,
+
         @NotEmpty(message = "Roles cannot be null or empty")
         List<Role> roles,
 
@@ -113,6 +115,7 @@ public record UserDto(
                 user.getEmployeeId(),
                 user.getPhoto(),
                 user.isActive(),
+                user.getAvailableAbsenceDays(),
                 user.getRoles().stream().toList(),
                 user.getLanguages().stream().map(p -> new LanguageDto(p.getId(), p.getName(), p.getCode())).toList()
         );
@@ -142,6 +145,7 @@ public record UserDto(
                 null,
                 true,
                 this.isActive,
+                this.availableAbsenceDays,
                 null,
                 null
         );

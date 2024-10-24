@@ -67,6 +67,9 @@ public class User {
     @Column(name = "is_active")
     private boolean isActive;
 
+    @Column(name = "available_absence_days")
+    private int availableAbsenceDays;
+
     @ManyToMany
     @JoinTable(
             name = "user_role",
