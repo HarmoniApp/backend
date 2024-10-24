@@ -2,11 +2,15 @@ package org.harmoniapp.harmoniwebapi.services;
 
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.ContractType;
+import org.harmoniapp.harmonidata.entities.Role;
+import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.ContractTypeDto;
+import org.harmoniapp.harmoniwebapi.contracts.RoleDto;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -48,7 +52,45 @@ public class ContractTypeService {
             var contractTypes = repositoryCollector.getContractTypes().findAll();
             return contractTypes.stream()
                     .map(ContractTypeDto::fromEntity)
+                    .sorted(Comparator.comparing(ContractTypeDto::name))
                     .toList();
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
+        }
+    }
+
+    public ContractTypeDto createContractType(ContractTypeDto contractTypeDto) {
+        try {
+            ContractType contractType = contractTypeDto.toEntity();
+            ContractType contractTypeSaved = repositoryCollector.getContractTypes().save(contractType);
+            return ContractTypeDto.fromEntity(contractTypeSaved);
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
+        }
+    }
+
+    public ContractTypeDto updateContractType(long id, ContractTypeDto contractTypeDto) {
+        try {
+            ContractType newContractType = contractTypeDto.toEntity();
+            return repositoryCollector.getContractTypes().findById(id)
+                    .map(contractType -> {
+                        contractType.setName(newContractType.getName());
+                        contractType.setAbsenceDays(newContractType.getAbsenceDays());
+                        ContractType updatedContractType = repositoryCollector.getContractTypes().save(contractType);
+                        return ContractTypeDto.fromEntity(updatedContractType);
+                    })
+                    .orElseGet(() -> {
+                        ContractType contractType = repositoryCollector.getContractTypes().save(newContractType);
+                        return ContractTypeDto.fromEntity(contractType);
+                    });
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
+        }
+    }
+
+    public void deleteContractType(long id) {
+        try {
+            repositoryCollector.getContractTypes().deleteById(id);
         } catch (Exception e) {
             throw new RuntimeException("An error occurred: " + e.getMessage(), e);
         }

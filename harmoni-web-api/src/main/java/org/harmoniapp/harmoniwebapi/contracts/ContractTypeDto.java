@@ -1,5 +1,7 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Min;
 import org.harmoniapp.harmonidata.entities.ContractType;
 
 /**
@@ -8,7 +10,11 @@ import org.harmoniapp.harmonidata.entities.ContractType;
  * @param id    the unique identifier of the ContractType
  * @param name  the name of the ContractType
  */
-public record ContractTypeDto(long id, String name) {
+public record ContractTypeDto(
+        long id,
+        String name,
+        @Min(value = 0, message = "Absence days must be zero or a positive number")
+        @JsonProperty("absence_days") int absenceDays) {
 
     /**
      * Converts a ContractType entity to a ContractTypeDto.
@@ -19,7 +25,8 @@ public record ContractTypeDto(long id, String name) {
     public static ContractTypeDto fromEntity(ContractType contractType) {
         return new ContractTypeDto(
                 contractType.getId(),
-                contractType.getName()
+                contractType.getName(),
+                contractType.getAbsenceDays()
         );
     }
 
@@ -31,7 +38,8 @@ public record ContractTypeDto(long id, String name) {
     public ContractType toEntity() {
         return new ContractType(
                 this.id,
-                this.name
+                this.name,
+                this.absenceDays
         );
     }
 }

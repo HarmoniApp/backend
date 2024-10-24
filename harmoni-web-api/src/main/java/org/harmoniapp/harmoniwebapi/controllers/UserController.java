@@ -66,6 +66,12 @@ public class UserController {
         return service.getUsersSearch(q);
     }
 
+    @GetMapping("{id}/availableAbsenceDays")
+    public int getAvailableAbsenceDays(@PathVariable Long id) {
+        return service.getUserAvailableAbsenceDays(id);
+    }
+
+
     /**
      * Creates a new user.
      *
