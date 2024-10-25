@@ -141,6 +141,7 @@ public record UserDto(
                 user.getEmployeeId(),
                 user.getPhoto(),
                 user.isActive(),
+                user.getAvailableAbsenceDays(),
                 user.getRoles().stream().toList(),
                 user.getLanguages().stream().map(p -> new LanguageDto(p.getId(), p.getName(), p.getCode())).toList()
         );
