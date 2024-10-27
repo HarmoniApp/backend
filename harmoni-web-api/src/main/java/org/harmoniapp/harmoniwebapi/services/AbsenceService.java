@@ -184,10 +184,23 @@ public class AbsenceService {
         absence.setUpdated(LocalDate.now());
         absence.setWorkingDays(HolidayCalculator.calculateWorkingDays(absence.getStart(), absence.getEnd()));
 
-        if(absence.getWorkingDays() > user.getAvailableAbsenceDays()){
+        int requestedDays = absence.getWorkingDays().intValue();
+        int availableDays = user.getAvailableAbsenceDays() + user.getUnusedAbsenceDays();
+
+        if (requestedDays > availableDays) {
             throw new RuntimeException("An error occurred: You can't take more days than available.");
+        }
+
+        if (user.getUnusedAbsenceDays() > 0 && user.getUnusedAbsenceExpiration() != null && user.getUnusedAbsenceExpiration().isAfter(LocalDate.now())) {
+            if (requestedDays <= user.getUnusedAbsenceDays()) {
+                user.setUnusedAbsenceDays(user.getUnusedAbsenceDays() - requestedDays);
+            } else {
+                requestedDays -= user.getUnusedAbsenceDays();
+                user.setUnusedAbsenceDays(0);
+                user.setAvailableAbsenceDays(user.getAvailableAbsenceDays() - requestedDays);
+            }
         } else {
-            user.setAvailableAbsenceDays(user.getAvailableAbsenceDays() - absence.getWorkingDays().intValue());
+            user.setAvailableAbsenceDays(user.getAvailableAbsenceDays() - requestedDays);
         }
 
         Absence savedAbsence = repositoryCollector.getAbsences().save(absence);
