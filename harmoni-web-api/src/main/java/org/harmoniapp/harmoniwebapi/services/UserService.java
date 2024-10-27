@@ -129,6 +129,7 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Department with ID " + userDto.workAddress().id() + " not found"));
 
         user.setWorkAddress(workAddress);
+        user.setActive(true);
         user.setPhoto("default.jpg");
         user.setAvailableAbsenceDays(contractType.getAbsenceDays());
         user.setPasswordExpirationDate(LocalDate.now().minusDays(1));
