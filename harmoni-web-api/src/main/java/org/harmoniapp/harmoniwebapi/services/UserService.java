@@ -96,7 +96,7 @@ public class UserService {
         User user = repositoryCollector.getUsers().findById(id)
                 .orElseThrow(IllegalArgumentException::new);
 
-        return user.getAvailableAbsenceDays();
+        return user.getAvailableAbsenceDays() + user.getUnusedAbsenceDays();
     }
 
     /**
