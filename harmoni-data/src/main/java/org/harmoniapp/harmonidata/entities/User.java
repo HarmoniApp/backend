@@ -58,11 +58,11 @@ public class User {
 
     private String photo;
 
-    @Column(name = "last_password_change")
-    private LocalDateTime lastPasswordChange;
+    @Column(name = "failed_login_attempts")
+    private int failedLoginAttempts;
 
-    @Column(name = "is_password_generated")
-    private boolean isPasswordGenerated;
+    @Column(name = "password_expiration_date")
+    private LocalDate passwordExpirationDate;
 
     @Column(name = "is_active")
     private boolean isActive;
