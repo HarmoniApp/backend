@@ -18,6 +18,9 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     Page<User> findAllByIsActive(boolean active, Pageable pageable);
 
+    List<User> findAllByIsActive(boolean isActive);
+
+
     @Query("""
             select u from User u left join u.roles roles left join u.languages languages
             where ((u.contractType.id in ?1 or ?1 is null) and

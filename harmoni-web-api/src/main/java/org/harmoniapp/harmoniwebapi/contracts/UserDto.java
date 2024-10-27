@@ -146,6 +146,8 @@ public record UserDto(
                 true,
                 this.isActive,
                 this.availableAbsenceDays,
+                0,
+                null,
                 null,
                 null
         );

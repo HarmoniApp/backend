@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -332,4 +334,45 @@ public class UserService {
 
         return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
     }
+
+    public void carryOverPreviousYearAbsenceDays(User user) {
+        if (user.getAvailableAbsenceDays() > 0) {
+            user.setUnusedAbsenceDays(user.getAvailableAbsenceDays());
+            user.setUnusedAbsenceExpiration(LocalDate.of(LocalDate.now().getYear() + 1, 9, 30));
+            user.setAvailableAbsenceDays(0);
+        }
+
+        int newAbsenceDays = repositoryCollector.getContractTypes()
+                .findById(user.getContractType().getId())
+                .orElseThrow(() -> new RuntimeException("Contract type not found"))
+                .getAbsenceDays();
+
+        user.setAvailableAbsenceDays(newAbsenceDays);
+        repositoryCollector.getUsers().save(user);
+    }
+
+    public void expireUnusedAbsenceDays(User user) {
+        if (user.getUnusedAbsenceExpiration() != null && user.getUnusedAbsenceExpiration().isBefore(LocalDate.now())) {
+            user.setUnusedAbsenceDays(0);
+            user.setUnusedAbsenceExpiration(null);
+            repositoryCollector.getUsers().save(user);
+        }
+    }
+
+    @Scheduled(cron = "0 0 0 1 1 ?")  // Every year 01.01 at 00:00
+    public void scheduledCarryOverPreviousYearAbsenceDays() {
+        List<User> users = repositoryCollector.getUsers().findAllByIsActive(true);
+        for (User user : users) {
+            carryOverPreviousYearAbsenceDays(user);
+        }
+    }
+
+    @Scheduled(cron = "0 0 0 1 10 ?")  // Every year 01.10 at 00:00
+    public void scheduledExpireUnusedAbsenceDays() {
+        List<User> users = repositoryCollector.getUsers().findAllByIsActive(true);
+        for (User user : users) {
+            expireUnusedAbsenceDays(user);
+        }
+    }
+
 }
