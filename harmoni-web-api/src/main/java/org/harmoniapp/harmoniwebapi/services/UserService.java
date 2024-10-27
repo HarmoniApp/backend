@@ -129,11 +129,9 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Department with ID " + userDto.workAddress().id() + " not found"));
 
         user.setWorkAddress(workAddress);
-        user.setLastPasswordChange(LocalDateTime.now());
-        user.setPasswordGenerated(true);
-        user.setActive(true);
         user.setPhoto("default.jpg");
         user.setAvailableAbsenceDays(contractType.getAbsenceDays());
+        user.setPasswordExpirationDate(LocalDate.now().minusDays(1));
 
         user.setLanguages(
                 userDto.languages().stream()
