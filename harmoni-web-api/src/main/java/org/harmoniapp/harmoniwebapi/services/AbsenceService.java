@@ -191,18 +191,15 @@ public class AbsenceService {
             throw new RuntimeException("An error occurred: You can't take more days than available.");
         }
 
-        if (user.getUnusedAbsenceDays() > 0 && user.getUnusedAbsenceExpiration() != null && user.getUnusedAbsenceExpiration().isAfter(LocalDate.now())) {
-            if (requestedDays <= user.getUnusedAbsenceDays()) {
-                user.setUnusedAbsenceDays(user.getUnusedAbsenceDays() - requestedDays);
-            } else {
-                requestedDays -= user.getUnusedAbsenceDays();
-                user.setUnusedAbsenceDays(0);
-                user.setAvailableAbsenceDays(user.getAvailableAbsenceDays() - requestedDays);
-            }
+        if (requestedDays <= user.getUnusedAbsenceDays()) {
+            user.setUnusedAbsenceDays(user.getUnusedAbsenceDays() - requestedDays);
         } else {
+            requestedDays -= user.getUnusedAbsenceDays();
+            user.setUnusedAbsenceDays(0);
             user.setAvailableAbsenceDays(user.getAvailableAbsenceDays() - requestedDays);
         }
 
+        repositoryCollector.getUsers().save(user);
         Absence savedAbsence = repositoryCollector.getAbsences().save(absence);
 
         newAbsenceCreatedNotification(savedAbsence);
