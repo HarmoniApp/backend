@@ -26,7 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -342,6 +341,15 @@ public class UserService {
         return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
     }
 
+    /**
+     * Changes the password for a user.
+     *
+     * @param id  The ID of the user whose password is to be changed.
+     * @param pwd The new password to set for the user.
+     * @return A message indicating the password change was successful.
+     * @throws EasyPasswordException    If the provided password is compromised.
+     * @throws IllegalArgumentException If the user with the specified ID is not found.
+     */
     public String changePassword(long id, String pwd) {
         if (passwordChecker.check(pwd).isCompromised()) {
             throw new EasyPasswordException();
@@ -352,14 +360,25 @@ public class UserService {
 
         String hashedPwd = passwordEncoder.encode(pwd);
         user.setPassword(hashedPwd);
-        user.setPasswordGenerated(false);
-        user.setLastPasswordChange(LocalDateTime.now().plusMonths(6));
+        user.setPasswordExpirationDate(LocalDate.now().plusMonths(6));
+        user.setFailedLoginAttempts(0);
 
         repositoryCollector.getUsers().save(user);
 
         return "Password changed successfully";
     }
 
+    /**
+     * Generates a new password for the user with the specified ID.
+     * <p>
+     * This method generates a new common text password, hashes it, and sets it as the user's password.
+     * The password expiration date is set to yesterday, and the failed login attempts are reset to 0.
+     * </p>
+     *
+     * @param id The ID of the user for whom the new password is generated.
+     * @return The newly generated password in plain text.
+     * @throws IllegalArgumentException if the user with the specified ID is not found.
+     */
     public String generateNewPassword(long id) {
         User user = repositoryCollector.getUsers().findById(id)
                 .orElseThrow(IllegalArgumentException::new);
@@ -367,8 +386,8 @@ public class UserService {
         String pwd = passwordManager.generateCommonTextPassword();
         String hashedPwd = passwordEncoder.encode(pwd);
         user.setPassword(hashedPwd);
-        user.setPasswordGenerated(true);
-        user.setLastPasswordChange(LocalDateTime.now().plusMonths(6));
+        user.setPasswordExpirationDate(LocalDate.now().minusDays(1));
+        user.setFailedLoginAttempts(0);
 
         repositoryCollector.getUsers().save(user);
 

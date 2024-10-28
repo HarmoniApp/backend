@@ -102,20 +102,23 @@ public class ProjectSecurityConfig {
 //        http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()); //Only HTTPS
 
         http.authorizeHttpRequests(request -> request.requestMatchers("/login", "/error").permitAll()
-                        .requestMatchers("csrf").authenticated()
+                        .requestMatchers("/csrf").authenticated()
+                        .requestMatchers(new AntPathRequestMatcher("/absence/{id}/status/{statusId}", "DELETE")).access(adminOrOwnerAuthorizationManager)
                         .requestMatchers(new AntPathRequestMatcher("/absence", "POST"),
                                 new AntPathRequestMatcher("/absence/{id}", "PUT"),
                                 new AntPathRequestMatcher("/absence/archive/{id}", "PATCH")).hasRole("USER")
-//                        .requestMatchers("/absence/range/user").hasAnyRole("USER", "ADMIN") ??
                         .requestMatchers("/absence/user/{id}/**").access(adminOrOwnerAuthorizationManager)
+                        .requestMatchers("/absence/range/**").authenticated()
                         .requestMatchers("/absence/**").hasRole("ADMIN")
                         .requestMatchers("/absence-type/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/address/**").hasRole("ADMIN")
                         .requestMatchers("/archived-shifts/**").hasRole("ADMIN")
                         .requestMatchers("/contract-type/**").hasRole("ADMIN")
+                        .requestMatchers("/excel/**").hasRole("ADMIN")
                         .requestMatchers("/language/**").hasRole("ADMIN")
                         .requestMatchers("/notification/user/{id}/**").access(ownerAuthorizationManager)
                         .requestMatchers("/notification/**").authenticated()
+                        .requestMatchers("pdf/**").hasRole("ADMIN")
                         .requestMatchers("/predefine-shift/**").hasRole("ADMIN")
                         .requestMatchers("/role/**").hasRole("ADMIN") // role/user/{id} only for admin?
                         .requestMatchers("/shift/range").access(adminOrOwnerQueryParamAuthorizationManager)
@@ -161,14 +164,12 @@ public class ProjectSecurityConfig {
      * {@link HarmoniUserPasswordAuthenticationProvider}.
      *
      * @param userDetailsService the service for loading user details.
-     * @param passwordEncoder    the encoder for checking user passwords.
      * @return the configured {@link AuthenticationManager}.
      */
     @Bean
-    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
-                                                       PasswordEncoder passwordEncoder) {
+    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService) {
         HarmoniUserPasswordAuthenticationProvider authenticationProvider =
-                new HarmoniUserPasswordAuthenticationProvider(userDetailsService, passwordEncoder);
+                new HarmoniUserPasswordAuthenticationProvider(userDetailsService);
         ProviderManager providerManager = new ProviderManager(authenticationProvider);
         providerManager.setEraseCredentialsAfterAuthentication(false);
         return providerManager;

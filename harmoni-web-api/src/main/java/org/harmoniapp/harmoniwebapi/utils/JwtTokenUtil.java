@@ -12,10 +12,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -127,7 +124,7 @@ public class JwtTokenUtil {
      * @param userDetails the {@link UserDetails} object containing user details.
      * @return {@code true} if the token is valid, {@code false} otherwise.
      */
-    public boolean isTokenValid(String token, UserDetails userDetails, LocalDateTime lastPassChange) {
+    public boolean isTokenValid(String token, UserDetails userDetails) {
         try {
             return decodeJWT(token).getSubject().equals(userDetails.getUsername())
                     && !isTokenExpired(token);

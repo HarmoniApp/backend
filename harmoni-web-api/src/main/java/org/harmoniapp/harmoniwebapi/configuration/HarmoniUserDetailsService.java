@@ -34,14 +34,25 @@ public class HarmoniUserDetailsService implements UserDetailsService {
      * <p>This method fetches the user from the database, verifies if the user exists, and assigns roles based on
      * the user's roles in the system. If the user has a "sup" role, they are granted "ROLE_ADMIN", otherwise "ROLE_USER".</p>
      *
+     * <p>If the user is inactive or has failed login attempts greater than or equal to 3, an exception is thrown.</p>
+     *
      * @param username the username identifying the user whose data is required (email in this case).
      * @return a fully populated {@link UserDetails} object.
-     * @throws UsernameNotFoundException if no user is found with the given username.
+     * @throws UsernameNotFoundException if no user is found with the given username, if the user is inactive,
+     *                                   or if the user account is locked due to multiple failed login attempts.
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         org.harmoniapp.harmonidata.entities.User user = repositoryCollector.getUsers().findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User details not found for the user: " + username));
+
+        if (!user.isActive()) {
+            throw new UsernameNotFoundException("User account is inactive.");
+        }
+
+        if (user.getFailedLoginAttempts() >= 3) {
+            throw new UsernameNotFoundException("User account is locked due to multiple failed login attempts.");
+        }
 
         List<GrantedAuthority> authorities;
         if (user.getRoles().stream().anyMatch(Role::isSup)) {

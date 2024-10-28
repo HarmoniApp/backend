@@ -102,18 +102,22 @@ public class ProjectSecurityProdConfig {
 
         http.authorizeHttpRequests(request -> request.requestMatchers("/login", "/error").permitAll()
                         .requestMatchers("/csrf").authenticated()
+                        .requestMatchers(new AntPathRequestMatcher("/absence/{id}/status/{statusId}", "DELETE")).access(adminOrOwnerAuthorizationManager)
                         .requestMatchers(new AntPathRequestMatcher("/absence", "POST"),
                                 new AntPathRequestMatcher("/absence/{id}", "PUT"),
                                 new AntPathRequestMatcher("/absence/archive/{id}", "PATCH")).hasRole("USER")
                         .requestMatchers("/absence/user/{id}/**").access(adminOrOwnerAuthorizationManager)
+                        .requestMatchers("/absence/range/**").authenticated()
                         .requestMatchers("/absence/**").hasRole("ADMIN")
                         .requestMatchers("/absence-type/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/address/**").hasRole("ADMIN")
                         .requestMatchers("/archived-shifts/**").hasRole("ADMIN")
                         .requestMatchers("/contract-type/**").hasRole("ADMIN")
+                        .requestMatchers("/excel/**").hasRole("ADMIN")
                         .requestMatchers("/language/**").hasRole("ADMIN")
                         .requestMatchers("/notification/user/{id}/**").access(ownerAuthorizationManager)
                         .requestMatchers("/notification/**").authenticated()
+                        .requestMatchers("pdf/**").hasRole("ADMIN")
                         .requestMatchers("/predefine-shift/**").hasRole("ADMIN")
                         .requestMatchers("/role/**").hasRole("ADMIN") // role/user/{id} only for admin?
                         .requestMatchers("/shift/range").access(adminOrOwnerQueryParamAuthorizationManager)

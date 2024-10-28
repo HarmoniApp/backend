@@ -6,6 +6,9 @@ import org.harmoniapp.harmoniwebapi.contracts.AbsenceDto;
 import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.harmoniapp.harmoniwebapi.services.AbsenceService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -76,7 +79,9 @@ public class AbsenceController {
      * @param userId    the ID of the user to filter absences for
      * @return a list of AbsenceDto representing the approved absences within the specified date range for the given user
      */
+    //TODO: use PostAuthorize or PostFilter?
     @GetMapping("/range/user")
+    @PostAuthorize("@securityService.isAbsenceOwner(returnObject, authentication) or hasRole('ADMIN')")
     public List<AbsenceDto> getAbsenceByDateRangeAndUserId(@RequestParam("startDate") LocalDate startDate,
                                                            @RequestParam("endDate") LocalDate endDate,
                                                            @RequestParam("userId") Long userId) {
@@ -91,7 +96,9 @@ public class AbsenceController {
      * @param userId    the ID of the user to filter absences for
      * @return a list of AbsenceDto representing the approved absences within the specified date range for the given user
      */
+    //TODO: use PostAuthorize or PostFilter?
     @GetMapping("/range/onlyApproved")
+    @PostAuthorize("@securityService.isAbsenceOwner(returnObject, authentication) or hasRole('ADMIN')")
     public List<AbsenceDto> getApprovedAbsenceByDateRangeAndUserId(@RequestParam("startDate") LocalDate startDate,
                                                                    @RequestParam("endDate") LocalDate endDate,
                                                                    @RequestParam("userId") Long userId) {

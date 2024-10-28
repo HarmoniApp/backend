@@ -62,7 +62,7 @@ public class JWTTokenValidationFilter extends OncePerRequestFilter {
 
             User user = userRepository.findByEmail(username).orElseThrow(IllegalArgumentException::new);
 
-            if (jwtTokenUtil.isTokenValid(jwt, userDetails, user.getLastPasswordChange())) {
+            if (jwtTokenUtil.isTokenValid(jwt, userDetails)) {
                 Long id = jwtTokenUtil.getUserId(jwt);
                 Principle principle = new Principle(id, username);
                 Authentication authentication = new UsernamePasswordAuthenticationToken(principle, null,
