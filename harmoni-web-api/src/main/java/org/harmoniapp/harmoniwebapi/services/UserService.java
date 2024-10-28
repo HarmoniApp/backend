@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -133,11 +134,9 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Department with ID " + userDto.workAddress().id() + " not found"));
 
         user.setWorkAddress(workAddress);
-        user.setLastPasswordChange(LocalDateTime.now());
-        user.setPasswordGenerated(true);
-        user.setActive(true);
         user.setPhoto("default.jpg");
         user.setAvailableAbsenceDays(contractType.getAbsenceDays());
+        user.setPasswordExpirationDate(LocalDate.now().minusDays(1));
 
         user.setLanguages(
                 userDto.languages().stream()
