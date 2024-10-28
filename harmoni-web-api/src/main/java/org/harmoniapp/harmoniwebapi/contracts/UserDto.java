@@ -85,7 +85,7 @@ public record UserDto(
         @JsonProperty("is_active") boolean isActive,
 
         @JsonProperty("available_absence_days") int availableAbsenceDays,
-        @JsonProperty("unused_absence_days") int unusedAbsenceDays,
+        @JsonProperty("unused_absence_days") Integer unusedAbsenceDays,
 
         @NotEmpty(message = "Roles cannot be null or empty")
         List<Role> roles,

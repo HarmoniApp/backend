@@ -71,7 +71,7 @@ public class User {
     private int availableAbsenceDays;
 
     @Column(name = "unused_absence_days")
-    private int unusedAbsenceDays;
+    private Integer unusedAbsenceDays;
 
     @Column(name = "unused_absence_expiration")
     private LocalDate unusedAbsenceExpiration;
