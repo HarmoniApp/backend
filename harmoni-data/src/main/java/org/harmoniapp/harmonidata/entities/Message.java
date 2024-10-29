@@ -27,7 +27,6 @@ public class Message {
     @Column(name = "receiver_id")
     private Long receiverId;
 
-    @Column(name = "content")
     private String content;
 
     @Column(name = "sent_at")
