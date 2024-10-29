@@ -16,6 +16,8 @@ public interface RepositoryCollector {
 
     LanguageRepository getLanguages();
 
+    MessageRepository getMessages();
+
     NotificationRepository getNotifications();
 
     NotificationTypeRepository getNotificationTypes();
