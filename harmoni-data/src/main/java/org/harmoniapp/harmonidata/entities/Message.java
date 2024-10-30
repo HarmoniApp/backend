@@ -31,8 +31,8 @@ public class Message {
 
     private String content;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "sent_at")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime sentAt;
 
     @Override

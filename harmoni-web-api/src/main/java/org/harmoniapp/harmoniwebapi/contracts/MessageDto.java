@@ -1,5 +1,6 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.harmoniapp.harmonidata.entities.Message;
 
@@ -10,6 +11,7 @@ public record MessageDto( //TODO: validation?
         @JsonProperty("sender_id") Long senderId,
         @JsonProperty("receiver_id") Long receiverId,
         String content,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         @JsonProperty("sent_at") LocalDateTime sentAt
 ) {
     public static MessageDto fromEntity(Message message) {
