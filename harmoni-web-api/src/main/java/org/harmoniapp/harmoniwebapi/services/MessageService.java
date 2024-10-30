@@ -1,5 +1,6 @@
 package org.harmoniapp.harmoniwebapi.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.Message;
 import org.harmoniapp.harmonidata.entities.User;
@@ -18,7 +19,18 @@ public class MessageService {
     private final RepositoryCollector repositoryCollector;
     private final SimpMessagingTemplate messagingTemplate;
 
+    public List<MessageDto> getChatHistory(Long userId1, Long userId2) {
+        List<Message> messages= repositoryCollector.getMessages().findChatHistory(userId1, userId2);
+        return messages.stream()
+                .map(MessageDto::fromEntity)
+                .toList();
+    }
 
+    public List<Long> getChatPartners(Long userId) {
+        return repositoryCollector.getMessages().findChatPartners(userId);
+    }
+
+    @Transactional
     public MessageDto sendMessage(MessageDto messageDto) {
         User sender = repositoryCollector.getUsers().findById(messageDto.senderId())
                 .orElseThrow(() -> new IllegalArgumentException("Sender not found"));
@@ -38,14 +50,13 @@ public class MessageService {
         return MessageDto.fromEntity(savedMessage);
     }
 
-    public List<MessageDto> getChatHistory(Long userId1, Long userId2) {
-        List<Message> messages= repositoryCollector.getMessages().findChatHistory(userId1, userId2);
-        return messages.stream()
-                .map(MessageDto::fromEntity)
-                .toList();
-    }
+    @Transactional
+    public MessageDto markMessageAsRead(Long messageId) {
+        Message message = repositoryCollector.getMessages().findById(messageId)
+                .orElseThrow(() -> new IllegalArgumentException("Message not found"));
 
-    public List<Long> getChatPartners(Long userId) {
-        return repositoryCollector.getMessages().findChatPartners(userId);
+        message.setRead(true);
+        Message updatedMessage = repositoryCollector.getMessages().save(message);
+        return MessageDto.fromEntity(updatedMessage);
     }
 }

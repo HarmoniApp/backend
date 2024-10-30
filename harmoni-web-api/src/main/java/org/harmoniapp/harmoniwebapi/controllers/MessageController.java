@@ -1,7 +1,6 @@
 package org.harmoniapp.harmoniwebapi.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.harmonidata.entities.Message;
 import org.harmoniapp.harmoniwebapi.contracts.MessageDto;
 import org.harmoniapp.harmoniwebapi.services.MessageService;
 import org.springframework.web.bind.annotation.*;
@@ -28,5 +27,10 @@ public class MessageController {
     @PostMapping("/send")
     public MessageDto sendMessage(@RequestBody MessageDto messageDto) {
         return service.sendMessage(messageDto);
+    }
+
+    @PatchMapping("/{id}/read")
+    public MessageDto markMessageAsRead(@PathVariable Long id) {
+        return service.markMessageAsRead(id);
     }
 }

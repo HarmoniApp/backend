@@ -35,6 +35,9 @@ public class Message {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime sentAt;
 
+    @Column(name ="is_read")
+    private boolean isRead;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

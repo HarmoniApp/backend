@@ -12,7 +12,8 @@ public record MessageDto( //TODO: validation?
         @JsonProperty("receiver_id") Long receiverId,
         String content,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-        @JsonProperty("sent_at") LocalDateTime sentAt
+        @JsonProperty("sent_at") LocalDateTime sentAt,
+        @JsonProperty("is_read") boolean isRead
 ) {
     public static MessageDto fromEntity(Message message) {
         return new MessageDto(
@@ -20,7 +21,9 @@ public record MessageDto( //TODO: validation?
                 message.getSender().getId(),
                 message.getReceiver().getId(),
                 message.getContent(),
-                message.getSentAt());
+                message.getSentAt(),
+                message.isRead()
+        );
     }
 
     public Message toEntity() {
@@ -29,7 +32,8 @@ public record MessageDto( //TODO: validation?
                 null,
                 null,
                 this.content,
-                this.sentAt != null ? this.sentAt : LocalDateTime.now());
+                this.sentAt != null ? this.sentAt : LocalDateTime.now(),
+                this.isRead
+        );
     }
-
 }
