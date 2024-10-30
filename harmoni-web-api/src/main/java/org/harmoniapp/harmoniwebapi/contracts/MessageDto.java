@@ -5,7 +5,7 @@ import org.harmoniapp.harmonidata.entities.Message;
 
 import java.time.LocalDateTime;
 
-public record MessageDto(
+public record MessageDto( //TODO: validation?
         Long id,
         @JsonProperty("sender_id") Long senderId,
         @JsonProperty("receiver_id") Long receiverId,
@@ -15,8 +15,8 @@ public record MessageDto(
     public static MessageDto fromEntity(Message message) {
         return new MessageDto(
                 message.getId(),
-                message.getSenderId(),
-                message.getReceiverId(),
+                message.getSender().getId(),
+                message.getReceiver().getId(),
                 message.getContent(),
                 message.getSentAt());
     }
@@ -24,10 +24,10 @@ public record MessageDto(
     public Message toEntity() {
         return new Message(
                 this.id,
-                this.senderId,
-                this.receiverId,
+                null,
+                null,
                 this.content,
-                this.sentAt);
+                this.sentAt != null ? this.sentAt : LocalDateTime.now());
     }
 
 }

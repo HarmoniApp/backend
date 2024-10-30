@@ -16,7 +16,7 @@ public class MessageController {
     private final MessageService service;
 
     @GetMapping("/history")
-    public List<Message> getChatHistory(@RequestParam Long userId1, @RequestParam Long userId2) {
+    public List<MessageDto> getChatHistory(@RequestParam Long userId1, @RequestParam Long userId2) {
         return service.getChatHistory(userId1, userId2);
     }
 
@@ -26,7 +26,7 @@ public class MessageController {
     }
 
     @PostMapping("/send")
-    public Message sendMessage(@RequestBody MessageDto messageDto) {
+    public MessageDto sendMessage(@RequestBody MessageDto messageDto) {
         return service.sendMessage(messageDto);
     }
 }

@@ -21,14 +21,17 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "sender_id")
-    private Long senderId;
+    @ManyToOne
+    @JoinColumn(name = "sender_id")
+    private User sender;
 
-    @Column(name = "receiver_id")
-    private Long receiverId;
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
 
     private String content;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "sent_at")
     private LocalDateTime sentAt;
 
