@@ -9,10 +9,13 @@ import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
-    @Query("SELECT DISTINCT CASE WHEN m.sender.id = :userId THEN m.receiver.id ELSE m.sender.id END " +
+    @Query("SELECT CASE WHEN m.sender.id = :userId THEN m.receiver.id ELSE m.sender.id END AS partnerId " +
             "FROM Message m " +
-            "WHERE m.sender.id = :userId OR m.receiver.id = :userId")
+            "WHERE m.sender.id = :userId OR m.receiver.id = :userId " +
+            "GROUP BY partnerId " +
+            "ORDER BY MAX(m.sentAt) DESC")
     List<Long> findChatPartners(@Param("userId") Long userId);
+
 
     @Query("SELECT m FROM Message m WHERE " +
             "(m.sender.id = :userId1 AND m.receiver.id = :userId2) OR " +
