@@ -45,6 +45,13 @@ public class PartialUserWithEmpIdService {
                 users.getTotalPages());
     }
 
+    public PartialUserWithEmpIdDto getPartialUserById(long id) {
+        User user = repositoryCollector.getUsers().findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        return PartialUserWithEmpIdDto.fromEntity(user);
+    }
+
     /**
      * Searches for users based on a query string. The query string is split into individual words
      * and used to match against user attributes. If the query string is empty or null, an exception is thrown.

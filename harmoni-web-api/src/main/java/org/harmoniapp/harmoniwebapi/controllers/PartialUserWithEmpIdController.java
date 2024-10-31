@@ -32,6 +32,11 @@ public class PartialUserWithEmpIdController {
         return partialUserWithEmpIdService.getAllPartialUsers(pageNumber, pageSize);
     }
 
+    @GetMapping("/{id}")
+    public PartialUserWithEmpIdDto getPartialUserById(@PathVariable long id) {
+        return partialUserWithEmpIdService.getPartialUserById(id);
+    }
+
     /**
      * Searches for users based on a query string and returns a list of partial user information, including their employee ID.
      *
