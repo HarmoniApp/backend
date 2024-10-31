@@ -1,6 +1,7 @@
 package org.harmoniapp.harmonidata.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,7 @@ public class Message {
     @JoinColumn(name = "receiver_id")
     private User receiver;
 
+    @NotEmpty(message = "Message cannot be empty")
     private String content;
 
     @Column(name = "sent_at")

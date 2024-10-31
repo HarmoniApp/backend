@@ -45,7 +45,7 @@ public class MessageService {
 
         Message savedMessage = repositoryCollector.getMessages().save(message);
 
-        messagingTemplate.convertAndSendToUser(messageDto.receiverId().toString(), "/client/messages", MessageDto.fromEntity(savedMessage));
+        messagingTemplate.convertAndSend("/client/messages/" + messageDto.receiverId(), MessageDto.fromEntity(savedMessage));
 
         return MessageDto.fromEntity(savedMessage);
     }
