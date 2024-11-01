@@ -14,10 +14,20 @@ import java.util.List;
 public class MessageController {
     private final MessageService service;
 
+//    @GetMapping("/history")
+//    public List<MessageDto> getChatHistory(@RequestParam Long userId1, @RequestParam Long userId2) {
+//        return service.getChatHistory(userId1, userId2);
+//    }
+
     @GetMapping("/history")
-    public List<MessageDto> getChatHistory(@RequestParam Long userId1, @RequestParam Long userId2) {
-        return service.getChatHistory(userId1, userId2);
+    public List<MessageDto> getChatHistory(
+            @RequestParam Long userId1,
+            @RequestParam Long userId2,
+            @RequestParam(defaultValue = "false") boolean translate,
+            @RequestParam(required = false) String targetLanguage) {
+        return service.getChatHistory(userId1, userId2, translate, targetLanguage);
     }
+
 
     @GetMapping("/chat-partners")
     public List<Long> getChatPartners(@RequestParam Long userId) {

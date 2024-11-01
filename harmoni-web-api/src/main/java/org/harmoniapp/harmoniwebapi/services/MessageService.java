@@ -18,12 +18,35 @@ import java.util.List;
 public class MessageService {
     private final RepositoryCollector repositoryCollector;
     private final SimpMessagingTemplate messagingTemplate;
+    private final TranslationService translationService;
 
-    public List<MessageDto> getChatHistory(Long userId1, Long userId2) {
-        List<Message> messages= repositoryCollector.getMessages().findChatHistory(userId1, userId2);
+//    public List<MessageDto> getChatHistory(Long userId1, Long userId2) {
+//        List<Message> messages= repositoryCollector.getMessages().findChatHistory(userId1, userId2);
+//        return messages.stream()
+//                .map(MessageDto::fromEntity)
+//                .toList();
+//    }
+
+    public List<MessageDto> getChatHistory(Long userId1, Long userId2, boolean translate, String targetLanguage) {
+        List<Message> messages = repositoryCollector.getMessages().findChatHistory(userId1, userId2);
+
         return messages.stream()
-                .map(MessageDto::fromEntity)
-                .toList();
+                .map(message -> {
+                    String content = message.getContent();
+
+                    if (translate && targetLanguage != null && !targetLanguage.isEmpty()) {
+                        content = translationService.translate(message.getContent(), targetLanguage);
+                    }
+
+                    return new MessageDto(
+                            message.getId(),
+                            message.getSender().getId(),
+                            message.getReceiver().getId(),
+                            content,
+                            message.getSentAt(),
+                            message.isRead()
+                    );
+                }).toList();
     }
 
     public List<Long> getChatPartners(Long userId) {
