@@ -7,6 +7,7 @@ import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
+import org.harmoniapp.harmoniwebapi.contracts.UserNewPassword;
 import org.harmoniapp.harmoniwebapi.exception.EasyPasswordException;
 import org.harmoniapp.harmoniwebapi.utils.PasswordManager;
 import org.springframework.context.annotation.ComponentScan;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
-public class UserService {
+public class  UserService {
     private final RepositoryCollector repositoryCollector;
     private final AddressService addressService;
     private final PasswordManager passwordManager;
@@ -350,15 +351,15 @@ public class UserService {
      * @throws EasyPasswordException    If the provided password is compromised.
      * @throws IllegalArgumentException If the user with the specified ID is not found.
      */
-    public String changePassword(long id, String pwd) {
-        if (passwordChecker.check(pwd).isCompromised()) {
+    public String changePassword(long id, UserNewPassword pwd) {
+        if (passwordChecker.check(pwd.newPassword()).isCompromised()) {
             throw new EasyPasswordException();
         }
 
         User user = repositoryCollector.getUsers().findById(id)
                 .orElseThrow(IllegalArgumentException::new);
 
-        String hashedPwd = passwordEncoder.encode(pwd);
+        String hashedPwd = passwordEncoder.encode(pwd.newPassword());
         user.setPassword(hashedPwd);
         user.setPasswordExpirationDate(LocalDate.now().plusMonths(6));
         user.setFailedLoginAttempts(0);

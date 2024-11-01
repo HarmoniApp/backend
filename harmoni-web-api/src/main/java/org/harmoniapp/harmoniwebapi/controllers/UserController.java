@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
+import org.harmoniapp.harmoniwebapi.contracts.UserNewPassword;
 import org.harmoniapp.harmoniwebapi.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -135,7 +136,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/changePassword")
-    public String changePassword(@PathVariable long id, @RequestBody String password) {
+    public String changePassword(@PathVariable long id, @RequestBody UserNewPassword password) {
         return service.changePassword(id, password);
     }
 
