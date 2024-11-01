@@ -80,6 +80,9 @@ public class MessageService {
 
         message.setRead(true);
         Message updatedMessage = repositoryCollector.getMessages().save(message);
+
+        messagingTemplate.convertAndSend("/client/messages/read-status/" + message.getSender().getId(), MessageDto.fromEntity(updatedMessage));
+
         return MessageDto.fromEntity(updatedMessage);
     }
 }
