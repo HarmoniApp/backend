@@ -5,9 +5,11 @@ import org.harmoniapp.harmonidata.entities.Address;
 import org.harmoniapp.harmonidata.entities.ContractType;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
+import org.harmoniapp.harmoniwebapi.contracts.LoginRequestDto;
 import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.harmoniapp.harmoniwebapi.exception.EasyPasswordException;
+import org.harmoniapp.harmoniwebapi.utils.JwtTokenUtil;
 import org.harmoniapp.harmoniwebapi.utils.PasswordManager;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Page;
@@ -26,7 +28,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -42,6 +46,7 @@ public class UserService {
     private final PasswordManager passwordManager;
     private final PasswordEncoder passwordEncoder;
     private final CompromisedPasswordChecker passwordChecker;
+    private final LoginService loginService;
     private final String photoDirPath = "./harmoni-web-api/src/main/resources/static/userPhoto/";
 
     /**
@@ -363,9 +368,9 @@ public class UserService {
         user.setPasswordExpirationDate(LocalDate.now().plusMonths(6));
         user.setFailedLoginAttempts(0);
 
-        repositoryCollector.getUsers().save(user);
-
-        return "Password changed successfully";
+        //TODO: do it better
+        var response = loginService.login(new LoginRequestDto(user.getEmail(), pwd));
+        return response.jwtToken();
     }
 
     /**
