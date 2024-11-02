@@ -85,6 +85,7 @@ public record UserDto(
         @JsonProperty("is_active") boolean isActive,
 
         @JsonProperty("available_absence_days") int availableAbsenceDays,
+        @JsonProperty("unused_absence_days") Integer unusedAbsenceDays,
 
         @NotEmpty(message = "Roles cannot be null or empty")
         List<Role> roles,
@@ -116,6 +117,7 @@ public record UserDto(
                 user.getPhoto(),
                 user.isActive(),
                 user.getAvailableAbsenceDays(),
+                user.getUnusedAbsenceDays(),
                 user.getRoles().stream().toList(),
                 user.getLanguages().stream().map(p -> new LanguageDto(p.getId(), p.getName(), p.getCode())).toList()
         );
@@ -146,6 +148,8 @@ public record UserDto(
                 LocalDate.now(),
                 this.isActive,
                 this.availableAbsenceDays,
+                0,
+                null,
                 null,
                 null
         );
