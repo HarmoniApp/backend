@@ -4,6 +4,7 @@ import com.google.gson.*;
 import io.github.cdimascio.dotenv.Dotenv;
 import okhttp3.*;
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.harmoniwebapi.utils.LanguageCodeMapper;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,8 @@ public class TranslationService {
 
         String requestBodyJson = new Gson().toJson(List.of(Map.of("Text", text)));
         RequestBody body = RequestBody.create(requestBodyJson, mediaType);
+
+        targetLanguage = LanguageCodeMapper.getApiLanguageCode(targetLanguage);
 
         HttpUrl url = HttpUrl.parse(API_URL).newBuilder()
                 .addQueryParameter("to", targetLanguage)
