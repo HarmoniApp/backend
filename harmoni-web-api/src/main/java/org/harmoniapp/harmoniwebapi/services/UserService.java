@@ -370,7 +370,7 @@ public class  UserService {
         user.setFailedLoginAttempts(0);
 
         //TODO: do it better
-        var response = loginService.login(new LoginRequestDto(user.getEmail(), pwd));
+        var response = loginService.login(new LoginRequestDto(user.getEmail(), pwd.newPassword()));
         return response.jwtToken();
     }
 
