@@ -28,4 +28,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             "(m.sender_id = :userId2 AND m.receiver_id = :userId1) " +
             "ORDER BY m.sent_at DESC LIMIT 1", nativeQuery = true)
     String findLastMessageByUsersId(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
+
+    @Query("SELECT m FROM Message m WHERE " +
+            "m.receiver.id = :userId AND m.sender.id = :partnerId AND m.isRead = false")
+    List<Message> findUnreadByUsersIds(@Param("userId") Long userId, @Param("partnerId") Long partnerId);
 }

@@ -89,4 +89,20 @@ public class MessageService {
 
         return MessageDto.fromEntity(updatedMessage);
     }
+
+    @Transactional
+    public List<MessageDto> markAllMessagesAsRead(Long userId1, Long userId2) {
+        List<Message> messages = repositoryCollector.getMessages().findUnreadByUsersIds(userId1, userId2);
+        messages.forEach(message -> message.setRead(true));
+        repositoryCollector.getMessages().saveAll(messages);
+
+        List<MessageDto> messagesDto = messages.stream()
+                .map(MessageDto::fromEntity)
+                .toList();
+
+        messagingTemplate.convertAndSend("/client/messages/read-status/" + userId2, messagesDto);
+
+        return messagesDto;
+    }
+
 }

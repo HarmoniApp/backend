@@ -48,4 +48,9 @@ public class MessageController {
     public MessageDto markMessageAsRead(@PathVariable Long id) {
         return service.markMessageAsRead(id);
     }
+
+    @PatchMapping("mark-all-read")
+    public List<MessageDto> markAllRead(@RequestParam Long userId1, @RequestParam Long userId2) {
+        return service.markAllMessagesAsRead(userId1, userId2);
+    }
 }
