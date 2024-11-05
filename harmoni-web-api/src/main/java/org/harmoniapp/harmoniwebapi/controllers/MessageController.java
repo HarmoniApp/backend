@@ -34,6 +34,11 @@ public class MessageController {
         return service.getChatPartners(userId);
     }
 
+    @GetMapping("/last")
+    public String getLasMessageByUsersId(@RequestParam Long userId1, @RequestParam Long userId2) {
+        return service.getLasMessageByUsersId(userId1, userId2);
+    }
+
     @PostMapping("/send")
     public MessageDto sendMessage(@RequestBody MessageDto messageDto) {
         return service.sendMessage(messageDto);

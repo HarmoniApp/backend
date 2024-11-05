@@ -53,6 +53,10 @@ public class MessageService {
         return repositoryCollector.getMessages().findChatPartners(userId);
     }
 
+    public String getLasMessageByUsersId(Long userId1, Long userId2) {
+        return  repositoryCollector.getMessages().findLastMessageByUsersId(userId1, userId2);
+    }
+
     @Transactional
     public MessageDto sendMessage(MessageDto messageDto) {
         User sender = repositoryCollector.getUsers().findById(messageDto.senderId())

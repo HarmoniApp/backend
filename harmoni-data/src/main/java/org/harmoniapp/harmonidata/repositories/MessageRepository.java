@@ -22,4 +22,10 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             "(m.sender.id = :userId2 AND m.receiver.id = :userId1) " +
             "ORDER BY m.sentAt ASC")
     List<Message> findChatHistory(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
+
+    @Query(value = "SELECT m.content FROM Message m WHERE " +
+            "(m.sender_id = :userId1 AND m.receiver_id = :userId2) OR " +
+            "(m.sender_id = :userId2 AND m.receiver_id = :userId1) " +
+            "ORDER BY m.sent_at DESC LIMIT 1", nativeQuery = true)
+    String findLastMessageByUsersId(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
 }
