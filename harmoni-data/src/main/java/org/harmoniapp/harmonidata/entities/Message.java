@@ -49,8 +49,8 @@ public class Message {
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ?
                 ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        User user = (User) o;
-        return getId() != null && Objects.equals(getId(), user.getId());
+        Message message = (Message) o;
+        return getId() != null && Objects.equals(getId(), message.getId());
     }
 
     @Override
