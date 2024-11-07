@@ -20,8 +20,8 @@ public record MessageDto( //TODO: validation?
         return new MessageDto(
                 message.getId(),
                 message.getSender().getId(),
-                message.getReceiver().getId(),
-                message.getGroup().getId(),
+                message.getReceiver() != null ? message.getReceiver().getId() : null,
+                message.getGroup() != null ? message.getGroup().getId() : null,
                 message.getContent(),
                 message.getSentAt(),
                 message.isRead()

@@ -22,12 +22,12 @@ public class MessageController {
     @GetMapping("/history")
     public List<MessageDto> getChatHistory(
             @RequestParam Long userId1,
-            @RequestParam Long userId2,
+            @RequestParam(required = false) Long userId2,
+            @RequestParam(required = false) Long groupId,
             @RequestParam(defaultValue = "false") boolean translate,
             @RequestParam(required = false) String targetLanguage) {
-        return service.getChatHistory(userId1, userId2, translate, targetLanguage);
+        return service.getChatHistory(userId1, userId2, groupId, translate, targetLanguage);
     }
-
 
     @GetMapping("/chat-partners")
     public List<Long> getChatPartners(@RequestParam Long userId) {
