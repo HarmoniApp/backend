@@ -10,6 +10,7 @@ public record MessageDto( //TODO: validation?
         Long id,
         @JsonProperty("sender_id") Long senderId,
         @JsonProperty("receiver_id") Long receiverId,
+        @JsonProperty("group_id") Long groupId,
         String content,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         @JsonProperty("sent_at") LocalDateTime sentAt,
@@ -20,6 +21,7 @@ public record MessageDto( //TODO: validation?
                 message.getId(),
                 message.getSender().getId(),
                 message.getReceiver().getId(),
+                message.getGroup().getId(),
                 message.getContent(),
                 message.getSentAt(),
                 message.isRead()
@@ -29,6 +31,7 @@ public record MessageDto( //TODO: validation?
     public Message toEntity() {
         return new Message(
                 this.id,
+                null,
                 null,
                 null,
                 this.content,

@@ -44,10 +44,10 @@ public class MessageController {
         return service.sendMessage(messageDto);
     }
 
-    @PatchMapping("/{id}/read")
-    public MessageDto markMessageAsRead(@PathVariable Long id) {
-        return service.markMessageAsRead(id);
-    }
+//    @PatchMapping("/{id}/read")
+//    public MessageDto markMessageAsRead(@PathVariable Long id) {
+//        return service.markMessageAsRead(id);
+//    }
 
     @PatchMapping("mark-all-read")
     public List<MessageDto> markAllRead(@RequestParam Long userId1, @RequestParam Long userId2) {

@@ -1,5 +1,6 @@
 package org.harmoniapp.harmonidata.entities;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -26,9 +27,15 @@ public class Message {
     @JoinColumn(name = "sender_id")
     private User sender;
 
+    @Nullable
     @ManyToOne
     @JoinColumn(name = "receiver_id")
     private User receiver;
+
+    @Nullable
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private Group group;
 
     @NotEmpty(message = "Message cannot be empty")
     private String content;

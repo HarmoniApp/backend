@@ -41,7 +41,8 @@ public class MessageService {
                     return new MessageDto(
                             message.getId(),
                             message.getSender().getId(),
-                            message.getReceiver().getId(),
+                            message.getReceiver() != null ? message.getReceiver().getId() : null,
+                            message.getGroup() != null ? message.getGroup().getId() : null,
                             content,
                             message.getSentAt(),
                             message.isRead()
@@ -77,18 +78,18 @@ public class MessageService {
         return MessageDto.fromEntity(savedMessage);
     }
 
-    @Transactional
-    public MessageDto markMessageAsRead(Long messageId) {
-        Message message = repositoryCollector.getMessages().findById(messageId)
-                .orElseThrow(() -> new IllegalArgumentException("Message not found"));
-
-        message.setRead(true);
-        Message updatedMessage = repositoryCollector.getMessages().save(message);
-
-        messagingTemplate.convertAndSend("/client/messages/read-status/" + message.getSender().getId(), MessageDto.fromEntity(updatedMessage));
-
-        return MessageDto.fromEntity(updatedMessage);
-    }
+//    @Transactional
+//    public MessageDto markMessageAsRead(Long messageId) {
+//        Message message = repositoryCollector.getMessages().findById(messageId)
+//                .orElseThrow(() -> new IllegalArgumentException("Message not found"));
+//
+//        message.setRead(true);
+//        Message updatedMessage = repositoryCollector.getMessages().save(message);
+//
+//        messagingTemplate.convertAndSend("/client/messages/read-status/" + message.getSender().getId(), MessageDto.fromEntity(updatedMessage));
+//
+//        return MessageDto.fromEntity(updatedMessage);
+//    }
 
     @Transactional
     public List<MessageDto> markAllMessagesAsRead(Long userId1, Long userId2) {

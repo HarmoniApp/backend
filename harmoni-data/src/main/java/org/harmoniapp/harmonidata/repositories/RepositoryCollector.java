@@ -14,6 +14,8 @@ public interface RepositoryCollector {
 
     ContractTypeRepository getContractTypes();
 
+    GroupRepository getGroups();
+
     LanguageRepository getLanguages();
 
     MessageRepository getMessages();
