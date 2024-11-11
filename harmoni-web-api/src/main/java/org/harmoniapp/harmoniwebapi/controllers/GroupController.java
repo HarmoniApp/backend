@@ -15,9 +15,19 @@ import java.util.List;
 public class GroupController {
     private final GroupService service;
 
+    @GetMapping("/details/{groupId}")
+    public GroupDto getGroupById(@PathVariable("groupId") Long groupId) {
+        return service.getGroupById(groupId);
+    }
+
     @GetMapping("/{id}")
     public List<PartialUserWithEmpIdDto> getGroupMembersByGroupId(@PathVariable("id") Long groupId) {
         return service.getGroupMembersByGroupId(groupId);
+    }
+
+    @GetMapping("/chat-partners")
+    public List<Long> getGroupChatPartners(@RequestParam Long userId) {
+        return service.getGroupChatPartners(userId);
     }
 
     @PostMapping

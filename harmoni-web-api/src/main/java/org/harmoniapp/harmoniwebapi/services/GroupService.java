@@ -12,12 +12,21 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class GroupService {
     private final RepositoryCollector repositoryCollector;
+
+    public GroupDto getGroupById(Long groupId) {
+        Group group = repositoryCollector.getGroups().findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
+
+        return GroupDto.fromEntity(group);
+    }
 
     public List<PartialUserWithEmpIdDto> getGroupMembersByGroupId(Long groupId) {
         Group group = repositoryCollector.getGroups().findById(groupId)
@@ -28,10 +37,18 @@ public class GroupService {
                 .toList();
     }
 
+    public List<Long> getGroupChatPartners(Long userId){
+        return repositoryCollector.getMessages().findGroupChatPartners(userId);
+    }
+
     @Transactional
     public GroupDto createGroup(GroupDto groupDto) {
-        Group group = groupDto.toEntity();
+        Set<User> members = groupDto.membersIds().stream()
+                .map(memberId -> repositoryCollector.getUsers().findById(memberId)
+                        .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + memberId)))
+                .collect(Collectors.toSet());
 
+        Group group = groupDto.toEntity(members);
         Group savedGroup = repositoryCollector.getGroups().save(group);
         return GroupDto.fromEntity(savedGroup);
     }

@@ -35,8 +35,8 @@ public class MessageController {
     }
 
     @GetMapping("/last")
-    public String getLasMessageByUsersId(@RequestParam Long userId1, @RequestParam Long userId2) {
-        return service.getLasMessageByUsersId(userId1, userId2);
+    public String getLasMessageByUsersId(@RequestParam(required = false) Long userId1, @RequestParam(required = false) Long userId2, @RequestParam(required = false) Long groupId) {
+        return service.getLasMessageByUsersId(userId1, userId2, groupId);
     }
 
     @PostMapping("/send")

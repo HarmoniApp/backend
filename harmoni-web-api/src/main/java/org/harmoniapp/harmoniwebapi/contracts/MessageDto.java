@@ -16,13 +16,13 @@ public record MessageDto( //TODO: validation?
         @JsonProperty("sent_at") LocalDateTime sentAt,
         @JsonProperty("is_read") boolean isRead
 ) {
-    public static MessageDto fromEntity(Message message) {
+    public static MessageDto fromEntity(Message message, String translatedContent) {
         return new MessageDto(
                 message.getId(),
                 message.getSender().getId(),
                 message.getReceiver() != null ? message.getReceiver().getId() : null,
                 message.getGroup() != null ? message.getGroup().getId() : null,
-                message.getContent(),
+                translatedContent != null ? translatedContent : message.getContent(),
                 message.getSentAt(),
                 message.isRead()
         );

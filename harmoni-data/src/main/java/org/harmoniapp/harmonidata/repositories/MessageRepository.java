@@ -11,11 +11,14 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     @Query("SELECT CASE WHEN m.sender.id = :userId THEN m.receiver.id ELSE m.sender.id END AS partnerId " +
             "FROM Message m " +
-            "WHERE m.sender.id = :userId OR m.receiver.id = :userId " +
+            "WHERE (m.sender.id = :userId OR m.receiver.id = :userId) " +
+            "AND m.receiver.id IS NOT NULL " +
             "GROUP BY partnerId " +
             "ORDER BY MAX(m.sentAt) DESC")
     List<Long> findChatPartners(@Param("userId") Long userId);
 
+    @Query(value = "SELECT DISTINCT gm.group_id FROM group_members gm WHERE gm.user_id = :userId", nativeQuery = true)
+    List<Long> findGroupChatPartners(@Param("userId") Long userId);
 
     @Query("SELECT m FROM Message m WHERE " +
             "(m.sender.id = :userId1 AND m.receiver.id = :userId2) OR " +
@@ -35,4 +38,9 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("SELECT m FROM Message m WHERE " +
             "m.receiver.id = :userId AND m.sender.id = :partnerId AND m.isRead = false")
     List<Message> findUnreadByUsersIds(@Param("userId") Long userId, @Param("partnerId") Long partnerId);
+
+    @Query(value = "SELECT m.content FROM Message m " +
+            "WHERE m.group_id = :groupId " +
+            "ORDER BY m.sent_at DESC LIMIT 1", nativeQuery = true)
+    String findLastMessageByGroupId(@Param("groupId") Long groupId);
 }

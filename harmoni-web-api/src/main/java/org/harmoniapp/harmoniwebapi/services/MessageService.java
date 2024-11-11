@@ -67,16 +67,7 @@ public class MessageService {
                     if (translate && targetLanguage != null && !targetLanguage.isEmpty()) {
                         content = translationService.translate(message.getContent(), targetLanguage);
                     }
-
-                    return new MessageDto(
-                            message.getId(),
-                            message.getSender().getId(),
-                            message.getReceiver() != null ? message.getReceiver().getId() : null,
-                            message.getGroup() != null ? message.getGroup().getId() : null,
-                            content,
-                            message.getSentAt(),
-                            message.isRead()
-                    );
+                    return MessageDto.fromEntity(message, content);
                 }).toList();
     }
 
@@ -85,8 +76,14 @@ public class MessageService {
         return repositoryCollector.getMessages().findChatPartners(userId);
     }
 
-    public String getLasMessageByUsersId(Long userId1, Long userId2) {
-        return  repositoryCollector.getMessages().findLastMessageByUsersId(userId1, userId2);
+    public String getLasMessageByUsersId(Long userId1, Long userId2, Long groupId) {
+        if (groupId != null) {
+            return repositoryCollector.getMessages().findLastMessageByGroupId(groupId);
+        } else if (userId2 != null) {
+            return repositoryCollector.getMessages().findLastMessageByUsersId(userId1, userId2);
+        } else {
+            throw new IllegalArgumentException("userId2 or groupId must be provided");
+        }
     }
 
 //    @Transactional
@@ -124,9 +121,9 @@ public class MessageService {
 
             Message savedMessage = repositoryCollector.getMessages().save(message);
 
-            messagingTemplate.convertAndSend("/client/messages/" + messageDto.receiverId(), MessageDto.fromEntity(savedMessage));
+            messagingTemplate.convertAndSend("/client/messages/" + messageDto.receiverId(), MessageDto.fromEntity(savedMessage, null));
 
-            return MessageDto.fromEntity(savedMessage);
+            return MessageDto.fromEntity(savedMessage, null);
         } else if (messageDto.groupId() != null) {
             Group group = repositoryCollector.getGroups().findById(messageDto.groupId())
                     .orElseThrow(() -> new IllegalArgumentException("Group not found"));
@@ -134,9 +131,9 @@ public class MessageService {
 
             Message savedMessage = repositoryCollector.getMessages().save(message);
 
-            messagingTemplate.convertAndSend("/client/messages/group/" + group.getId(), MessageDto.fromEntity(savedMessage));
+            messagingTemplate.convertAndSend("/client/messages/group/" + group.getId(), MessageDto.fromEntity(savedMessage, null));
 
-            return MessageDto.fromEntity(savedMessage);
+            return MessageDto.fromEntity(savedMessage, null);
         } else {
             throw new IllegalArgumentException("receiverId or groupId must be provided.");
         }
@@ -164,7 +161,7 @@ public class MessageService {
         repositoryCollector.getMessages().saveAll(messages);
 
         List<MessageDto> messagesDto = messages.stream()
-                .map(MessageDto::fromEntity)
+                .map(m -> MessageDto.fromEntity(m, null))
                 .toList();
 
         messagingTemplate.convertAndSend("/client/messages/read-status/" + userId2, messagesDto);

@@ -1,13 +1,15 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
 import org.harmoniapp.harmonidata.entities.Group;
+import org.harmoniapp.harmonidata.entities.User;
 
 import java.util.List;
+import java.util.Set;
 
 public record GroupDto(
         Long id,
         String name,
-        List<PartialUserWithEmpIdDto> members
+        List<Long> membersIds
 ) {
     public static GroupDto fromEntity(Group group) {
         return new GroupDto(
@@ -15,16 +17,16 @@ public record GroupDto(
                 group.getName(),
                 group.getMembers() != null
                         ? group.getMembers().stream()
-                        .map(user -> new PartialUserWithEmpIdDto(user.getId(), user.getFirstname(), user.getSurname(), user.getPhoto(), user.getEmployeeId()))
+                        .map(User::getId)
                         .toList()
                         : List.of());
     }
 
-    public Group toEntity() {
+    public Group toEntity(Set<User> users) {
         return new Group(
                 this.id,
                 this.name,
-                null
+                users
         );
     }
 }
