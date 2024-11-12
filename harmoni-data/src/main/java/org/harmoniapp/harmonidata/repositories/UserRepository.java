@@ -51,4 +51,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
         select u from User u left join u.roles roles
         where roles.isSup = true and u.isActive = true""")
     Page<User> findSupervisors(Pageable pageable);
+
+    Optional<User> findByEmail(String email);
 }

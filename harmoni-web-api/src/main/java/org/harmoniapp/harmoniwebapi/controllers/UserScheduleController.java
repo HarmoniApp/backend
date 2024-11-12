@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/calendar")
-@CrossOrigin(origins = "http://localhost:3000")
 public class UserScheduleController {
     private final UserScheduleService userScheduleService;
 

@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/contract-type")
-@CrossOrigin(origins = "http://localhost:3000")
 public class ContractTypeController {
     private final ContractTypeService contractTypeService;
 

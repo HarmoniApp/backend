@@ -9,7 +9,6 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 
@@ -76,7 +75,7 @@ public class User {
     @Column(name = "unused_absence_expiration")
     private LocalDate unusedAbsenceExpiration;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),

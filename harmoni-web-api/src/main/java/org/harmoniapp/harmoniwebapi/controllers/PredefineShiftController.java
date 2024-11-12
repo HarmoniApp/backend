@@ -16,7 +16,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/predefine-shift")
-@CrossOrigin(origins = "http://localhost:3000")
 public class PredefineShiftController {
     private final PredefineShiftService predefineShiftService;
 
