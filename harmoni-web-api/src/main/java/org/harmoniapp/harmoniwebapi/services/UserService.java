@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
-public class  UserService {
+public class UserService {
     private final RepositoryCollector repositoryCollector;
     private final AddressService addressService;
     private final PasswordManager passwordManager;
@@ -101,7 +102,7 @@ public class  UserService {
         User user = repositoryCollector.getUsers().findById(id)
                 .orElseThrow(IllegalArgumentException::new);
 
-        return user.getAvailableAbsenceDays();
+        return user.getAvailableAbsenceDays() + user.getUnusedAbsenceDays();
     }
 
     /**
@@ -134,6 +135,7 @@ public class  UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Department with ID " + userDto.workAddress().id() + " not found"));
 
         user.setWorkAddress(workAddress);
+        user.setActive(true);
         user.setPhoto("default.jpg");
         user.setAvailableAbsenceDays(contractType.getAbsenceDays());
         user.setPasswordExpirationDate(LocalDate.now().minusDays(1));
@@ -392,4 +394,45 @@ public class  UserService {
 
         return pwd;
     }
+
+    public void carryOverPreviousYearAbsenceDays(User user) {
+        if (user.getAvailableAbsenceDays() > 0) {
+            user.setUnusedAbsenceDays(user.getAvailableAbsenceDays());
+            user.setUnusedAbsenceExpiration(LocalDate.of(LocalDate.now().getYear() + 1, 9, 30));
+            user.setAvailableAbsenceDays(0);
+        }
+
+        int newAbsenceDays = repositoryCollector.getContractTypes()
+                .findById(user.getContractType().getId())
+                .orElseThrow(() -> new RuntimeException("Contract type not found"))
+                .getAbsenceDays();
+
+        user.setAvailableAbsenceDays(newAbsenceDays);
+        repositoryCollector.getUsers().save(user);
+    }
+
+    public void expireUnusedAbsenceDays(User user) {
+        if (user.getUnusedAbsenceExpiration() != null && user.getUnusedAbsenceExpiration().isBefore(LocalDate.now())) {
+            user.setUnusedAbsenceDays(0);
+            user.setUnusedAbsenceExpiration(null);
+            repositoryCollector.getUsers().save(user);
+        }
+    }
+
+    @Scheduled(cron = "0 0 0 1 1 ?")  // Every year 01.01 at 00:00
+    public void scheduledCarryOverPreviousYearAbsenceDays() {
+        List<User> users = repositoryCollector.getUsers().findAllByIsActive(true);
+        for (User user : users) {
+            carryOverPreviousYearAbsenceDays(user);
+        }
+    }
+
+    @Scheduled(cron = "0 0 0 1 10 ?")  // Every year 01.10 at 00:00
+    public void scheduledExpireUnusedAbsenceDays() {
+        List<User> users = repositoryCollector.getUsers().findAllByIsActive(true);
+        for (User user : users) {
+            expireUnusedAbsenceDays(user);
+        }
+    }
+
 }

@@ -69,6 +69,12 @@ public class User {
     @Column(name = "available_absence_days")
     private int availableAbsenceDays;
 
+    @Column(name = "unused_absence_days")
+    private Integer unusedAbsenceDays;
+
+    @Column(name = "unused_absence_expiration")
+    private LocalDate unusedAbsenceExpiration;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role",
