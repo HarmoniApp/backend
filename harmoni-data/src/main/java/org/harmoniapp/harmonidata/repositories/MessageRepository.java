@@ -17,7 +17,12 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             "ORDER BY MAX(m.sentAt) DESC")
     List<Long> findChatPartners(@Param("userId") Long userId);
 
-    @Query(value = "SELECT DISTINCT gm.group_id FROM group_members gm WHERE gm.user_id = :userId", nativeQuery = true)
+    @Query(value = "SELECT gm.group_id " +
+            "FROM group_members gm " +
+            "LEFT JOIN message m ON m.group_id = gm.group_id " +
+            "WHERE gm.user_id = :userId " +
+            "GROUP BY gm.group_id " +
+            "ORDER BY COALESCE(MAX(m.sent_at), TIMESTAMP '2020-01-01 00:00:00') DESC", nativeQuery = true)
     List<Long> findGroupChatPartners(@Param("userId") Long userId);
 
     @Query("SELECT m FROM Message m WHERE " +

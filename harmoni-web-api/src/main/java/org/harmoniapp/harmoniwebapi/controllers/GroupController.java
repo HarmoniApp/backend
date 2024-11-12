@@ -20,7 +20,7 @@ public class GroupController {
         return service.getGroupById(groupId);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/members")
     public List<PartialUserWithEmpIdDto> getGroupMembersByGroupId(@PathVariable("id") Long groupId) {
         return service.getGroupMembersByGroupId(groupId);
     }
