@@ -79,7 +79,6 @@ public class AbsenceController {
      * @param userId    the ID of the user to filter absences for
      * @return a list of AbsenceDto representing the approved absences within the specified date range for the given user
      */
-    //TODO: use PostAuthorize or PostFilter?
     @GetMapping("/range/user")
     @PostAuthorize("@securityService.isAbsenceOwner(returnObject, authentication) or hasRole('ADMIN')")
     public List<AbsenceDto> getAbsenceByDateRangeAndUserId(@RequestParam("startDate") LocalDate startDate,
@@ -96,7 +95,6 @@ public class AbsenceController {
      * @param userId    the ID of the user to filter absences for
      * @return a list of AbsenceDto representing the approved absences within the specified date range for the given user
      */
-    //TODO: use PostAuthorize or PostFilter?
     @GetMapping("/range/onlyApproved")
     @PostAuthorize("@securityService.isAbsenceOwner(returnObject, authentication) or hasRole('ADMIN')")
     public List<AbsenceDto> getApprovedAbsenceByDateRangeAndUserId(@RequestParam("startDate") LocalDate startDate,
