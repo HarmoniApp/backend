@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.repositories.UserRepository;
 import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomAccessDeniedHandler;
 import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomBasicAuthenticationEntryPoint;
-import org.harmoniapp.harmoniwebapi.filter.*;
+import org.harmoniapp.harmoniwebapi.filter.AuthoritiesLoggingAfterFilter;
+import org.harmoniapp.harmoniwebapi.filter.CsrfCookieFilter;
+import org.harmoniapp.harmoniwebapi.filter.JWTTokenValidationFilter;
 import org.harmoniapp.harmoniwebapi.utils.JwtTokenUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -94,7 +96,6 @@ public class ProjectSecurityProdConfig {
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
-//                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new JWTTokenValidationFilter(jwtTokenUtil, harmoniUserDetailsService, userRepository), BasicAuthenticationFilter.class);
 
 //        http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()); //Only HTTP

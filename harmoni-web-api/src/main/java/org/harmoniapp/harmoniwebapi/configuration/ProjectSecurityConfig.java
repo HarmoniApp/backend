@@ -95,13 +95,13 @@ public class ProjectSecurityConfig {
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
-//                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new JWTTokenValidationFilter(jwtTokenUtil, harmoniUserDetailsService, userRepository), BasicAuthenticationFilter.class);
 
         http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()); //Only HTTP
 //        http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()); //Only HTTPS
 
-        http.authorizeHttpRequests(request -> request.requestMatchers("/login", "/error").permitAll()
+        //TODO: Change '/ws/**' to require authentication
+        http.authorizeHttpRequests(request -> request.requestMatchers("/login", "/error", "/ws/**").permitAll()
                         .requestMatchers("/csrf").authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/absence/{id}/status/{statusId}", "DELETE")).access(adminOrOwnerAuthorizationManager)
                         .requestMatchers(new AntPathRequestMatcher("/absence", "POST"),
