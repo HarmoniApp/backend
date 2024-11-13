@@ -21,36 +21,6 @@ public class MessageService {
     private final SimpMessagingTemplate messagingTemplate;
     private final TranslationService translationService;
 
-//    public List<MessageDto> getChatHistory(Long userId1, Long userId2) {
-//        List<Message> messages= repositoryCollector.getMessages().findChatHistory(userId1, userId2);
-//        return messages.stream()
-//                .map(MessageDto::fromEntity)
-//                .toList();
-//    }
-
-//    public List<MessageDto> getChatHistory(Long userId1, Long userId2, boolean translate, String targetLanguage) {
-//        List<Message> messages = repositoryCollector.getMessages().findChatHistory(userId1, userId2);
-//
-//        return messages.stream()
-//                .map(message -> {
-//                    String content = message.getContent();
-//
-//                    if (translate && targetLanguage != null && !targetLanguage.isEmpty()) {
-//                        content = translationService.translate(message.getContent(), targetLanguage);
-//                    }
-//
-//                    return new MessageDto(
-//                            message.getId(),
-//                            message.getSender().getId(),
-//                            message.getReceiver() != null ? message.getReceiver().getId() : null,
-//                            message.getGroup() != null ? message.getGroup().getId() : null,
-//                            content,
-//                            message.getSentAt(),
-//                            message.isRead()
-//                    );
-//                }).toList();
-//    }
-
     public List<MessageDto> getChatHistory(Long userId1, Long userId2, Long groupId, boolean translate, String targetLanguage) {
         List<Message> messages;
 
@@ -85,26 +55,6 @@ public class MessageService {
             throw new IllegalArgumentException("userId2 or groupId must be provided");
         }
     }
-
-//    @Transactional
-//    public MessageDto sendMessage(MessageDto messageDto) {
-//        User sender = repositoryCollector.getUsers().findById(messageDto.senderId())
-//                .orElseThrow(() -> new IllegalArgumentException("Sender not found"));
-//
-//        User receiver = repositoryCollector.getUsers().findById(messageDto.receiverId())
-//                .orElseThrow(() -> new IllegalArgumentException("Receiver not found"));
-//
-//        Message message = messageDto.toEntity();
-//
-//        message.setSender(sender);
-//        message.setReceiver(receiver);
-//
-//        Message savedMessage = repositoryCollector.getMessages().save(message);
-//
-//        messagingTemplate.convertAndSend("/client/messages/" + messageDto.receiverId(), MessageDto.fromEntity(savedMessage));
-//
-//        return MessageDto.fromEntity(savedMessage);
-//    }
 
     @Transactional
     public MessageDto sendMessage(MessageDto messageDto) {
