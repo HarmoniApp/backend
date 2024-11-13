@@ -81,7 +81,14 @@ public class MessageService {
 
             Message savedMessage = repositoryCollector.getMessages().save(message);
 
-            messagingTemplate.convertAndSend("/client/messages/group/" + group.getId(), MessageDto.fromEntity(savedMessage, null));
+            for (User member : group.getMembers()) {
+                if (!member.getId().equals(sender.getId())) {
+                    messagingTemplate.convertAndSend(
+                            "/client/groupMessages/" + member.getId(),
+                            MessageDto.fromEntity(savedMessage, null)
+                    );
+                }
+            }
 
             return MessageDto.fromEntity(savedMessage, null);
         } else {
