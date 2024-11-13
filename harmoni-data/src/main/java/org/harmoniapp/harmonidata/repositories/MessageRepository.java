@@ -44,6 +44,11 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             "m.receiver.id = :userId AND m.sender.id = :partnerId AND m.isRead = false")
     List<Message> findUnreadByUsersIds(@Param("userId") Long userId, @Param("partnerId") Long partnerId);
 
+    @Query("SELECT m FROM Message m WHERE " +
+            "m.group.id = :groupId AND m.isRead = false AND m.sender.id != :userId")
+    List<Message> findUnreadByGroupId(@Param("userId") Long userId, @Param("groupId") Long groupId);
+
+
     @Query(value = "SELECT m.content FROM Message m " +
             "WHERE m.group_id = :groupId " +
             "ORDER BY m.sent_at DESC LIMIT 1", nativeQuery = true)

@@ -112,8 +112,15 @@ public class MessageService {
 //    }
 
     @Transactional
-    public List<MessageDto> markAllMessagesAsRead(Long userId1, Long userId2) {
-        List<Message> messages = repositoryCollector.getMessages().findUnreadByUsersIds(userId1, userId2);
+    public List<MessageDto> markAllMessagesAsRead(Long userId1, Long userId2, Long groupId) {
+        List<Message> messages;
+
+        if (groupId != null) {
+            messages = repositoryCollector.getMessages().findUnreadByGroupId(userId1, groupId);
+        } else {
+            messages = repositoryCollector.getMessages().findUnreadByUsersIds(userId1, userId2);
+        }
+
         messages.forEach(message -> message.setRead(true));
         repositoryCollector.getMessages().saveAll(messages);
 
@@ -121,7 +128,18 @@ public class MessageService {
                 .map(m -> MessageDto.fromEntity(m, null))
                 .toList();
 
-        messagingTemplate.convertAndSend("/client/messages/read-status/" + userId2, messagesDto);
+        if (groupId != null) {
+            Group group = repositoryCollector.getGroups().findById(groupId)
+                    .orElseThrow(() -> new IllegalArgumentException("Group not found"));
+
+            group.getMembers().forEach(member -> {
+                if (!member.getId().equals(userId1)) {
+                    messagingTemplate.convertAndSend("/client/groupMessages/readStatus/" + member.getId(), messagesDto);
+                }
+            });
+        } else {
+            messagingTemplate.convertAndSend("/client/messages/readStatus/" + userId2, messagesDto);
+        }
 
         return messagesDto;
     }
