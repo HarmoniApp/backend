@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.Nullable;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -53,4 +54,12 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Page<User> findSupervisors(Pageable pageable);
 
     Optional<User> findByEmail(String email);
+
+    @Query("""
+        select u from User u
+        where u.isActive = true and u not in (
+            select a.user from Absence a
+            where a.status.name='approved' and (a.start <= ?2 or a.end >= ?1)
+        )""")
+    List<User> findAllActiveWithoutAbsenceInDateRange(LocalDate startDate, LocalDate endDate);
 }
