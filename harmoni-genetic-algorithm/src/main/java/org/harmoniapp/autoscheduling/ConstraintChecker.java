@@ -32,6 +32,27 @@ public class ConstraintChecker {
 
         List<List<Shift>> shiftsByDay = groupByDay(chromosome);
         violations += checkMorningShiftAfterNight(shiftsByDay);
+        violations += checkQuantityOfShiftsPerDay(shiftsByDay);
+
+        return violations;
+    }
+
+    private double checkQuantityOfShiftsPerDay(List<List<Shift>> shiftsByDay) {
+        double violations = 0.0;
+
+        for (List<Shift> shifts : shiftsByDay) {
+            Map<Employee, Integer> employeeShifts = new HashMap<>();
+            for (Shift shift : shifts) {
+                for (Employee emp : shift.getEmployees()) {
+                    employeeShifts.put(emp, employeeShifts.getOrDefault(emp, 0) + 1);
+                }
+            }
+            for (int count : employeeShifts.values()) {
+                if (count > 1) {
+                    violations += hardPenalty;
+                }
+            }
+        }
 
         return violations;
     }
