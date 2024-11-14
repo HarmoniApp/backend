@@ -33,6 +33,7 @@ public class ConstraintChecker {
         List<List<Shift>> shiftsByDay = groupByDay(chromosome);
         violations += checkMorningShiftAfterNight(shiftsByDay);
         violations += checkQuantityOfShiftsPerDay(shiftsByDay);
+        violations += checkEarlierShiftNextDay(shiftsByDay);
 
         return violations;
     }
@@ -124,6 +125,33 @@ public class ConstraintChecker {
             }
         }
 
+        return violations;
+    }
+
+    private double checkEarlierShiftNextDay(List<List<Shift>> days) {
+        double violations = 0.0;
+
+        for (int i = 0; i < days.size() - 1; i++) {
+            List<Shift> currentDayShifts = days.get(i);
+            List<Shift> nextDayShifts = days.get(i + 1);
+
+            for (Shift currentShift : currentDayShifts) {
+                for (Employee emp : currentShift.getEmployees()) {
+                    violations += checkEmployeeInEarlierShifts(nextDayShifts, emp);
+                }
+            }
+        }
+
+        return violations;
+    }
+
+    private double checkEmployeeInEarlierShifts(List<Shift> nextDayShifts, Employee emp) {
+        double violations = 0.0;
+        for (Shift earlierShift : nextDayShifts) {
+            if (earlierShift.getEmployees().contains(emp)) {
+                violations += softPenalty;
+            }
+        }
         return violations;
     }
 }
