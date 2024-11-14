@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class Requirements {
-    private String role;
-    private int employeesNumber;
+    private final String role;
+    private final int employeesNumber;
 }

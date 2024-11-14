@@ -1,7 +1,9 @@
 package org.harmoniapp;
 
 import org.harmoniapp.autoscheduling.*;
+import sun.util.resources.LocaleData;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,17 +13,13 @@ public class App {
     public static void main(String[] args) {
         List<Employee> employees = new ArrayList<>();
         for (int i = 0; i < 24; i++) {
-            Employee employee = new Employee();
-            employee.setId("Employee_" + i);
-            employee.setRole("role_" + i % 3);
+            Employee employee = new Employee("Employee_" + i, "role_" + i % 3);
             employees.add(employee);
         }
 
         List<Requirements> requirements = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            Requirements requirement = new Requirements();
-            requirement.setRole("role_" + i);
-            requirement.setEmployeesNumber(2);
+            Requirements requirement = new Requirements("role_" + i, 2);
             requirements.add(requirement);
         }
 

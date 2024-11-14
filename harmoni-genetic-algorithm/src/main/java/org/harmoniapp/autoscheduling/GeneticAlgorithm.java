@@ -11,6 +11,16 @@ public class GeneticAlgorithm {
     private final ConstraintChecker constraintChecker;
     private final Random random;
 
+    public GeneticAlgorithm() {
+        this.populationSize = 50;
+        this.tournamentSize = populationSize / 5;
+        this.maxGenerations = 20000;
+        this.mutationRate = 0.02;
+        this.crossoverRate = 0.6;
+        this.constraintChecker = new ConstraintChecker();
+        this.random = new Random();
+    }
+
     public GeneticAlgorithm(int populationSize, int maxGenerations, double mutationRate, double crossoverRate) {
         this.populationSize = populationSize;
         this.tournamentSize = populationSize / 5;
@@ -45,7 +55,7 @@ public class GeneticAlgorithm {
                 break;
             }
         }
-        //TODO: maybe return best chromosome instead of its gens
+
         return bestChromosome.getGens();
     }
 
