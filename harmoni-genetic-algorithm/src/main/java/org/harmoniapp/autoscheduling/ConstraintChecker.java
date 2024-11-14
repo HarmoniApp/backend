@@ -31,7 +31,6 @@ public class ConstraintChecker {
         violations += violationsMaxShiftPerWeek(chromosome);
 
         List<List<Shift>> shiftsByDay = groupByDay(chromosome);
-        violations += checkMorningShiftAfterNight(shiftsByDay);
         violations += checkQuantityOfShiftsPerDay(shiftsByDay);
         violations += checkEarlierShiftNextDay(shiftsByDay);
 
@@ -106,28 +105,6 @@ public class ConstraintChecker {
         return false;
     }
 
-    private double checkMorningShiftAfterNight(List<List<Shift>> days) {
-        double violations = 0.0;
-
-        for (int i = 0; i < days.size() - 1; i++) {
-            List<Shift> currentDayShifts = days.get(i);
-            List<Shift> nextDayShifts = days.get(i + 1);
-
-            if (!currentDayShifts.isEmpty() && !nextDayShifts.isEmpty()) {
-                List<Employee> lastShiftEmployees = currentDayShifts.get(currentDayShifts.size() - 1).getEmployees();
-                List<Employee> firstShiftEmployees = nextDayShifts.get(0).getEmployees();
-
-                for (Employee emp : lastShiftEmployees) {
-                    if (firstShiftEmployees.contains(emp)) {
-                        violations += softPenalty;
-                    }
-                }
-            }
-        }
-
-        return violations;
-    }
-
     private double checkEarlierShiftNextDay(List<List<Shift>> days) {
         double violations = 0.0;
 
@@ -135,23 +112,18 @@ public class ConstraintChecker {
             List<Shift> currentDayShifts = days.get(i);
             List<Shift> nextDayShifts = days.get(i + 1);
 
-            for (Shift currentShift : currentDayShifts) {
-                for (Employee emp : currentShift.getEmployees()) {
-                    violations += checkEmployeeInEarlierShifts(nextDayShifts, emp);
+            for (int j =0; j < currentDayShifts.size(); j++) {
+                for (Employee emp : currentDayShifts.get(j).getEmployees()) {
+                    for (int k=0; k < j; k++) {
+                        if (nextDayShifts.get(k).getEmployees().contains(emp)) {
+                            violations += softPenalty;
+                            break;
+                        }
+                    }
                 }
             }
         }
 
-        return violations;
-    }
-
-    private double checkEmployeeInEarlierShifts(List<Shift> nextDayShifts, Employee emp) {
-        double violations = 0.0;
-        for (Shift earlierShift : nextDayShifts) {
-            if (earlierShift.getEmployees().contains(emp)) {
-                violations += softPenalty;
-            }
-        }
         return violations;
     }
 }
