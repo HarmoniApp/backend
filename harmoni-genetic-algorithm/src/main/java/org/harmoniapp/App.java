@@ -1,9 +1,7 @@
 package org.harmoniapp;
 
 import org.harmoniapp.autoscheduling.*;
-import sun.util.resources.LocaleData;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +32,7 @@ public class App {
         Map<String, List<Employee>> employeesByRole = employees.stream().collect(Collectors.groupingBy(Employee::getRole));
 
         GeneticAlgorithm GA = new GeneticAlgorithm(50, 20000, 0.02, 0.6);
-        List<Shift> result = GA.run(shifts, employeesByRole);
-        System.out.println(result);
+        Chromosome result = GA.run(shifts, employeesByRole);
+        System.out.println(result.getGens());
     }
 }

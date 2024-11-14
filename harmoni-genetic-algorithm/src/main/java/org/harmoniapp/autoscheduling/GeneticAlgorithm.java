@@ -31,7 +31,7 @@ public class GeneticAlgorithm {
         this.random = new Random();
     }
 
-    public List<Shift> run(List<Shift> shifts, Map<String, List<Employee>> employees) {
+    public Chromosome run(List<Shift> shifts, Map<String, List<Employee>> employees) {
         List<Chromosome> population = initializePopulation(shifts, employees);
 
         assert !population.isEmpty();
@@ -56,7 +56,7 @@ public class GeneticAlgorithm {
             }
         }
 
-        return bestChromosome.getGens();
+        return bestChromosome;
     }
 
     private List<Chromosome> initializePopulation(List<Shift> shifts, Map<String, List<Employee>> employees) {
