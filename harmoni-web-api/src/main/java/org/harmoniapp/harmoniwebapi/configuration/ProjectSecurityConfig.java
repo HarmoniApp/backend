@@ -132,6 +132,7 @@ public class ProjectSecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/user/{id}", "GET")).access(adminOrOwnerAuthorizationManager)
                         .requestMatchers("/user/**").hasRole("ADMIN")
                         .requestMatchers("/calendar/user/{id}/**").access(adminOrOwnerAuthorizationManager)
+                        .requestMatchers("/userPhoto/**").hasAnyRole("USER", "ADMIN")
                 )
                 .httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()))
                 .exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
