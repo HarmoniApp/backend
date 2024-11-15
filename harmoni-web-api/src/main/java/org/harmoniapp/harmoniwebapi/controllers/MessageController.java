@@ -1,5 +1,6 @@
 package org.harmoniapp.harmoniwebapi.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.MessageDto;
 import org.harmoniapp.harmoniwebapi.services.MessageService;
@@ -40,7 +41,7 @@ public class MessageController {
     }
 
     @PostMapping("/send")
-    public MessageDto sendMessage(@RequestBody MessageDto messageDto) {
+    public MessageDto sendMessage(@Valid @RequestBody MessageDto messageDto) {
         return service.sendMessage(messageDto);
     }
 

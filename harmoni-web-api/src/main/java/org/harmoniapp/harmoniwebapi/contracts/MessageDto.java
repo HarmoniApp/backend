@@ -2,6 +2,7 @@ package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import org.harmoniapp.harmonidata.entities.Message;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ public record MessageDto( //TODO: validation?
         @JsonProperty("sender_id") Long senderId,
         @JsonProperty("receiver_id") Long receiverId,
         @JsonProperty("group_id") Long groupId,
+        @NotBlank(message = "Content cannot be blank")
         String content,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         @JsonProperty("sent_at") LocalDateTime sentAt,
