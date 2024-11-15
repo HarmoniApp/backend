@@ -33,7 +33,7 @@ public class MessageService {
         pageNumber = (pageNumber < 1) ? 0 : pageNumber - 1;
         pageSize = (pageSize < 1) ? 20 : pageSize;
         Sort.Direction sortDirection = Sort.Direction.DESC;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, "sent_at"));
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, "sentAt"));
         Page<Message> messages;
 
         if (groupId != null) {
