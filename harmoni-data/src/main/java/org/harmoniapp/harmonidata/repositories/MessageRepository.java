@@ -1,6 +1,8 @@
 package org.harmoniapp.harmonidata.repositories;
 
 import org.harmoniapp.harmonidata.entities.Message;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -30,10 +32,10 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             "(m.sender.id = :userId1 AND m.receiver.id = :userId2) OR " +
             "(m.sender.id = :userId2 AND m.receiver.id = :userId1) " +
             "ORDER BY m.sentAt ASC")
-    List<Message> findChatHistory(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
+    Page<Message> findChatHistory(@Param("userId1") Long userId1, @Param("userId2") Long userId2, Pageable pageable);
 
-    @Query("SELECT m FROM Message m WHERE m.group.id = :groupId ORDER BY m.sentAt ASC")
-    List<Message> findGroupChatHistory(@Param("groupId") Long groupId);
+    @Query("SELECT m FROM Message m WHERE m.group.id = :groupId")
+    Page<Message> findGroupChatHistory(@Param("groupId") Long groupId, Pageable pageable);
 
     @Query(value = "SELECT m.content FROM Message m WHERE " +
             "(m.sender_id = :userId1 AND m.receiver_id = :userId2) OR " +

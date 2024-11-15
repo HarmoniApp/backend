@@ -3,6 +3,7 @@ package org.harmoniapp.harmoniwebapi.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.MessageDto;
+import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.harmoniapp.harmoniwebapi.services.MessageService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,12 +22,14 @@ public class MessageController {
 //    }
 
     @GetMapping("/history")
-    public List<MessageDto> getChatHistory(@RequestParam Long userId1,
-                                           @RequestParam(required = false) Long userId2,
-                                           @RequestParam(required = false) Long groupId,
-                                           @RequestParam(defaultValue = "false") boolean translate,
-                                           @RequestParam(required = false) String targetLanguage) {
-        return service.getChatHistory(userId1, userId2, groupId, translate, targetLanguage);
+    public PageDto<MessageDto> getChatHistory(@RequestParam Long userId1,
+                                              @RequestParam(required = false) Long userId2,
+                                              @RequestParam(required = false) Long groupId,
+                                              @RequestParam(defaultValue = "false") boolean translate,
+                                              @RequestParam(required = false) String targetLanguage,
+                                              @RequestParam(name = "pageNumber", required = false, defaultValue = "1") int pageNumber,
+                                              @RequestParam(name = "pageSize", required = false, defaultValue = "20") int pageSize) {
+        return service.getChatHistory(userId1, userId2, groupId, translate, targetLanguage, pageNumber, pageSize);
     }
 
     @GetMapping("/chat-partners")

@@ -7,10 +7,16 @@ import org.harmoniapp.harmonidata.entities.Message;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.MessageDto;
+import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -21,16 +27,22 @@ public class MessageService {
     private final SimpMessagingTemplate messagingTemplate;
     private final TranslationService translationService;
 
-    public List<MessageDto> getChatHistory(Long userId1, Long userId2, Long groupId, boolean translate, String targetLanguage) {
-        List<Message> messages;
+    public PageDto<MessageDto> getChatHistory(Long userId1, Long userId2, Long groupId,
+                                              boolean translate, String targetLanguage,
+                                              int pageNumber, int pageSize) {
+        pageNumber = (pageNumber < 1) ? 0 : pageNumber - 1;
+        pageSize = (pageSize < 1) ? 20 : pageSize;
+        Sort.Direction sortDirection = Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, "sent_at"));
+        Page<Message> messages;
 
         if (groupId != null) {
-            messages = repositoryCollector.getMessages().findGroupChatHistory(groupId);
+            messages = repositoryCollector.getMessages().findGroupChatHistory(groupId, pageable);
         } else {
-            messages = repositoryCollector.getMessages().findChatHistory(userId1, userId2);
+            messages = repositoryCollector.getMessages().findChatHistory(userId1, userId2, pageable);
         }
 
-        return messages.stream()
+        List<MessageDto> messageDtoList = messages.stream()
                 .map(message -> {
                     String content = message.getContent();
 
@@ -38,7 +50,13 @@ public class MessageService {
                         content = translationService.translate(message.getContent(), targetLanguage);
                     }
                     return MessageDto.fromEntity(message, content);
-                }).toList();
+                })
+                .sorted(Comparator.comparing(MessageDto::sentAt))
+                .toList();
+        return new PageDto<>(messageDtoList,
+                messages.getSize(),
+                messages.getNumber() + 1,
+                messages.getTotalPages());
     }
 
 
@@ -122,7 +140,7 @@ public class MessageService {
         }
 
         messages.forEach(message -> message.setRead(true));
-        repositoryCollector.getMessages().saveAll(messages);
+        messages = repositoryCollector.getMessages().saveAll(messages);
 
         List<MessageDto> messagesDto = messages.stream()
                 .map(m -> MessageDto.fromEntity(m, null))
