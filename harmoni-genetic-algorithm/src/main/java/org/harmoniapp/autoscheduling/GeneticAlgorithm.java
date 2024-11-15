@@ -20,7 +20,7 @@ public class GeneticAlgorithm {
     public GeneticAlgorithm() {
         this.populationSize = 50;
         this.tournamentSize = populationSize / 5;
-        this.maxGenerations = 20000;
+        this.maxGenerations = 100000;
         this.mutationRate = 0.02;
         this.crossoverRate = 0.6;
         this.constraintChecker = new ConstraintChecker();
