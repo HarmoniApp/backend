@@ -4,14 +4,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.MessageDto;
 import org.harmoniapp.harmoniwebapi.services.MessageService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("message")
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/message")
 public class MessageController {
     private final MessageService service;
 
@@ -21,12 +21,11 @@ public class MessageController {
 //    }
 
     @GetMapping("/history")
-    public List<MessageDto> getChatHistory(
-            @RequestParam Long userId1,
-            @RequestParam(required = false) Long userId2,
-            @RequestParam(required = false) Long groupId,
-            @RequestParam(defaultValue = "false") boolean translate,
-            @RequestParam(required = false) String targetLanguage) {
+    public List<MessageDto> getChatHistory(@RequestParam Long userId1,
+                                           @RequestParam(required = false) Long userId2,
+                                           @RequestParam(required = false) Long groupId,
+                                           @RequestParam(defaultValue = "false") boolean translate,
+                                           @RequestParam(required = false) String targetLanguage) {
         return service.getChatHistory(userId1, userId2, groupId, translate, targetLanguage);
     }
 
@@ -36,11 +35,14 @@ public class MessageController {
     }
 
     @GetMapping("/last")
-    public String getLasMessageByUsersId(@RequestParam(required = false) Long userId1, @RequestParam(required = false) Long userId2, @RequestParam(required = false) Long groupId) {
+    public String getLasMessageByUsersId(@RequestParam(required = false) Long userId1,
+                                         @RequestParam(required = false) Long userId2,
+                                         @RequestParam(required = false) Long groupId) {
         return service.getLasMessageByUsersId(userId1, userId2, groupId);
     }
 
     @PostMapping("/send")
+    @PreAuthorize("@securityService.canSendMessage(#messageDto, authentication)")
     public MessageDto sendMessage(@Valid @RequestBody MessageDto messageDto) {
         return service.sendMessage(messageDto);
     }
@@ -50,8 +52,11 @@ public class MessageController {
 //        return service.markMessageAsRead(id);
 //    }
 
-    @PatchMapping("mark-all-read")
-    public List<MessageDto> markAllRead(@RequestParam Long userId1, @RequestParam(required = false) Long userId2, @RequestParam(required = false) Long groupId) {
+    @PatchMapping("/mark-all-read")
+    @PreAuthorize("@securityService.canMarkAllMessagesAsRead(#userId1, #groupId,ó authentication)")
+    public List<MessageDto> markAllRead(@RequestParam Long userId1,
+                                        @RequestParam(required = false) Long userId2,
+                                        @RequestParam(required = false) Long groupId) {
         return service.markAllMessagesAsRead(userId1, userId2, groupId);
     }
 }

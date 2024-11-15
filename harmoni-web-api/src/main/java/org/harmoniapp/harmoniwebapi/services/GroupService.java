@@ -7,7 +7,6 @@ import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.GroupDto;
 import org.harmoniapp.harmoniwebapi.contracts.PartialUserWithEmpIdDto;
-import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 

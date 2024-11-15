@@ -1,5 +1,6 @@
 package org.harmoniapp.harmoniwebapi.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.GroupDto;
 import org.harmoniapp.harmoniwebapi.contracts.PartialUserWithEmpIdDto;
@@ -10,8 +11,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("group")
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/group")
 public class GroupController {
     private final GroupService service;
 
@@ -20,8 +20,8 @@ public class GroupController {
         return service.getGroupById(groupId);
     }
 
-    @GetMapping("/{id}/members")
-    public List<PartialUserWithEmpIdDto> getGroupMembersByGroupId(@PathVariable("id") Long groupId) {
+    @GetMapping("/{groupId}/members")
+    public List<PartialUserWithEmpIdDto> getGroupMembersByGroupId(@PathVariable Long groupId) {
         return service.getGroupMembersByGroupId(groupId);
     }
 
@@ -31,7 +31,7 @@ public class GroupController {
     }
 
     @PostMapping
-    public GroupDto createGroup(@RequestBody GroupDto groupDto) {
+    public GroupDto createGroup(@Valid @RequestBody GroupDto groupDto) {
         return  service.createGroup(groupDto);
     }
 
@@ -45,8 +45,8 @@ public class GroupController {
         return service.removeMemberFromGroup(groupId, userId);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteGroup(@PathVariable("id") Long groupId) {
+    @DeleteMapping("/{groupId}")
+    public void deleteGroup(@PathVariable Long groupId) {
         service.deleteGroup(groupId);
     }
 }

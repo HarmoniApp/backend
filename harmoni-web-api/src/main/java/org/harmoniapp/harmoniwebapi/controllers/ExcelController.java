@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/excel")
-@CrossOrigin(origins = "http://localhost:3000")
 public class ExcelController {
     private final ExcelService excelService;
 

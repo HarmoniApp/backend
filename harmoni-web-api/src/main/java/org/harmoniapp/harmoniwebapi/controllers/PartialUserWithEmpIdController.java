@@ -14,8 +14,7 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("user/simple/empId")
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/user/simple/empId")
 public class PartialUserWithEmpIdController {
     private final PartialUserWithEmpIdService partialUserWithEmpIdService;
 
