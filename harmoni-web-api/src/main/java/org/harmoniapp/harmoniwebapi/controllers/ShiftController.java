@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.ShiftDto;
 import org.harmoniapp.harmoniwebapi.services.ShiftService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -16,17 +17,20 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/shift")
-@CrossOrigin(origins = "http://localhost:3000")
 public class ShiftController {
     private final ShiftService shiftService;
 
     /**
      * Retrieves a shift's information by shift ID.
      *
+     * <p>This endpoint is secured and only accessible by users with the 'ADMIN' role
+     * or the owner of the shift.</p>
+     *
      * @param id the ID of the shift to retrieve
      * @return a ShiftDto containing shift information
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') || @securityService.isShiftOwner(#id, authentication)")
     public ShiftDto getShift(@PathVariable long id) {
         return shiftService.getShift(id);
     }

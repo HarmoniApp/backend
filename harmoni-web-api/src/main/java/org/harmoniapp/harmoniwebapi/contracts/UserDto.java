@@ -1,16 +1,13 @@
 package org.harmoniapp.harmoniwebapi.contracts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.harmoniapp.harmonidata.entities.ContractType;
 import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.User;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -50,7 +47,6 @@ public record UserDto(
         @Size(max = 320, message = "Email must be less than or equal to 320 characters")
         String email,
 
-        //TODO: validation?
         String password,
 
         @NotNull(message = "Contract type cannot be null")
@@ -85,6 +81,7 @@ public record UserDto(
         @JsonProperty("is_active") boolean isActive,
 
         @JsonProperty("available_absence_days") int availableAbsenceDays,
+        @JsonProperty("unused_absence_days") Integer unusedAbsenceDays,
 
         @NotEmpty(message = "Roles cannot be null or empty")
         List<Role> roles,
@@ -116,6 +113,38 @@ public record UserDto(
                 user.getPhoto(),
                 user.isActive(),
                 user.getAvailableAbsenceDays(),
+                user.getUnusedAbsenceDays(),
+                user.getRoles().stream().toList(),
+                user.getLanguages().stream().map(p -> new LanguageDto(p.getId(), p.getName(), p.getCode())).toList()
+        );
+    }
+
+    /**
+     * Converts a User entity to a UserDto.
+     *
+     * @param user The User entity to be converted.
+     * @param password The user password in plain text
+     * @return A UserDto representing the User entity.
+     */
+    public static UserDto fromEntityWithPassword(User user, String password) {
+        return new UserDto(
+                user.getId(),
+                user.getFirstname(),
+                user.getSurname(),
+                user.getEmail(),
+                password,
+                user.getContractType(),
+                user.getContractSignature(),
+                user.getContractExpiration(),
+                AddressDto.fromEntity(user.getResidence()),
+                AddressDto.fromEntity(user.getWorkAddress()),
+                (user.getSupervisor() != null) ? user.getSupervisor().getId() : null,
+                user.getPhoneNumber(),
+                user.getEmployeeId(),
+                user.getPhoto(),
+                user.isActive(),
+                user.getAvailableAbsenceDays(),
+                user.getUnusedAbsenceDays(),
                 user.getRoles().stream().toList(),
                 user.getLanguages().stream().map(p -> new LanguageDto(p.getId(), p.getName(), p.getCode())).toList()
         );
@@ -146,6 +175,8 @@ public record UserDto(
                 LocalDate.now(),
                 this.isActive,
                 this.availableAbsenceDays,
+                0,
+                null,
                 null,
                 null
         );

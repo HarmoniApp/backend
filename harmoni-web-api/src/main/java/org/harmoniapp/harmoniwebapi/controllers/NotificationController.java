@@ -3,6 +3,7 @@ package org.harmoniapp.harmoniwebapi.controllers;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.NotificationDto;
 import org.harmoniapp.harmoniwebapi.services.NotificationService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,7 +15,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("notification")
-@CrossOrigin(origins = "http://localhost:3000")
 public class NotificationController {
     private final NotificationService notificationService;
 
@@ -43,10 +43,14 @@ public class NotificationController {
     /**
      * Marks a notification as read.
      *
+     * <p>This endpoint is protected by security measures, and will only allow the owner of the notification
+     * to mark it as read.</p>
+     *
      * @param id the ID of the notification to mark as read
      * @return the updated NotificationDto object representing the read notification
      */
     @PatchMapping("/{id}/read")
+    @PreAuthorize("@securityService.isNotificationOwner(#id, authentication)")
     public NotificationDto markNotificationAsRead(@PathVariable Long id) {
         return notificationService.markNotificationAsRead(id);
     }
@@ -65,9 +69,13 @@ public class NotificationController {
     /**
      * Deletes a notification by its ID.
      *
+     * <p>This endpoint is protected by security measures, and will only allow the owner of the notification
+     *  to delete it.</p>
+     *
      * @param id the ID of the notification to delete
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("@securityService.isNotificationOwner(#id, authentication)")
     public void deleteNotification(@PathVariable Long id) {
         notificationService.deleteNotification(id);
     }

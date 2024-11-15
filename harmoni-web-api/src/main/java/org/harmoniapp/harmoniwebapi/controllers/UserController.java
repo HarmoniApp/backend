@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
+import org.harmoniapp.harmoniwebapi.contracts.UserNewPassword;
 import org.harmoniapp.harmoniwebapi.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
-@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
     private final UserService service;
 
@@ -133,5 +133,15 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable long id) {
         service.delete(id);
+    }
+
+    @PatchMapping("/{id}/changePassword")
+    public String changePassword(@PathVariable long id, @RequestBody UserNewPassword password) {
+        return service.changePassword(id, password);
+    }
+
+    @PatchMapping("/{id}/generatePassword")
+    public String generateNewPassword(@PathVariable long id) {
+        return service.generateNewPassword(id);
     }
 }

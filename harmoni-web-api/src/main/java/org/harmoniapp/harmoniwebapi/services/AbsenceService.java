@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service class for managing absences.
@@ -107,7 +110,7 @@ public class AbsenceService {
         return absenceByDateRangeAndUserId.stream()
                 .filter(a -> a.getStatus().getId() == 2)
                 .map(AbsenceDto::fromEntity)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**
@@ -125,7 +128,7 @@ public class AbsenceService {
         return userAbsences.stream()
                 .filter(a -> a.getStatus().getId() == 2)
                 .map(AbsenceDto::fromEntity)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**
@@ -184,12 +187,22 @@ public class AbsenceService {
         absence.setUpdated(LocalDate.now());
         absence.setWorkingDays(HolidayCalculator.calculateWorkingDays(absence.getStart(), absence.getEnd()));
 
-        if(absence.getWorkingDays() > user.getAvailableAbsenceDays()){
+        int requestedDays = absence.getWorkingDays().intValue();
+        int availableDays = user.getAvailableAbsenceDays() + user.getUnusedAbsenceDays();
+
+        if (requestedDays > availableDays) {
             throw new RuntimeException("An error occurred: You can't take more days than available.");
-        } else {
-            user.setAvailableAbsenceDays(user.getAvailableAbsenceDays() - absence.getWorkingDays().intValue());
         }
 
+        if (requestedDays <= user.getUnusedAbsenceDays()) {
+            user.setUnusedAbsenceDays(user.getUnusedAbsenceDays() - requestedDays);
+        } else {
+            requestedDays -= user.getUnusedAbsenceDays();
+            user.setUnusedAbsenceDays(0);
+            user.setAvailableAbsenceDays(user.getAvailableAbsenceDays() - requestedDays);
+        }
+
+        repositoryCollector.getUsers().save(user);
         Absence savedAbsence = repositoryCollector.getAbsences().save(absence);
 
         newAbsenceCreatedNotification(savedAbsence);
