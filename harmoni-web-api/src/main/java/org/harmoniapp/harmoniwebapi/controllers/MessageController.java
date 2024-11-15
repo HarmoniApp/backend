@@ -53,7 +53,7 @@ public class MessageController {
 //    }
 
     @PatchMapping("/mark-all-read")
-    @PreAuthorize("@securityService.canMarkAllMessagesAsRead(#userId1, #groupId,ó authentication)")
+    @PreAuthorize("@securityService.canMarkAllMessagesAsRead(#userId1, #groupId, authentication)")
     public List<MessageDto> markAllRead(@RequestParam Long userId1,
                                         @RequestParam(required = false) Long userId2,
                                         @RequestParam(required = false) Long groupId) {
