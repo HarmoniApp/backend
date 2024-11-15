@@ -7,7 +7,7 @@ import org.harmoniapp.harmonidata.entities.Message;
 
 import java.time.LocalDateTime;
 
-public record MessageDto( //TODO: validation?
+public record MessageDto(
         Long id,
         @JsonProperty("sender_id") Long senderId,
         @JsonProperty("receiver_id") Long receiverId,
