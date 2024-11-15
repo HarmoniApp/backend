@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Represents a chromosome in the genetic algorithm.
+ */
 @Data
 public class Chromosome {
     private List<Shift> gens;

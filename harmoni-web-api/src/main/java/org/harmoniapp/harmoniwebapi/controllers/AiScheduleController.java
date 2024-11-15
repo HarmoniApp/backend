@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * REST controller for managing AI schedule generation.
+ * Provides endpoints to generate schedules based on requirements.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/aiSchedule")
@@ -19,6 +23,12 @@ public class AiScheduleController {
     private final AiScheduleService service;
 
 
+    /**
+     * Generates a schedule based on the specified requirements.
+     *
+     * @param requirements the list of schedule requirements to generate the schedule from
+     * @return an AiSchedulerResponse containing the generated schedule
+     */
     @PostMapping("/generate")
     public AiSchedulerResponse generateSchedule(@Valid @RequestBody List<ScheduleRequirement> requirements) {
         return service.generateSchedule(requirements);

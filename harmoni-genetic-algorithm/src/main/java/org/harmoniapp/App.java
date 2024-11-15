@@ -8,6 +8,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class App {
+
+    /**
+     * Main method.
+     * Example of how to use the genetic algorithm to solve the employee scheduling problem.
+     *
+     * @param args the command-line arguments
+     */
     public static void main(String[] args) {
         List<Employee> employees = new ArrayList<>();
         for (int i = 0; i < 24; i++) {

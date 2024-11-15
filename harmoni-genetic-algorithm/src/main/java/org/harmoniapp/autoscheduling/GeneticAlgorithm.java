@@ -2,6 +2,9 @@ package org.harmoniapp.autoscheduling;
 
 import java.util.*;
 
+/**
+ * Represents the genetic algorithm used to generate schedules.
+ */
 public class GeneticAlgorithm {
     private final int populationSize;
     private final int tournamentSize;
@@ -11,6 +14,9 @@ public class GeneticAlgorithm {
     private final ConstraintChecker constraintChecker;
     private final Random random;
 
+    /**
+     * Creates a new GeneticAlgorithm instance with default parameters.
+     */
     public GeneticAlgorithm() {
         this.populationSize = 50;
         this.tournamentSize = populationSize / 5;
@@ -21,6 +27,14 @@ public class GeneticAlgorithm {
         this.random = new Random();
     }
 
+    /**
+     * Creates a new GeneticAlgorithm instance with the specified parameters.
+     *
+     * @param populationSize the size of the population
+     * @param maxGenerations the maximum number of generations
+     * @param mutationRate   the mutation rate
+     * @param crossoverRate  the crossover rate
+     */
     public GeneticAlgorithm(int populationSize, int maxGenerations, double mutationRate, double crossoverRate) {
         this.populationSize = populationSize;
         this.tournamentSize = populationSize / 5;
@@ -31,6 +45,13 @@ public class GeneticAlgorithm {
         this.random = new Random();
     }
 
+    /**
+     * Runs the genetic algorithm to generate a schedule.
+     *
+     * @param shifts    the list of shifts to generate the schedule from
+     * @param employees the list of employees to generate the schedule from
+     * @return the generated schedule
+     */
     public Chromosome run(List<Shift> shifts, Map<String, List<Employee>> employees) {
         List<Chromosome> population = initializePopulation(shifts, employees);
 
@@ -59,6 +80,13 @@ public class GeneticAlgorithm {
         return bestChromosome;
     }
 
+    /**
+     * Initializes the population of chromosomes.
+     *
+     * @param shifts    the list of shifts to generate the schedule from
+     * @param employees the list of employees to generate the schedule from
+     * @return the initialized population
+     */
     private List<Chromosome> initializePopulation(List<Shift> shifts, Map<String, List<Employee>> employees) {
         List<Chromosome> population = new ArrayList<>(shifts.size());
         for (int i = 0; i < populationSize; i++) {
@@ -67,6 +95,13 @@ public class GeneticAlgorithm {
         return population;
     }
 
+    /**
+     * Generates a random chromosome.
+     *
+     * @param shifts    the list of shifts to generate the chromosome from
+     * @param employees the list of employees to generate the chromosome from
+     * @return the generated chromosome
+     */
     private Chromosome generateRandomChromosome(List<Shift> shifts, Map<String, List<Employee>> employees) {
         List<Shift> gens = new ArrayList<>(shifts.size());
         for (Shift shift : shifts) {
@@ -76,6 +111,13 @@ public class GeneticAlgorithm {
         return new Chromosome(gens, constraintChecker);
     }
 
+    /**
+     * Evolves the population of chromosomes.
+     *
+     * @param population    the population to evolve
+     * @param employeesByRole the list of employees grouped by role
+     * @return the evolved population
+     */
     private List<Chromosome> evolvePopulation(List<Chromosome> population, Map<String, List<Employee>> employeesByRole) {
         assert !population.isEmpty();
         Chromosome best = population.stream().max(Comparator.comparing(Chromosome::getFitness)).get();
@@ -96,6 +138,12 @@ public class GeneticAlgorithm {
         return newPopulation;
     }
 
+    /**
+     * Selects a chromosome using tournament selection.
+     *
+     * @param population the population to select from
+     * @return the selected chromosome
+     */
     private Chromosome tournamentSelection(List<Chromosome> population) {
         List<Chromosome> tournament = new ArrayList<>(tournamentSize);
         for (int i = 0; i < tournamentSize; i++) {
@@ -105,6 +153,13 @@ public class GeneticAlgorithm {
         return tournament.stream().max(Comparator.comparing(Chromosome::getFitness)).get();
     }
 
+    /**
+     * Performs crossover on two chromosomes.
+     *
+     * @param parent1 the first parent chromosome
+     * @param parent2 the second parent chromosome
+     * @return the offspring chromosomes
+     */
     private List<Chromosome> crossover(Chromosome parent1, Chromosome parent2) {
         if (random.nextDouble() > crossoverRate) {
             return Arrays.asList(parent1, parent2);
@@ -126,6 +181,13 @@ public class GeneticAlgorithm {
         return Arrays.asList(new Chromosome(childGens1, constraintChecker), new Chromosome(childGens2, constraintChecker));
     }
 
+    /**
+     * Mutates a chromosome.
+     *
+     * @param chromosome the chromosome to mutate
+     * @param employees  the list of employees to mutate the chromosome from
+     * @return the mutated chromosome
+     */
     private Chromosome mutate(Chromosome chromosome, Map<String, List<Employee>> employees) {
         List<Shift> gens = chromosome.getGens();
         for (int i = 0; i < gens.size(); i++) {
@@ -138,6 +200,13 @@ public class GeneticAlgorithm {
         return new Chromosome(gens, constraintChecker);
     }
 
+    /**
+     * Selects random employees for a shift.
+     *
+     * @param requirements the requirements for the shift
+     * @param employees    the list of employees to select from
+     * @return the selected employees
+     */
     private List<Employee> selectRandomEmployees(List<Requirements> requirements, Map<String, List<Employee>> employees) {
         List<Employee> employeesForShift = new ArrayList<>();
         for (Requirements req : requirements) {

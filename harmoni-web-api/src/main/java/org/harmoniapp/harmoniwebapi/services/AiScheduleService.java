@@ -16,6 +16,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
+/**
+ * Service for AI schedule generation.
+ * Provides methods for generating schedules based on requirements.
+ */
 @Service
 @RequiredArgsConstructor
 public class AiScheduleService {
@@ -24,6 +28,12 @@ public class AiScheduleService {
     private List<Role> roleCache;
     private List<PredefineShift> predefineShiftCache;
 
+    /**
+     * Generates a schedule based on the specified requirements.
+     *
+     * @param requirementsDto the list of schedule requirements to generate the schedule from
+     * @return an AiSchedulerResponse containing the generated schedule
+     */
     public AiSchedulerResponse generateSchedule(List<ScheduleRequirement> requirementsDto) {
         requirementsDto.sort(Comparator.comparing(ScheduleRequirement::date));
         loadCache(requirementsDto.getFirst().date(), requirementsDto.getLast().date());
@@ -56,6 +66,11 @@ public class AiScheduleService {
         );
     }
 
+    /**
+     * Prepares employees for the schedule generation.
+     *
+     * @return a map of employees grouped by role
+     */
     private Map<String, List<Employee>> prepareEmployees() {
         List<Employee> employees = new ArrayList<>(userCache.size());
         for (User user : userCache) {
@@ -65,6 +80,12 @@ public class AiScheduleService {
         return employees.stream().collect(Collectors.groupingBy(Employee::getRole));
     }
 
+    /**
+     * Prepares shifts for the schedule generation.
+     *
+     * @param scheduleRequirements the list of schedule requirements
+     * @return a list of shifts
+     */
     private List<Shift> prepareShifts(List<ScheduleRequirement> scheduleRequirements) {
         List<Shift> shifts = new ArrayList<>();
 
@@ -87,6 +108,12 @@ public class AiScheduleService {
         return shifts;
     }
 
+    /**
+     * Prepares requirements for the schedule generation.
+     *
+     * @param requirements the list of requirements
+     * @return a list of requirements
+     */
     private List<Requirements> prepareRequirements(List<ReqRoleDto> requirements) {
         List<Requirements> req = new ArrayList<>(requirements.size());
         for (ReqRoleDto reqRoleDto : requirements) {
@@ -96,6 +123,12 @@ public class AiScheduleService {
         return req;
     }
 
+    /**
+     * Decodes shifts from shift representation in algorithm to entity.
+     *
+     * @param shifts the list of shifts
+     * @return a list of decoded shifts
+     */
     private List<org.harmoniapp.harmonidata.entities.Shift> decodeShifts(List<Shift> shifts) {
         List<org.harmoniapp.harmonidata.entities.Shift> decodedShiftList = new ArrayList<>(shifts.size());
         LocalDate now = LocalDate.now();
@@ -131,6 +164,13 @@ public class AiScheduleService {
         return decodedShiftList;
     }
 
+    /**
+     * Verifies if there are enough employees to generate a schedule.
+     *
+     * @param requirementsDto the list of schedule requirements
+     * @param employees       the map of employees grouped by role
+     * @throws NotEnoughEmployees if there are not enough employees to generate a schedule
+     */
     private void verifyUserQuantity(List<ScheduleRequirement> requirementsDto, Map<String, List<Employee>> employees) throws NotEnoughEmployees {
         Map<String, Integer> required = summarizeRequiredEmployees(requirementsDto);
         Map<String, Integer> available = employees.entrySet().stream()
@@ -145,6 +185,12 @@ public class AiScheduleService {
         });
     }
 
+    /**
+     * Summarizes required employees from the list of schedule requirements.
+     *
+     * @param requirementsDto the list of schedule requirements
+     * @return a map of roles and required employees
+     */
     private Map<String, Integer> summarizeRequiredEmployees(List<ScheduleRequirement> requirementsDto) {
         return requirementsDto.stream()
                 .flatMap(scheduleRequirement -> scheduleRequirement.shifts().stream())
@@ -160,12 +206,21 @@ public class AiScheduleService {
                 ));
     }
 
+    /**
+     * Loads cache for the specified date range.
+     *
+     * @param start the start date
+     * @param end   the end date
+     */
     private void loadCache(LocalDate start, LocalDate end) {
         userCache = repositoryCollector.getUsers().findAllActiveWithoutAbsenceInDateRange(start, end);
         roleCache = repositoryCollector.getRoles().findAll();
         predefineShiftCache = repositoryCollector.getPredefineShifts().findAll();
     }
 
+    /**
+     * Clears the cache.
+     */
     private void clearCache() {
         userCache = null;
         roleCache = null;
