@@ -6,10 +6,8 @@ import org.harmoniapp.harmonidata.entities.PredefineShift;
 import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
-import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.AiSchedulerResponse;
-import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.ReqRoleDto;
-import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.ReqShiftDto;
-import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.ScheduleRequirement;
+import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.*;
+import org.harmoniapp.harmoniwebapi.exception.NotEnoughEmployees;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,14 +25,20 @@ public class AiScheduleService {
     private List<PredefineShift> predefineShiftCache;
 
     public AiSchedulerResponse generateSchedule(List<ScheduleRequirement> requirementsDto) {
-        //TODO: check if number employees in requirements is correct
-        GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
-
-        predefineShiftCache = repositoryCollector.getPredefineShifts().findAll();
-
         requirementsDto.sort(Comparator.comparing(ScheduleRequirement::date));
+        loadCache(requirementsDto.getFirst().date(), requirementsDto.getLast().date());
+
+        Map<String, List<Employee>> employees = prepareEmployees();
+        try {
+            verifyUserQuantity(requirementsDto, employees);
+        } catch (NotEnoughEmployees e) {
+            clearCache();
+            throw e;
+        }
+
         List<Shift> shifts = prepareShifts(requirementsDto);
-        Map<String, List<Employee>> employees = prepareEmployees(requirementsDto.getFirst().date(), requirementsDto.getLast().date());
+
+        GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
         Chromosome chromosome = geneticAlgorithm.run(shifts, employees);
         if (chromosome.getFitness() < 0.9) {
             return new AiSchedulerResponse(
@@ -45,17 +49,14 @@ public class AiScheduleService {
         List<org.harmoniapp.harmonidata.entities.Shift> decodedShifts = decodeShifts(chromosome.getGens());
         repositoryCollector.getShifts().saveAll(decodedShifts);
 
-        userCache = null;
-        roleCache = null;
+        clearCache();
 
         return new AiSchedulerResponse(
                 "Układanie grafiku zakończone pomyślnie", true
         );
     }
 
-    private Map<String, List<Employee>> prepareEmployees(LocalDate start, LocalDate end) {
-        userCache = repositoryCollector.getUsers().findAllActiveWithoutAbsenceInDateRange(start, end);
-
+    private Map<String, List<Employee>> prepareEmployees() {
         List<Employee> employees = new ArrayList<>(userCache.size());
         for (User user : userCache) {
             Employee employee = new Employee(user.getEmployeeId(), user.getRoles().getFirst().getName());
@@ -67,7 +68,6 @@ public class AiScheduleService {
     private List<Shift> prepareShifts(List<ScheduleRequirement> scheduleRequirements) {
         List<Shift> shifts = new ArrayList<>();
 
-//        scheduleRequirements.sort(Comparator.comparing(ScheduleRequirement::date));
         for (ScheduleRequirement scheduleRequirement : scheduleRequirements) {
 
             scheduleRequirement.shifts()
@@ -88,7 +88,6 @@ public class AiScheduleService {
     }
 
     private List<Requirements> prepareRequirements(List<ReqRoleDto> requirements) {
-        roleCache = repositoryCollector.getRoles().findAll();
         List<Requirements> req = new ArrayList<>(requirements.size());
         for (ReqRoleDto reqRoleDto : requirements) {
             Role role = roleCache.stream().filter(r -> Objects.equals(r.getId(), reqRoleDto.roleId())).findFirst().orElseThrow();
@@ -130,5 +129,46 @@ public class AiScheduleService {
             }
         }
         return decodedShiftList;
+    }
+
+    private void verifyUserQuantity(List<ScheduleRequirement> requirementsDto, Map<String, List<Employee>> employees) throws NotEnoughEmployees {
+        Map<String, Integer> required = summarizeRequiredEmployees(requirementsDto);
+        Map<String, Integer> available = employees.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().size() * 5));
+        required.forEach((role, requiredCount) -> {
+            int availableCount = available.getOrDefault(role, 0);
+            if (availableCount < requiredCount) {
+                String message = String.format("Za mało pracowników o roli %s, wymagane zmiany do obsadzenia: %d, możliwe zmiany do obsadzenia: %d",
+                        role, requiredCount, availableCount);
+                throw new NotEnoughEmployees(message);
+            }
+        });
+    }
+
+    private Map<String, Integer> summarizeRequiredEmployees(List<ScheduleRequirement> requirementsDto) {
+        return requirementsDto.stream()
+                .flatMap(scheduleRequirement -> scheduleRequirement.shifts().stream())
+                .flatMap(reqShiftDto -> reqShiftDto.roles().stream())
+                .collect(Collectors.toMap(
+                        reqRoleDto -> roleCache.stream()
+                                .filter(r -> r.getId().equals(reqRoleDto.roleId()))
+                                .findFirst()
+                                .orElseThrow()
+                                .getName(),
+                        ReqRoleDto::quantity,
+                        Integer::sum
+                ));
+    }
+
+    private void loadCache(LocalDate start, LocalDate end) {
+        userCache = repositoryCollector.getUsers().findAllActiveWithoutAbsenceInDateRange(start, end);
+        roleCache = repositoryCollector.getRoles().findAll();
+        predefineShiftCache = repositoryCollector.getPredefineShifts().findAll();
+    }
+
+    private void clearCache() {
+        userCache = null;
+        roleCache = null;
+        predefineShiftCache = null;
     }
 }
