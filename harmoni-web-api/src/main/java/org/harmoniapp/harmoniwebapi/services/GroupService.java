@@ -83,6 +83,7 @@ public class GroupService {
     @Transactional
     public void deleteGroup(Long groupId) {
         try {
+            repositoryCollector.getMessages().deleteByGroupId(groupId);
             repositoryCollector.getGroups().deleteById(groupId);
         } catch (Exception e) {
             throw new RuntimeException("An error occurred: " + e.getMessage(), e);

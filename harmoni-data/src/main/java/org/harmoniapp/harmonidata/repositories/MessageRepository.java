@@ -2,6 +2,7 @@ package org.harmoniapp.harmonidata.repositories;
 
 import org.harmoniapp.harmonidata.entities.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -53,4 +54,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             "WHERE m.group_id = :groupId " +
             "ORDER BY m.sent_at DESC LIMIT 1", nativeQuery = true)
     String findLastMessageByGroupId(@Param("groupId") Long groupId);
+
+    @Modifying
+    @Query(value = "DELETE FROM message WHERE group_id = :groupId", nativeQuery = true)
+    void deleteByGroupId(@Param("groupId") Long groupId);
 }
