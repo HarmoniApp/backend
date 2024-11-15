@@ -1,5 +1,6 @@
 package org.harmoniapp.harmoniwebapi.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.AiSchedulerResponse;
 import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.ScheduleRequirement;
@@ -19,7 +20,7 @@ public class AiScheduleController {
 
 
     @PostMapping("/generate")
-    public AiSchedulerResponse generateSchedule(@RequestBody List<ScheduleRequirement> requirements) {
+    public AiSchedulerResponse generateSchedule(@Valid @RequestBody List<ScheduleRequirement> requirements) {
         return service.generateSchedule(requirements);
     }
 }
