@@ -33,4 +33,14 @@ public class AiScheduleController {
     public AiSchedulerResponse generateSchedule(@Valid @RequestBody List<ScheduleRequirement> requirements) {
         return service.generateSchedule(requirements);
     }
+
+    /**
+     * Revokes the last generated schedule.
+     *
+     * @return an AiSchedulerResponse containing the result of the revocation
+     */
+    @PostMapping("/revoke")
+    public AiSchedulerResponse revokeSchedule() {
+        return service.revokeSchedule();
+    }
 }

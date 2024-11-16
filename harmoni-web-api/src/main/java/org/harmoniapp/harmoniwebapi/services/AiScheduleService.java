@@ -9,6 +9,7 @@ import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.*;
 import org.harmoniapp.harmoniwebapi.exception.NotEnoughEmployees;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AiScheduleService {
     private final RepositoryCollector repositoryCollector;
-    ;
+    private List<Long> lastGeneratedShiftIds;
 
     /**
      * Generates a schedule based on the specified requirements.
@@ -41,11 +42,7 @@ public class AiScheduleService {
         List<Role> roles = repositoryCollector.getRoles().findAll();
 
         Map<String, List<Employee>> employees = prepareEmployees(requirementsDto, users);
-        try {
-            verifyUserQuantity(requirementsDto, employees, roles);
-        } catch (NotEnoughEmployees e) {
-            throw e;
-        }
+        verifyUserQuantity(requirementsDto, employees, roles);
 
         List<Shift> shifts = prepareShifts(requirementsDto, predefineShifts, roles);
 
@@ -58,7 +55,9 @@ public class AiScheduleService {
         }
 
         List<org.harmoniapp.harmonidata.entities.Shift> decodedShifts = decodeShifts(chromosome.getGens(), users, predefineShifts, roles);
-        repositoryCollector.getShifts().saveAll(decodedShifts);
+        lastGeneratedShiftIds = repositoryCollector.getShifts().saveAll(decodedShifts).stream()
+                .map(org.harmoniapp.harmonidata.entities.Shift::getId)
+                .toList();
 
         return new AiSchedulerResponse(
                 "Układanie grafiku zakończone pomyślnie", true
@@ -106,7 +105,7 @@ public class AiScheduleService {
 
             scheduleRequirement.shifts()
                     .sort(Comparator.comparing(rs -> predefineShifts.stream()
-                            .filter(ps -> ps.getId().equals((long) rs.shiftId()))
+                            .filter(ps -> ps.getId().equals(rs.shiftId()))
                             .findFirst()
                             .orElseThrow()
                             .getStart())
@@ -219,5 +218,29 @@ public class AiScheduleService {
                         ReqRoleDto::quantity,
                         Integer::sum
                 ));
+    }
+
+    /**
+     * Revokes the last generated schedule.
+     * Removes the last generated shifts if they are not published.
+     *
+     * @return an AiSchedulerResponse containing the result of the revocation
+     */
+    @Transactional
+    public AiSchedulerResponse revokeSchedule() {
+        if (lastGeneratedShiftIds.isEmpty()) {
+            return new AiSchedulerResponse(
+                    "Nie ma żadnego grafiku do usunięcia", null
+            );
+        }
+
+        List<org.harmoniapp.harmonidata.entities.Shift> shifts = repositoryCollector.getShifts().findAllById(lastGeneratedShiftIds);
+        shifts.removeIf(org.harmoniapp.harmonidata.entities.Shift::isPublished);
+        repositoryCollector.getShifts().deleteAll(shifts);
+        lastGeneratedShiftIds = null;
+
+        return new AiSchedulerResponse(
+                "Usunięto ostatnio wygenerowany grafik", null
+        );
     }
 }
