@@ -79,7 +79,7 @@ public class AiScheduleService {
 
         List<Employee> employees = new ArrayList<>();
         for (User user : users) {
-            List<Role> userRoles = user.getRoles();
+            Set<Role> userRoles = user.getRoles();
             for (Role role : userRoles) {
                 if (validRoles.contains(role.getId())) {
                     Employee employee = new Employee(user.getEmployeeId(), role.getName());

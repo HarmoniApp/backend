@@ -148,7 +148,7 @@ public class UserService {
         user.setRoles(
                 userDto.roles().stream()
                         .map(p -> repositoryCollector.getRoles().findById(p.getId()).get())
-                        .toList()
+                        .collect(Collectors.toSet())
         );
 
         String rawPwd = passwordManager.generateCommonTextPassword();
@@ -209,7 +209,7 @@ public class UserService {
         existingUser.setRoles(
                 userDto.roles().stream()
                         .map(p -> repositoryCollector.getRoles().findById(p.getId()).get())
-                        .toList()
+                        .collect(Collectors.toSet())
         );
 
         User response = repositoryCollector.getUsers().save(existingUser);
