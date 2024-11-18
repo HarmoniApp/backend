@@ -3,7 +3,6 @@ package org.harmoniapp.harmoniwebapi.configuration;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.repositories.UserRepository;
-import org.harmoniapp.harmoniwebapi.configuration.AuthorizationManagers.OwnerAuthorizationManager;
 import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomAccessDeniedHandler;
 import org.harmoniapp.harmoniwebapi.exceptionhandling.CustomBasicAuthenticationEntryPoint;
 import org.harmoniapp.harmoniwebapi.filter.AuthoritiesLoggingAfterFilter;
@@ -120,7 +119,7 @@ public class ProjectSecurityConfig {
                         .requestMatchers("/archived-shifts/**").hasRole("ADMIN")
                         .requestMatchers("/contract-type/**").hasRole("ADMIN")
                         .requestMatchers("/excel/**").hasRole("ADMIN")
-                        .requestMatchers("/language/**").hasRole("ADMIN")
+                        .requestMatchers("/language/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/notification/user/{id}/**").access(ownerAuthorizationManager)
                         .requestMatchers("/notification/**").authenticated()
                         .requestMatchers("/pdf/**").hasRole("ADMIN")
@@ -146,7 +145,7 @@ public class ProjectSecurityConfig {
                         .requestMatchers("/group/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/message/history/**",
                                 "/message/last/**").access(conversationMemberQueryParamAuthorizationManager)
-                        .requestMatchers("/message/chat-partners/**").access(ownerQueryParamAuthorizationManager)
+//                        .requestMatchers("/message/chat-partners/**").access(ownerQueryParamAuthorizationManager)
                         .requestMatchers("/message/**").hasAnyRole("USER", "ADMIN")
                 )
                 .httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()))
