@@ -117,7 +117,7 @@ public class ProjectSecurityProdConfig {
                         .requestMatchers("/archived-shifts/**").hasRole("ADMIN")
                         .requestMatchers("/contract-type/**").hasRole("ADMIN")
                         .requestMatchers("/excel/**").hasRole("ADMIN")
-                        .requestMatchers("/language/**").hasRole("ADMIN")
+                        .requestMatchers("/language/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/notification/user/{id}/**").access(ownerAuthorizationManager)
                         .requestMatchers("/notification/**").authenticated()
                         .requestMatchers("/pdf/**").hasRole("ADMIN")
@@ -143,7 +143,7 @@ public class ProjectSecurityProdConfig {
                         .requestMatchers("/group/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/message/history/**",
                                 "/message/last/**").access(conversationMemberQueryParamAuthorizationManager)
-                        .requestMatchers("/message/chat-partners/**").access(ownerQueryParamAuthorizationManager)
+//                        .requestMatchers("/message/chat-partners/**").access(ownerQueryParamAuthorizationManager
                         .requestMatchers("/message/**").hasAnyRole("USER", "ADMIN")
                 )
                 .httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()))
