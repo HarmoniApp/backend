@@ -27,22 +27,17 @@ public class MessageService {
     private final SimpMessagingTemplate messagingTemplate;
     private final TranslationService translationService;
 
-    public PageDto<MessageDto> getChatHistory(Long userId1, Long userId2, Long groupId,
-                                              boolean translate, String targetLanguage,
-                                              int pageNumber, int pageSize) {
-        pageNumber = (pageNumber < 1) ? 0 : pageNumber - 1;
-        pageSize = (pageSize < 1) ? 20 : pageSize;
-        Sort.Direction sortDirection = Sort.Direction.DESC;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, "sentAt"));
-        Page<Message> messages;
+    public List<MessageDto> getChatHistory(Long userId1, Long userId2, Long groupId,
+                                              boolean translate, String targetLanguage) {
+        List<Message> messages;
 
         if (groupId != null) {
-            messages = repositoryCollector.getMessages().findGroupChatHistory(groupId, pageable);
+            messages = repositoryCollector.getMessages().findGroupChatHistory(groupId);
         } else {
-            messages = repositoryCollector.getMessages().findChatHistory(userId1, userId2, pageable);
+            messages = repositoryCollector.getMessages().findChatHistory(userId1, userId2);
         }
 
-        List<MessageDto> messageDtoList = messages.stream()
+        return messages.stream()
                 .map(message -> {
                     String content = message.getContent();
 
@@ -51,12 +46,7 @@ public class MessageService {
                     }
                     return MessageDto.fromEntity(message, content);
                 })
-                .sorted(Comparator.comparing(MessageDto::sentAt))
                 .toList();
-        return new PageDto<>(messageDtoList,
-                messages.getSize(),
-                messages.getNumber() + 1,
-                messages.getTotalPages());
     }
 
 
