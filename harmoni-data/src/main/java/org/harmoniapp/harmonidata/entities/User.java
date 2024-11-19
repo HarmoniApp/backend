@@ -45,11 +45,9 @@ public class User {
 
     @ManyToOne
     @JoinColumn
-    @NotNull(message = "Contract type cannot be null")
     private ContractType contractType;
 
     @Column(name = "contract_signature")
-    @NotNull(message = "Contract signature cannot be null")
     private LocalDate contractSignature;
 
     @Column(name = "contract_expiration")
@@ -62,7 +60,6 @@ public class User {
 
     @ManyToOne
     @JoinColumn
-    @NotNull(message = "Work address cannot be null")
     private Address workAddress;
 
     @ManyToOne
@@ -118,7 +115,6 @@ public class User {
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    @NotEmpty(message = "Roles cannot be null or empty")
     @UniqueElements(message = "Roles must be unique")
     private Set<Role> roles;
 

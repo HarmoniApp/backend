@@ -31,7 +31,6 @@ public class Vacation {
 
     @ManyToOne
     @JoinColumn(name = "contract_type")
-    @NotNull(message = "Contract type is required")
     private ContractType contractType;
 
     @Column(name = "max_available")

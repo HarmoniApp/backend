@@ -39,7 +39,6 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "type_id")
-    @NotNull(message = "Type cannot be null")
     private NotificationType type;
 
     @ColumnDefault("false")

@@ -39,7 +39,6 @@ public class Shift {
 
     @ManyToOne
     @JoinColumn(name = "role_id")
-    @NotNull(message = "Role cannot be null")
     private Role role;
 
     @ColumnDefault("false")
