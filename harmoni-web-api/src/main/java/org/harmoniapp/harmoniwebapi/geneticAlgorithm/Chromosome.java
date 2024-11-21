@@ -1,4 +1,4 @@
-package org.harmoniapp.autoscheduling;
+package org.harmoniapp.harmoniwebapi.geneticAlgorithm;
 
 import lombok.Data;
 

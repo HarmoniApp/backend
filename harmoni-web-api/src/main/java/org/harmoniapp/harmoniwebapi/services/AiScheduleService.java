@@ -1,14 +1,14 @@
 package org.harmoniapp.harmoniwebapi.services;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.autoscheduling.*;
-import org.harmoniapp.autoscheduling.Shift;
 import org.harmoniapp.harmonidata.entities.*;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.configuration.Principle;
 import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.*;
 import org.harmoniapp.harmoniwebapi.contracts.NotificationDto;
 import org.harmoniapp.harmoniwebapi.exception.NotEnoughEmployees;
+import org.harmoniapp.harmoniwebapi.geneticAlgorithm.*;
+import org.harmoniapp.harmoniwebapi.geneticAlgorithm.Shift;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -97,7 +97,7 @@ public class AiScheduleService {
                 }
             }
         }
-        return employees.stream().collect(Collectors.groupingBy(Employee::getRole));
+        return employees.stream().collect(Collectors.groupingBy(Employee::role));
     }
 
     /**
@@ -172,11 +172,11 @@ public class AiScheduleService {
                 decodedShift.setStart(start);
                 decodedShift.setEnd(end);
                 decodedShift.setUser(users.stream()
-                        .filter(u -> u.getEmployeeId().equals(employee.getId()))
+                        .filter(u -> u.getEmployeeId().equals(employee.id()))
                         .findFirst()
                         .orElseThrow());
                 decodedShift.setRole(roles.stream()
-                        .filter(r -> r.getName().equals(employee.getRole()))
+                        .filter(r -> r.getName().equals(employee.id()))
                         .findFirst()
                         .orElseThrow());
                 decodedShift.setPublished(false);

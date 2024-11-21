@@ -80,12 +80,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.harmoniapp</groupId>
-            <artifactId>harmoni-genetic-algorithm</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>33.2.1-jre</version>
