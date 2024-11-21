@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 /**
  * Service for AI schedule generation.
- * Provides methods for generating schedules based on requirements.
+ * Provides methods for generating schedules based on requirements using a genetic algorithm.
  */
 @Service
 @RequiredArgsConstructor
@@ -35,6 +35,7 @@ public class AiScheduleService {
      * Generates a schedule based on the specified requirements.
      *
      * @param requirementsDto the list of schedule requirements to generate the schedule from
+     * @param authentication  the authentication object containing the user's credentials
      * @return an AiSchedulerResponse containing the generated schedule
      */
     public AiSchedulerResponse generateSchedule(List<ScheduleRequirement> requirementsDto, Authentication authentication) {
@@ -50,11 +51,12 @@ public class AiScheduleService {
 
         List<Shift> shifts = prepareShifts(requirementsDto, predefineShifts, roles);
 
-        GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
-        Chromosome chromosome = geneticAlgorithm.run(shifts, employees);
-
         Principle principle = (Principle) authentication.getPrincipal();
         User receiver = repositoryCollector.getUsers().findById(principle.id()).orElseThrow();
+        GenerationListener listener = new AiGenerationListener(messagingTemplate, receiver.getId());
+        GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(1000, listener);
+        Chromosome chromosome = geneticAlgorithm.run(shifts, employees);
+
         if (chromosome.getFitness() < 0.9) {
             createAndSendFailedNotification(receiver);
             return new AiSchedulerResponse(
@@ -291,5 +293,18 @@ public class AiScheduleService {
         notification = repositoryCollector.getNotifications().save(notification);
         messagingTemplate.convertAndSend("/client/notifications/" + user.getId(),
                 NotificationDto.fromEntity(notification));
+    }
+
+    /**
+     * Listener for generation updates in the genetic algorithm.
+     * Sends progress updates to the client via WebSocket.
+     */
+    private record AiGenerationListener(SimpMessagingTemplate messagingTemplate,
+                                        long receiverId) implements GenerationListener {
+        @Override
+        public void onGenerationUpdate(int generation, double fitness) {
+            GeneratingProgressDto response = new GeneratingProgressDto(generation, fitness);
+            messagingTemplate.convertAndSend("/client/fitness/" + receiverId, response);
+        }
     }
 }

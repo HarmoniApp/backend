@@ -1,10 +1,13 @@
 package org.harmoniapp.harmoniwebapi.geneticAlgorithm;
 
+import lombok.AllArgsConstructor;
+
 import java.util.*;
 
 /**
  * Represents the genetic algorithm used to generate schedules.
  */
+@AllArgsConstructor
 public class GeneticAlgorithm {
     private final int populationSize;
     private final int tournamentSize;
@@ -13,36 +16,40 @@ public class GeneticAlgorithm {
     private final double crossoverRate;
     private final ConstraintChecker constraintChecker;
     private final Random random;
+    private final int reportInterval;
+    private final GenerationListener listener;
 
     /**
      * Creates a new GeneticAlgorithm instance with default parameters.
      */
     public GeneticAlgorithm() {
         this.populationSize = 50;
-        this.tournamentSize = populationSize / 5;
+        this.tournamentSize = 10;
         this.maxGenerations = 100000;
         this.mutationRate = 0.02;
         this.crossoverRate = 0.6;
         this.constraintChecker = new ConstraintChecker();
         this.random = new Random();
+        this.reportInterval = 100;
+        this.listener = null;
     }
 
     /**
-     * Creates a new GeneticAlgorithm instance with the specified parameters.
+     * Creates a new GeneticAlgorithm instance with specified parameters.
      *
-     * @param populationSize the size of the population
-     * @param maxGenerations the maximum number of generations
-     * @param mutationRate   the mutation rate
-     * @param crossoverRate  the crossover rate
+     * @param reportInterval the interval at which progress is reported
+     * @param listener       the listener for generation updates
      */
-    public GeneticAlgorithm(int populationSize, int maxGenerations, double mutationRate, double crossoverRate) {
-        this.populationSize = populationSize;
-        this.tournamentSize = populationSize / 5;
-        this.maxGenerations = maxGenerations;
-        this.mutationRate = mutationRate;
-        this.crossoverRate = crossoverRate;
+    public GeneticAlgorithm(int reportInterval, GenerationListener listener) {
+        this.populationSize = 50;
+        this.tournamentSize = 10;
+        this.maxGenerations = 100000;
+        this.mutationRate = 0.02;
+        this.crossoverRate = 0.6;
         this.constraintChecker = new ConstraintChecker();
         this.random = new Random();
+        this.reportInterval = reportInterval;
+        this.listener = listener;
     }
 
     /**
@@ -67,12 +74,11 @@ public class GeneticAlgorithm {
                 bestChromosome = newBestChromosome;
             }
 
-            if (i % 100 == 0) {
-                System.out.println("Generation: " + i + " Fitness: " + bestChromosome.getFitness());
+            if ((i % reportInterval == 0 || bestChromosome.getFitness() == 1) && listener != null) {
+                listener.onGenerationUpdate(i/this.maxGenerations, bestChromosome.getFitness());
             }
 
             if (bestChromosome.getFitness() == 1) {
-                System.out.println("Generation: " + i + " Fitness: " + bestChromosome.getFitness());
                 break;
             }
         }
