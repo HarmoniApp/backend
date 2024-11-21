@@ -96,7 +96,7 @@ public class ConstraintChecker {
      * @return true if the employee count is violated, false otherwise
      */
     private boolean violationsEmployeeCount(Shift shift) {
-        return shift.getEmployees().size() != shift.getRequirements().stream().mapToInt(Requirements::getEmployeesNumber).sum();
+        return shift.getEmployees().size() != shift.getRequirements().stream().mapToInt(Requirements::employeesNumber).sum();
     }
 
     /**
@@ -143,10 +143,10 @@ public class ConstraintChecker {
     private boolean violationsRoleMatch(Shift shift) {
         for (Requirements req : shift.getRequirements()) {
             long count = shift.getEmployees().stream()
-                    .filter(emp -> emp.getRole().equals(req.getRole()))
+                    .filter(emp -> emp.role().equals(req.role()))
                     .count();
 
-            if (count != req.getEmployeesNumber()) {
+            if (count != req.employeesNumber()) {
                 return true;
             }
         }
