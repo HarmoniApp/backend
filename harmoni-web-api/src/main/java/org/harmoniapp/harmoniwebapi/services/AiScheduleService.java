@@ -2,12 +2,15 @@ package org.harmoniapp.harmoniwebapi.services;
 
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.autoscheduling.*;
-import org.harmoniapp.harmonidata.entities.PredefineShift;
-import org.harmoniapp.harmonidata.entities.Role;
-import org.harmoniapp.harmonidata.entities.User;
+import org.harmoniapp.autoscheduling.Shift;
+import org.harmoniapp.harmonidata.entities.*;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
+import org.harmoniapp.harmoniwebapi.configuration.Principle;
 import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.*;
+import org.harmoniapp.harmoniwebapi.contracts.NotificationDto;
 import org.harmoniapp.harmoniwebapi.exception.NotEnoughEmployees;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AiScheduleService {
     private final RepositoryCollector repositoryCollector;
+    private final SimpMessagingTemplate messagingTemplate;
     private List<Long> lastGeneratedShiftIds;
 
     /**
@@ -33,7 +37,7 @@ public class AiScheduleService {
      * @param requirementsDto the list of schedule requirements to generate the schedule from
      * @return an AiSchedulerResponse containing the generated schedule
      */
-    public AiSchedulerResponse generateSchedule(List<ScheduleRequirement> requirementsDto) {
+    public AiSchedulerResponse generateSchedule(List<ScheduleRequirement> requirementsDto, Authentication authentication) {
         requirementsDto.sort(Comparator.comparing(ScheduleRequirement::date));
 
         List<User> users = repositoryCollector.getUsers().findAllActiveWithoutAbsenceInDateRange(
@@ -48,7 +52,11 @@ public class AiScheduleService {
 
         GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
         Chromosome chromosome = geneticAlgorithm.run(shifts, employees);
+
+        Principle principle = (Principle) authentication.getPrincipal();
+        User receiver = repositoryCollector.getUsers().findById(principle.id()).orElseThrow();
         if (chromosome.getFitness() < 0.9) {
+            createAndSendFailedNotification(receiver);
             return new AiSchedulerResponse(
                     "Nie udało się wygenerować grafiku, spróbuj ponownie", false
             );
@@ -59,6 +67,7 @@ public class AiScheduleService {
                 .map(org.harmoniapp.harmonidata.entities.Shift::getId)
                 .toList();
 
+        createAndSendSuccesfuleNotification(receiver);
         return new AiSchedulerResponse(
                 "Układanie grafiku zakończone pomyślnie", true
         );
@@ -242,5 +251,45 @@ public class AiScheduleService {
         return new AiSchedulerResponse(
                 "Usunięto ostatnio wygenerowany grafik", null
         );
+    }
+
+    /**
+     * Creates and sends a notification indicating that the automatic schedule generation was successful.
+     *
+     * @param user the user to whom the notification will be sent
+     */
+    private void createAndSendSuccesfuleNotification(User user) {
+        NotificationType type = repositoryCollector.getNotificationTypes().findById(8L).orElseThrow();
+        Notification notification = Notification.builder()
+                .user(user)
+                .title("Automatyczne układanie grafiku ukończone")
+                .message("Grafik został pomyślnie wygenerowany, zobacz teraz w kalendarzu.")
+                .type(type)
+                .read(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+        notification = repositoryCollector.getNotifications().save(notification);
+        messagingTemplate.convertAndSend("/client/notifications/" + user.getId(),
+                NotificationDto.fromEntity(notification));
+    }
+
+    /**
+     * Creates and sends a notification indicating that the automatic schedule generation failed.
+     *
+     * @param user the user to whom the notification will be sent
+     */
+    private void createAndSendFailedNotification(User user) {
+        NotificationType type = repositoryCollector.getNotificationTypes().findById(7L).orElseThrow();
+        Notification notification = Notification.builder()
+                .user(user)
+                .title("Automatyczne układanie grafiku nie powiodło się")
+                .message("Nie udało się wygenerować grafiku, spróbuj ponownie.")
+                .type(type)
+                .read(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+        notification = repositoryCollector.getNotifications().save(notification);
+        messagingTemplate.convertAndSend("/client/notifications/" + user.getId(),
+                NotificationDto.fromEntity(notification));
     }
 }

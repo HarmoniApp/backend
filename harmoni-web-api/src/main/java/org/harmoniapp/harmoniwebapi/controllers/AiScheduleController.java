@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.AiSchedulerResponse;
 import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.ScheduleRequirement;
 import org.harmoniapp.harmoniwebapi.services.AiScheduleService;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,8 +31,8 @@ public class AiScheduleController {
      * @return an AiSchedulerResponse containing the generated schedule
      */
     @PostMapping("/generate")
-    public AiSchedulerResponse generateSchedule(@Valid @RequestBody List<ScheduleRequirement> requirements) {
-        return service.generateSchedule(requirements);
+    public AiSchedulerResponse generateSchedule(@Valid @RequestBody List<ScheduleRequirement> requirements, Authentication authentication) {
+        return service.generateSchedule(requirements, authentication);
     }
 
     /**
