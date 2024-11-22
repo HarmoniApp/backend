@@ -103,7 +103,7 @@ public class ProjectSecurityConfig {
         //TODO: Change '/ws/**' to require authentication
         http.authorizeHttpRequests(request -> request.requestMatchers("/login", "/error", "/ws/**").permitAll()
                         .requestMatchers("/csrf").authenticated()
-                        .requestMatchers(new AntPathRequestMatcher("/absence/{id}/status/{statusId}", "DELETE")).access(adminOrOwnerAuthorizationManager)
+                        .requestMatchers(new AntPathRequestMatcher("/absence/{id}/status/{statusId}", "DELETE")).authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/absence", "POST"),
                                 new AntPathRequestMatcher("/absence/{id}", "PUT"),
                                 new AntPathRequestMatcher("/absence/archive/{id}", "PATCH")).hasRole("USER")
