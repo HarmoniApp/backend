@@ -70,11 +70,14 @@ public class ShiftService {
      *
      * @param shiftDto the ShiftDto containing the details of the shift to create
      * @return the created ShiftDto
-     * @throws IllegalArgumentException if the user or role ID provided does not exist
+     * @throws IllegalArgumentException if the user or role ID provided does not exist or if the shift start and end times are in the past
      * @throws RuntimeException if an error occurs during creation
      */
     public ShiftDto createShift(ShiftDto shiftDto) {
         try {
+            if(shiftDto.start().isBefore(LocalDateTime.now()) || shiftDto.end().isBefore(LocalDateTime.now())) {
+                throw new IllegalArgumentException("Shift start and end times must be in the future");
+            }
             User user = repositoryCollector.getUsers().findById(shiftDto.userId())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -109,6 +112,9 @@ public class ShiftService {
             Role role = repositoryCollector.getRoles().findByName(shiftDto.roleName());
 
             if (existingShift == null) {
+                if(shiftDto.start().isBefore(LocalDateTime.now()) || shiftDto.end().isBefore(LocalDateTime.now())) {
+                    throw new IllegalArgumentException("Shift start and end times must be in the future");
+                }
                 Shift newShift = new Shift(id, shiftDto.start(), shiftDto.end(), user, role, false);
                 Shift savedShift = repositoryCollector.getShifts().save(newShift);
                 return ShiftDto.fromEntity(savedShift);
