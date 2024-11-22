@@ -36,7 +36,7 @@ public record RoleDto(
         return new RoleDto(
                 role.getId(),
                 role.getName(),
-                role.isSup(),
+                role.getIsSup(),
                 role.getColor());
     }
 
