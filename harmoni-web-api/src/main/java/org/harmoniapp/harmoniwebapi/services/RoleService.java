@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service class for managing roles.
@@ -96,27 +97,24 @@ public class RoleService {
      * @param id the ID of the role to update
      * @param roleDto the RoleDto containing the updated details of the role
      * @return the updated or created RoleDto
+     * @throws IllegalArgumentException if the role to update is the admin role
      * @throws RuntimeException if an error occurs during update
      */
     @Transactional
     public RoleDto updateRole(long id, RoleDto roleDto) {
-        try {
-            Role newRole = roleDto.toEntity();
-            return repositoryCollector.getRoles().findById(id)
-                    .map(role -> {
-                        role.setName(newRole.getName());
-                        role.setSup(newRole.isSup());
-                        role.setColor(newRole.getColor());
-                        Role updatedRole = repositoryCollector.getRoles().save(role);
-                        return RoleDto.fromEntity(updatedRole);
-                    })
-                    .orElseGet(() -> {
-                        Role createdRole = repositoryCollector.getRoles().save(newRole);
-                        return RoleDto.fromEntity(createdRole);
-                    });
-        } catch (Exception e) {
-            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
+        Optional<Role> optionalRole = repositoryCollector.getRoles().findById(id);
+        Role newRole = roleDto.toEntity();
+        if (optionalRole.isEmpty()) {
+            newRole = repositoryCollector.getRoles().save(newRole);
+            return RoleDto.fromEntity(newRole);
         }
+        Role role = optionalRole.get();
+        if (role.getName().equals("admin")) {
+            throw new IllegalArgumentException("Cannot update the admin role");
+        }
+        newRole.setId(role.getId());
+        newRole = repositoryCollector.getRoles().save(newRole);
+        return RoleDto.fromEntity(newRole);
     }
 
     /**
@@ -124,11 +122,14 @@ public class RoleService {
      * If the role is associated with any users, it removes the role from those users before deleting it.
      *
      * @param id the ID of the Role to be deleted
-     * @throws IllegalArgumentException if the role with the specified ID does not exist
+     * @throws IllegalArgumentException if the role with the specified ID does not exist or if the role is the admin role
      */
     public void deleteRole(long id) {
         Role role = repositoryCollector.getRoles().findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Role not found"));
+        if (role.getName().equals("admin")) {
+            throw new IllegalArgumentException("Cannot update the admin role");
+        }
 
         List<User> users = repositoryCollector.getUsers().findByRoles_Id(id);
         if(!users.isEmpty()) {
