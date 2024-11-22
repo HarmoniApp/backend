@@ -121,15 +121,21 @@ public class RoleService {
 
     /**
      * Deletes a role by its ID.
+     * If the role is associated with any users, it removes the role from those users before deleting it.
      *
      * @param id the ID of the Role to be deleted
-     * @throws RuntimeException if an error occurs during deletion
+     * @throws IllegalArgumentException if the role with the specified ID does not exist
      */
     public void deleteRole(long id) {
-        try {
-            repositoryCollector.getRoles().deleteById(id);
-        } catch (Exception e) {
-            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
+        Role role = repositoryCollector.getRoles().findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Role not found"));
+
+        List<User> users = repositoryCollector.getUsers().findByRoles_Id(id);
+        if(!users.isEmpty()) {
+            users.forEach((user -> user.getRoles().remove(role)));
+            repositoryCollector.getUsers().saveAll(users);
         }
+
+        repositoryCollector.getRoles().deleteById(id);
     }
 }

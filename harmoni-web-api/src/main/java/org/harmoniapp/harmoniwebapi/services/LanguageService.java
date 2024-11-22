@@ -2,6 +2,7 @@ package org.harmoniapp.harmoniwebapi.services;
 
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.Language;
+import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.LanguageDto;
 import org.springframework.context.annotation.ComponentScan;
@@ -90,14 +91,18 @@ public class LanguageService {
 
     /**
      * Deletes a language by its ID.
+     * If the language is associated with any users, it removes the language from those users before deleting it.
      *
      * @param id the ID of the language to delete.
      * @throws IllegalArgumentException if the language with the specified ID does not exist.
      */
     public void deleteLanguage(long id) {
-        var languageOptional = repositoryCollector.getLanguages().findById(id);
-        if (languageOptional.isEmpty()) {
-            throw new IllegalArgumentException();
+        Language language = repositoryCollector.getLanguages().findById(id).orElseThrow(IllegalArgumentException::new);
+
+        List<User> users = repositoryCollector.getUsers().findByLanguages_Id(id);
+        if (!users.isEmpty()) {
+            users.forEach(user -> user.getLanguages().remove(language));
+            repositoryCollector.getUsers().saveAll(users);
         }
 
         repositoryCollector.getLanguages().deleteById(id);

@@ -53,4 +53,13 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Page<User> findSupervisors(Pageable pageable);
 
     Optional<User> findByEmail(String email);
+
+    @Query("select u from User u where u.residence.id = ?1 or u.workAddress.id = ?1")
+    List<User> findByResidence_IdOrWorkAddress_Id(Long id);
+
+    List<User> findByContractType_Id(Long id);
+
+    List<User> findByLanguages_Id(Long ids);
+
+    List<User> findByRoles_Id(Long ids);
 }
