@@ -24,14 +24,14 @@ public record SupervisorDto(long id,
 
     /**
      * Converts a {@link User} entity to a {@link SupervisorDto}.
-     * Filters roles based on the {@link Role#isSup()} method and maps them to {@link RoleDto}.
+     * Filters roles based on the {@link Role#getIsSup()} method and maps them to {@link RoleDto}.
      *
      * @param user the {@link User} entity to convert.
      * @return a {@link SupervisorDto} representing the user entity.
      */
     public static SupervisorDto fromEntity(User user) {
         List<RoleDto> roles = user.getRoles().stream()
-                .filter(Role::isSup)
+                .filter(Role::getIsSup)
                 .map(RoleDto::fromEntity)
                 .toList();
 

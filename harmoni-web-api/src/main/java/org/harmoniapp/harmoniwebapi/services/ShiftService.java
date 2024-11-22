@@ -163,7 +163,7 @@ public class ShiftService {
             Shift shift = repositoryCollector.getShifts().findById(id)
                     .orElseThrow(() -> new RuntimeException("Shift not found"));
 
-            if (shift.isPublished()) {
+            if (shift.getPublished()) {
                 deletedShiftNotification(shift);
             }
 

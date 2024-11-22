@@ -1,6 +1,8 @@
 package org.harmoniapp.harmonidata.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,18 +12,21 @@ import org.hibernate.proxy.HibernateProxy;
 import java.util.Objects;
 
 @Entity
-@Table(name = "vacation")
+@Table(name = "vacation", schema = "public",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"absence_type", "contract_type"}))
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Vacation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "absence_type")
+    @NotNull(message = "Absence type is required")
     private AbsenceType absenceType;
 
     @ManyToOne
@@ -29,6 +34,8 @@ public class Vacation {
     private ContractType contractType;
 
     @Column(name = "max_available")
+    @NotNull(message = "Max available is required")
+    @Positive(message = "Max available must be a positive number")
     private Integer maxAvailable;
 
     @Override

@@ -73,7 +73,7 @@ public record AbsenceDto(
                 absence.getSubmission(),
                 absence.getUpdated(),
                 absence.getWorkingDays(),
-                absence.isArchived(),
+                absence.getArchived(),
                 absence.getUser().getEmployeeId()
         );
     }

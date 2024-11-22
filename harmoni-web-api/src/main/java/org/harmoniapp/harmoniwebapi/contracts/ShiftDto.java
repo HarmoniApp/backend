@@ -51,7 +51,7 @@ public record ShiftDto(
                 shift.getEnd(),
                 shift.getUser().getId(),
                 shift.getRole().getName(),
-                shift.isPublished()
+                shift.getPublished()
         );
     }
 
