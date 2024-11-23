@@ -3,6 +3,7 @@ package org.harmoniapp.harmoniwebapi.contracts;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 import org.harmoniapp.harmonidata.entities.ContractType;
 import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.User;
@@ -29,6 +30,7 @@ import java.util.List;
  * @param roles              The roles assigned to the user.
  * @param languages          The languages known by the user.
  */
+@Builder
 public record UserDto(
         long id,
 

@@ -53,4 +53,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Page<User> findSupervisors(Pageable pageable);
 
     Optional<User> findByEmail(String email);
+
+    List<User> findByRoles_IsSupTrue();
+
 }

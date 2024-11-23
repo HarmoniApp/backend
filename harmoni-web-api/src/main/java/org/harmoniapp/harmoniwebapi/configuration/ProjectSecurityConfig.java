@@ -91,7 +91,7 @@ public class ProjectSecurityConfig {
         }));
 
         http.csrf(csrfConfig -> csrfConfig.csrfTokenRequestHandler(csrfTokenRequestHandler)
-                        .ignoringRequestMatchers("/login") //public endpoints
+                        .ignoringRequestMatchers("/**") //public endpoints
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
