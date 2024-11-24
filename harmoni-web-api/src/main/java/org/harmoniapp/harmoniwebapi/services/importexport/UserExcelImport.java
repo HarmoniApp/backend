@@ -1,5 +1,6 @@
 package org.harmoniapp.harmoniwebapi.services.importexport;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -10,7 +11,8 @@ import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.AddressDto;
 import org.harmoniapp.harmoniwebapi.contracts.LanguageDto;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
-import org.harmoniapp.harmoniwebapi.contracts.UserImportResponseDto;
+import org.harmoniapp.harmoniwebapi.exception.EmptyFileException;
+import org.harmoniapp.harmoniwebapi.exception.InvalidCellException;
 import org.harmoniapp.harmoniwebapi.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -35,26 +37,24 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
      * Imports users from an Excel file.
      *
      * @param file the Excel file containing user data.
-     * @return a UserImportResponseDto with the result of the import operation.
-     * @throws RuntimeException if the file is empty, headers are invalid, or an error occurs during import.
+     * @return a ResponseEntity containing a list of UserDto with the result of the import operation.
+     * @throws EmptyFileException if the file is empty.
+     * @throws InvalidCellException if the headers are invalid or an error occurs during import.
      */
-    public ResponseEntity<UserImportResponseDto> importUsers(MultipartFile file) {
+    @Transactional
+    public ResponseEntity<List<UserDto>> importUsers(MultipartFile file) {
         Sheet sheet = readSheet(file);
         Iterator<Row> rows = sheet.rowIterator();
         if (!rows.hasNext()) {
-            throw new RuntimeException("Empty file");
+            throw new EmptyFileException("Empty file");
         }
         List<String> headers = extractHeaders(rows.next());
         if (headers == null) {
-            throw new RuntimeException("Invalid headers");
+            throw new InvalidCellException("Invalid headers");
         }
 
         List<UserDto> userDtoList;
-        try {
-            userDtoList = createUserDtoListFromSpreadsheet(rows, headers);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        userDtoList = createUserDtoListFromSpreadsheet(rows, headers);
 
         List<UserDto> savedUsers = saveUsers(userDtoList);
         updateSupervisors(sheet, headers, savedUsers);
@@ -83,7 +83,8 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
      * Saves a list of user DTOs to the database.
      *
      * @param userDtoList the list of user DTOs to save.
-     * @return a list of saved user DTOs, with null entries for users that could not be saved.
+     * @return a list of saved user DTOs.
+     * @throws InvalidCellException if a user cannot be saved.
      */
     private List<UserDto> saveUsers(List<UserDto> userDtoList) {
         List<UserDto> savedUsers = new ArrayList<>();
@@ -93,7 +94,7 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
                 UserDto newUser = userService.add(userDto);
                 savedUsers.add(newUser);
             } catch (Exception e) {
-                savedUsers.add(null);
+                throw new InvalidCellException("Invalid row: " + (userDtoList.indexOf(userDto) + 2));
             }
         }
         return savedUsers;
@@ -128,24 +129,19 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
      * Generates a response indicating the result of the import operation.
      *
      * @param savedUsers the list of saved user DTOs.
-     * @return a {@link UserImportResponseDto} containing the list of successfully saved users and the list of failed row indices.
+     * @return a ResponseEntity containing the list of successfully saved users.
      */
-    private ResponseEntity<UserImportResponseDto> generateResponse(List<UserDto> savedUsers) {
-        List<Integer> failedRows = new ArrayList<>();
+    private ResponseEntity<List<UserDto>> generateResponse(List<UserDto> savedUsers) {
         List<UserDto> response = new ArrayList<>();
-        for (int i = 0; i < savedUsers.size(); i++) {
-            if (savedUsers.get(i) == null) {
-                failedRows.add(i + 1);
-            } else {
-                UserDto dto = UserDto.builder()
-                        .employeeId(savedUsers.get(i).employeeId())
-                        .email(savedUsers.get(i).email())
-                        .password(savedUsers.get(i).password())
-                        .build();
-                response.add(dto);
-            }
+        for (UserDto savedUser : savedUsers) {
+            UserDto dto = UserDto.builder()
+                    .employeeId(savedUser.employeeId())
+                    .email(savedUser.email())
+                    .password(savedUser.password())
+                    .build();
+            response.add(dto);
         }
-        return new ResponseEntity<>(new UserImportResponseDto(response, failedRows), null, 200);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -178,11 +174,11 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
      * Validates the given row.
      *
      * @param row the row to validate.
-     * @throws RuntimeException if the row is invalid.
+     * @throws InvalidCellException if the row is invalid.
      */
     private void validateRow(Row row) {
         if (row.getLastCellNum() != expectedHeaders.size()) {
-            throw new RuntimeException("Invalid row: " + row.getRowNum());
+            throw new InvalidCellException("Invalid row: " + row.getRowNum());
         }
     }
 
@@ -197,6 +193,7 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
      * @param supervisors   the list of supervisors from the database.
      * @param departments   the list of departments from the database.
      * @return a UserDto created from the row data.
+     * @throws InvalidCellException if the row contains invalid data.
      */
     private UserDto createUserDtoFromRow(Row row, List<String> headers, List<Role> roles, List<Language> languages,
                                          List<ContractType> contractTypes, List<User> supervisors, List<Address> departments) {
@@ -207,6 +204,11 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
         while (cells.hasNext()) {
             Cell cell = cells.next();
             populateUserAndAddressBuilders(cell, headers.get(cell.getColumnIndex()), userBuilder, addressBuilder, roles, languages, contractTypes, supervisors, departments);
+        }
+
+        UserDto preview = userBuilder.build();
+        if (preview.languages().isEmpty() || preview.roles().isEmpty()) {
+            throw new InvalidCellException("Invalid row: " + row.getRowNum());
         }
 
         return userBuilder.residence(addressBuilder.build()).build();

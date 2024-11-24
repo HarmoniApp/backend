@@ -1,10 +1,12 @@
 package org.harmoniapp.harmoniwebapi.services.importexport;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.harmoniwebapi.contracts.UserImportResponseDto;
+import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * Service for importing users from an Excel file.
@@ -19,9 +21,9 @@ public class ImportService {
      * Imports users from an Excel file.
      *
      * @param file the Excel file to import.
-     * @return a UserImportResponseDto with the result of the import operation.
+     * @return a ResponseEntity containing a list of UserDto objects with the result of the import operation.
      */
-    public ResponseEntity<UserImportResponseDto> importUsersFromExcel(MultipartFile file) {
+    public ResponseEntity<List<UserDto>> importUsersFromExcel(MultipartFile file) {
         return userExcelImport.importUsers(file);
     }
 
