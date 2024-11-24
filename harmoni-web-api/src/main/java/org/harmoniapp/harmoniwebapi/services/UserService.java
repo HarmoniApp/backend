@@ -231,7 +231,8 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User with ID " + id + " not found"));
 
         String originalFilename = file.getOriginalFilename();
-        if (originalFilename == null || !(originalFilename.endsWith(".jpg") || originalFilename.endsWith(".png"))) {
+        if (originalFilename == null ||
+                !(originalFilename.endsWith(".jpg") || originalFilename.endsWith(".png") || originalFilename.endsWith(".jpeg"))) {
             throw new IllegalArgumentException("File must be a JPG or PNG image");
         }
 
