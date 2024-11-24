@@ -1,5 +1,10 @@
 package org.harmoniapp.harmoniwebapi.services.importexport;
 
+import com.lowagie.text.Font;
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -13,11 +18,17 @@ import org.harmoniapp.harmoniwebapi.contracts.LanguageDto;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.harmoniapp.harmoniwebapi.exception.EmptyFileException;
 import org.harmoniapp.harmoniwebapi.exception.InvalidCellException;
+import org.harmoniapp.harmoniwebapi.exception.PdfGenerationException;
 import org.harmoniapp.harmoniwebapi.services.UserService;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,11 +49,11 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
      *
      * @param file the Excel file containing user data.
      * @return a ResponseEntity containing a list of UserDto with the result of the import operation.
-     * @throws EmptyFileException if the file is empty.
+     * @throws EmptyFileException   if the file is empty.
      * @throws InvalidCellException if the headers are invalid or an error occurs during import.
      */
     @Transactional
-    public ResponseEntity<List<UserDto>> importUsers(MultipartFile file) {
+    public ResponseEntity<InputStreamResource> importUsers(MultipartFile file) {
         Sheet sheet = readSheet(file);
         Iterator<Row> rows = sheet.rowIterator();
         if (!rows.hasNext()) {
@@ -131,7 +142,26 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
      * @param savedUsers the list of saved user DTOs.
      * @return a ResponseEntity containing the list of successfully saved users.
      */
-    private ResponseEntity<List<UserDto>> generateResponse(List<UserDto> savedUsers) {
+    private ResponseEntity<InputStreamResource> generateResponse(List<UserDto> savedUsers) {
+        List<UserDto> response = createResponseList(savedUsers);
+
+        //TODO: extract PDF generation to a separate class
+        byte[] pdfData = generatePdf(response);
+        ByteArrayInputStream bis = new ByteArrayInputStream(pdfData);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(bis));
+    }
+
+    /**
+     * Creates a list of UserDto objects containing only the employee ID, email, and password
+     * from the provided list of saved UserDto objects.
+     *
+     * @param savedUsers the list of saved UserDto objects
+     * @return a list of UserDto objects with limited fields
+     */
+    private List<UserDto> createResponseList(List<UserDto> savedUsers) {
         List<UserDto> response = new ArrayList<>();
         for (UserDto savedUser : savedUsers) {
             UserDto dto = UserDto.builder()
@@ -141,7 +171,70 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
                     .build();
             response.add(dto);
         }
-        return ResponseEntity.ok(response);
+        return response;
+    }
+
+    /**
+     * Generates a PDF document from a list of UserDto objects.
+     *
+     * @param response the list of UserDto objects to include in the PDF
+     * @return a byte array representing the generated PDF
+     * @throws PdfGenerationException if an error occurs while generating the PDF
+     */
+    private byte[] generatePdf(List<UserDto> response) {
+        Document document = new Document(PageSize.A4.rotate());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            PdfWriter.getInstance(document, out);
+            document.open();
+            Font font = FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Color.BLACK);
+            PdfPTable table = createPdfTable(response, font);
+            document.add(table);
+            document.close();
+        } catch (DocumentException e) {
+            throw new PdfGenerationException("Error while generating PDF");
+        }
+
+        return out.toByteArray();
+    }
+
+    /**
+     * Creates a PDF table with user information.
+     *
+     * @param response the list of UserDto containing user information
+     * @param font     the font to be used in the table
+     * @return a PdfPTable containing the user information
+     * @throws DocumentException if there is an error creating the table
+     */
+    private PdfPTable createPdfTable(List<UserDto> response, Font font) throws DocumentException {
+        PdfPTable table = new PdfPTable(5);
+        table.setWidthPercentage(95);
+        table.setWidths(new int[]{2, 1, 4, 1, 4});
+
+        for (UserDto user : response) {
+            addTableCell(table, user.employeeId(), font);
+            addTableCell(table, "login: ", font);
+            addTableCell(table, user.email(), font);
+            addTableCell(table, "haslo: ", font);
+            addTableCell(table, user.password(), font);
+        }
+
+        return table;
+    }
+
+    /**
+     * Adds a cell to the given PDF table with the specified text and font.
+     *
+     * @param table the PDF table to which the cell is added
+     * @param text  the text to be displayed in the cell
+     * @param font  the font to be used for the cell text
+     */
+    private void addTableCell(PdfPTable table, String text, Font font) {
+        PdfPCell cell = new PdfPCell(new Phrase(text, font));
+        cell.setPadding(10);
+        cell.setNoWrap(true);
+        table.addCell(cell);
     }
 
     /**
