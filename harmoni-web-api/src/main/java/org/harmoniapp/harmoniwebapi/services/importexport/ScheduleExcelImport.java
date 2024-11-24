@@ -8,6 +8,7 @@ import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.exception.InvalidCellException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,17 +22,17 @@ import java.util.List;
  */
 @Component
 @RequiredArgsConstructor
-public class ScheduleExcelImport {
+public class ScheduleExcelImport implements ImportSchedule, ReadWorkbook {
     private final RepositoryCollector repositoryCollector;
 
     /**
-     * Imports a schedule from an Excel sheet.
+     * Imports a schedule from an Excel file.
      *
-     * @param sheet the Excel sheet containing the schedule data.
+     * @param file the Excel file containing the schedule.
      * @return a ResponseEntity with a success message.
-     * @throws IllegalArgumentException if no rows are found in the Excel file.
      */
-    public ResponseEntity<String> importScheduleFromExcel(Sheet sheet) {
+    public ResponseEntity<String> importSchedule(MultipartFile file) {
+        Sheet sheet = readSheet(file);
         List<User> users = repositoryCollector.getUsers().findAllByIsActive(true);
 
         Iterator<Row> rows = sheet.rowIterator();

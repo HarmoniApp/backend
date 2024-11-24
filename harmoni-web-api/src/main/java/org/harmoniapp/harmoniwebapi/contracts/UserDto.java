@@ -32,7 +32,7 @@ import java.util.List;
  */
 @Builder
 public record UserDto(
-        long id,
+        Long id,
 
         @NotEmpty(message = "First name cannot be empty")
         @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
@@ -80,9 +80,9 @@ public record UserDto(
 
         String photo,
 
-        @JsonProperty("is_active") boolean isActive,
+        @JsonProperty("is_active") Boolean isActive,
 
-        @JsonProperty("available_absence_days") int availableAbsenceDays,
+        @JsonProperty("available_absence_days") Integer availableAbsenceDays,
         @JsonProperty("unused_absence_days") Integer unusedAbsenceDays,
 
         @NotEmpty(message = "Roles cannot be null or empty")

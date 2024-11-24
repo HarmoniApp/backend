@@ -1,6 +1,7 @@
 package org.harmoniapp.harmoniwebapi.controllers.importexport;
 
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.harmoniwebapi.contracts.UserImportResponseDto;
 import org.harmoniapp.harmoniwebapi.services.importexport.ImportService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,10 +23,10 @@ public class ImportController {
      * Endpoint to import users from an Excel file.
      *
      * @param file the Excel file to import.
-     * @return a ResponseEntity with the result of the import operation.
+     * @return a UserImportResponseDto with the result of the import operation.
      */
     @PostMapping("/users/import-excel")
-    public ResponseEntity<String> importUsersFromExcel(@RequestPart MultipartFile file) {
+    public ResponseEntity<UserImportResponseDto> importUsersFromExcel(@RequestPart MultipartFile file) {
         return service.importUsersFromExcel(file);
     }
 

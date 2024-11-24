@@ -10,9 +10,11 @@ import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.AddressDto;
 import org.harmoniapp.harmoniwebapi.contracts.LanguageDto;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
+import org.harmoniapp.harmoniwebapi.contracts.UserImportResponseDto;
 import org.harmoniapp.harmoniwebapi.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class UserExcelImport {
+public class UserExcelImport implements ImportUser, ReadWorkbook {
     private final RepositoryCollector repositoryCollector;
     private final UserService userService;
     private final List<String> expectedHeaders = List.of("employee id", "first name", "surname", "email",
@@ -30,30 +32,28 @@ public class UserExcelImport {
             "contract type", "contract signature", "contract expiration", "supervisor employee id", "department name");
 
     /**
-     * Imports users from the given Excel sheet.
+     * Imports users from an Excel file.
      *
-     * <p>This method reads the provided Excel sheet, extracts user data, and saves the users to the database.
-     * It also updates the supervisors for the imported users and generates a response indicating the result
-     * of the import operation.</p>
-     *
-     * @param sheet the Excel sheet containing user data.
-     * @return a {@link ResponseEntity} with a message indicating the result of the import operation.
+     * @param file the Excel file containing user data.
+     * @return a UserImportResponseDto with the result of the import operation.
+     * @throws RuntimeException if the file is empty, headers are invalid, or an error occurs during import.
      */
-    public ResponseEntity<String> importUsers(Sheet sheet) {
+    public ResponseEntity<UserImportResponseDto> importUsers(MultipartFile file) {
+        Sheet sheet = readSheet(file);
         Iterator<Row> rows = sheet.rowIterator();
         if (!rows.hasNext()) {
-            return ResponseEntity.badRequest().body("No rows found");
+            throw new RuntimeException("Empty file");
         }
         List<String> headers = extractHeaders(rows.next());
         if (headers == null) {
-            return ResponseEntity.badRequest().body("Invalid headers");
+            throw new RuntimeException("Invalid headers");
         }
 
         List<UserDto> userDtoList;
         try {
             userDtoList = createUserDtoListFromSpreadsheet(rows, headers);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body("Invalid row: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
 
         List<UserDto> savedUsers = saveUsers(userDtoList);
@@ -102,8 +102,8 @@ public class UserExcelImport {
     /**
      * Updates the supervisors for the saved users.
      *
-     * @param sheet the Excel sheet containing user data.
-     * @param headers the list of headers from the Excel sheet.
+     * @param sheet      the Excel sheet containing user data.
+     * @param headers    the list of headers from the Excel sheet.
      * @param savedUsers the list of saved user DTOs.
      */
     private void updateSupervisors(Sheet sheet, List<String> headers, List<UserDto> savedUsers) {
@@ -128,26 +128,30 @@ public class UserExcelImport {
      * Generates a response indicating the result of the import operation.
      *
      * @param savedUsers the list of saved user DTOs.
-     * @return a {@link ResponseEntity} with a message indicating the result of the import operation.
+     * @return a {@link UserImportResponseDto} containing the list of successfully saved users and the list of failed row indices.
      */
-    private ResponseEntity<String> generateResponse(List<UserDto> savedUsers) {
+    private ResponseEntity<UserImportResponseDto> generateResponse(List<UserDto> savedUsers) {
         List<Integer> failedRows = new ArrayList<>();
+        List<UserDto> response = new ArrayList<>();
         for (int i = 0; i < savedUsers.size(); i++) {
             if (savedUsers.get(i) == null) {
                 failedRows.add(i + 1);
+            } else {
+                UserDto dto = UserDto.builder()
+                        .employeeId(savedUsers.get(i).employeeId())
+                        .email(savedUsers.get(i).email())
+                        .password(savedUsers.get(i).password())
+                        .build();
+                response.add(dto);
             }
         }
-        if (failedRows.isEmpty()) {
-            return ResponseEntity.ok("Imported users from excel");
-        } else {
-            return ResponseEntity.ok().body("Imported users from excel, but some rows failed: " + failedRows);
-        }
+        return new ResponseEntity<>(new UserImportResponseDto(response, failedRows), null, 200);
     }
 
     /**
      * Creates a list of user DTOs from the spreadsheet.
      *
-     * @param rows the iterator over the rows of the spreadsheet.
+     * @param rows    the iterator over the rows of the spreadsheet.
      * @param headers the list of headers from the spreadsheet.
      * @return a list of user DTOs created from the spreadsheet.
      * @throws RuntimeException if a row is invalid.
@@ -162,7 +166,6 @@ public class UserExcelImport {
 
         while (rows.hasNext()) {
             Row row = rows.next();
-            System.out.println(row.getRowNum());
             validateRow(row);
             UserDto userDto = createUserDtoFromRow(row, headers, roles, languages, contractTypes, supervisors, departments);
             userDtoList.add(userDto);
@@ -186,13 +189,13 @@ public class UserExcelImport {
     /**
      * Creates a UserDto from a row in the spreadsheet.
      *
-     * @param row the row containing user data.
-     * @param headers the list of headers from the spreadsheet.
-     * @param roles the list of roles from the database.
-     * @param languages the list of languages from the database.
+     * @param row           the row containing user data.
+     * @param headers       the list of headers from the spreadsheet.
+     * @param roles         the list of roles from the database.
+     * @param languages     the list of languages from the database.
      * @param contractTypes the list of contract types from the database.
-     * @param supervisors the list of supervisors from the database.
-     * @param departments the list of departments from the database.
+     * @param supervisors   the list of supervisors from the database.
+     * @param departments   the list of departments from the database.
      * @return a UserDto created from the row data.
      */
     private UserDto createUserDtoFromRow(Row row, List<String> headers, List<Role> roles, List<Language> languages,
@@ -212,15 +215,15 @@ public class UserExcelImport {
     /**
      * Populates the user and address builders with data from the given cell.
      *
-     * @param cell the cell containing the data.
-     * @param header the header corresponding to the cell.
-     * @param userBuilder the builder for creating a UserDto.
+     * @param cell           the cell containing the data.
+     * @param header         the header corresponding to the cell.
+     * @param userBuilder    the builder for creating a UserDto.
      * @param addressBuilder the builder for creating an AddressDto.
-     * @param roles the list of roles from the database.
-     * @param languages the list of languages from the database.
-     * @param contractTypes the list of contract types from the database.
-     * @param supervisors the list of supervisors from the database.
-     * @param departments the list of departments from the database.
+     * @param roles          the list of roles from the database.
+     * @param languages      the list of languages from the database.
+     * @param contractTypes  the list of contract types from the database.
+     * @param supervisors    the list of supervisors from the database.
+     * @param departments    the list of departments from the database.
      */
     private void populateUserAndAddressBuilders(Cell cell, String header, UserDto.UserDtoBuilder userBuilder,
                                                 AddressDto.AddressDtoBuilder addressBuilder, List<Role> roles, List<Language> languages,
@@ -251,7 +254,7 @@ public class UserExcelImport {
     /**
      * Retrieves a list of roles based on the provided role names.
      *
-     * @param roles the comma-separated role names.
+     * @param roles    the comma-separated role names.
      * @param roleList the list of roles to filter from.
      * @return a list of roles that match the provided names.
      */
@@ -264,7 +267,7 @@ public class UserExcelImport {
     /**
      * Retrieves a list of language DTOs based on the provided language names.
      *
-     * @param languages the comma-separated language names.
+     * @param languages    the comma-separated language names.
      * @param languageList the list of languages to filter from.
      * @return a list of language DTOs that match the provided names.
      */
@@ -279,7 +282,7 @@ public class UserExcelImport {
      * Retrieves a contract type based on the provided contract type name.
      *
      * @param contractTypeName the name of the contract type to find.
-     * @param contractTypes the list of contract types to search.
+     * @param contractTypes    the list of contract types to search.
      * @return the matching contract type, or null if no match is found.
      */
     private ContractType getContractType(String contractTypeName, List<ContractType> contractTypes) {
@@ -293,7 +296,7 @@ public class UserExcelImport {
      * Retrieves the supervisor ID based on the provided supervisor employee ID.
      *
      * @param supervisorEmployeeId the employee ID of the supervisor to find.
-     * @param supervisors the list of supervisors to search.
+     * @param supervisors          the list of supervisors to search.
      * @return the ID of the matching supervisor, or -1L if no match is found.
      */
     private Long getSupervisorId(String supervisorEmployeeId, List<User> supervisors) {
@@ -308,7 +311,7 @@ public class UserExcelImport {
      * Retrieves the department address based on the provided department name.
      *
      * @param departmentName the name of the department to find.
-     * @param departments the list of departments to search.
+     * @param departments    the list of departments to search.
      * @return the address of the matching department, or null if no match is found.
      */
     private AddressDto getDepartment(String departmentName, List<Address> departments) {
