@@ -225,7 +225,7 @@ public class UserService {
      * @throws IllegalArgumentException if the user is not found or the file format is not supported.
      */
     public UserDto uploadPhoto(long id, MultipartFile file) {
-        List<String> defaultPhotos = List.of("default.jpg", "man.jpg", "women.jpg");
+        List<String> defaultPhotos = List.of("default.jpg", "man.jpg", "woman.jpg");
 
         User user = repositoryCollector.getUsers().findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User with ID " + id + " not found"));
