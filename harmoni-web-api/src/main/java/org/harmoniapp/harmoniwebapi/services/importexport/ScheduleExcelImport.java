@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
+import org.harmoniapp.harmoniwebapi.exception.EmptyFileException;
 import org.harmoniapp.harmoniwebapi.exception.InvalidCellException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +32,8 @@ public class ScheduleExcelImport implements ImportSchedule, ReadWorkbook {
      *
      * @param file the Excel file containing the schedule.
      * @return a ResponseEntity with a success message.
+     * @throws EmptyFileException if no rows are found in the Excel file.
+     * @throws InvalidCellException if an invalid employee ID is found in the Excel file.
      */
     public ResponseEntity<String> importSchedule(MultipartFile file) {
         Sheet sheet = readSheet(file);
@@ -37,14 +41,22 @@ public class ScheduleExcelImport implements ImportSchedule, ReadWorkbook {
 
         Iterator<Row> rows = sheet.rowIterator();
         if (!rows.hasNext()) {
-            throw new IllegalArgumentException("No rows found in the Excel file");
+            throw new EmptyFileException("No rows found in the Excel file");
         }
-        List<String> header = extractHeaders(rows.next());
+        List<LocalDateTime> dateHeaders = extractHeaders(rows.next());
         List<Shift> shiftList = new ArrayList<>();
         while (rows.hasNext()) {
             Row row = rows.next();
-            String employeeId = row.getCell(header.indexOf("employee id")).getStringCellValue();
-            processRow(row, header, users, shiftList, employeeId);
+
+            Cell empCell = row.getCell(0);
+            String empId = getCellValueAsString(empCell);
+            User user = users.stream()
+                    .filter(u -> u.getEmployeeId().equals(empId))
+                    .findFirst()
+                    .orElseThrow(() -> new InvalidCellException("Invalid cell: "
+                            + empCell.getAddress().formatAsString() + " - invalid employee ID"));
+
+            processRow(row, dateHeaders, user, shiftList);
         }
         repositoryCollector.getShifts().saveAll(shiftList);
         return ResponseEntity.ok("Schedule imported successfully");
@@ -52,39 +64,67 @@ public class ScheduleExcelImport implements ImportSchedule, ReadWorkbook {
     }
 
     /**
-     * Processes a row from the Excel sheet and creates shifts.
+     * Processes a row from the Excel sheet and creates shifts for the user.
      *
-     * @param row the row to process.
-     * @param header the list of headers from the Excel sheet.
-     * @param users the list of active users.
-     * @param shiftList the list to add created shifts to.
-     * @param employeeId the employee ID of the user.
+     * @param row       the row to process
+     * @param header    the list of date headers
+     * @param user      the user associated with the row
+     * @param shiftList the list to add the created shifts to
      */
-    private void processRow(Row row, List<String> header, List<User> users, List<Shift> shiftList, String employeeId) {
-        for (int i = 1; i < header.size(); i++) {
-            Cell cell = row.getCell(i);
-            cell.setCellType(CellType.STRING);
-            String cellValue = cell.getStringCellValue().trim();
+    private void processRow(Row row, List<LocalDateTime> header, User user, List<Shift> shiftList) {
+        for (int i = 0; i < header.size(); i++) {
+            Cell cell = row.getCell(i + 1);
+            String cellValue = getCellValueAsString(cell);
             if (cellValue.isEmpty()) {
                 continue;
             }
-            LocalDateTime day = LocalDate.parse(header.get(i)).atStartOfDay();
+
+            LocalDateTime day = header.get(i);
             List<String> workHours = List.of(cellValue.split("-", 2));
             LocalDateTime start = parseTime(workHours.get(0), day, cell);
             LocalDateTime end = parseTime(workHours.get(1), day, cell);
             if (start.isAfter(end)) {
                 end = end.plusDays(1);
             }
-            Shift shift = createShift(users, employeeId, start, end);
+
+            Shift shift = createShift(user, start, end);
             shiftList.add(shift);
         }
+    }
+
+    /**
+     * Converts the value of a cell to a string.
+     *
+     * @param cell the cell to convert
+     * @return the string value of the cell
+     */
+    private String getCellValueAsString(Cell cell) {
+        cell.setCellType(CellType.STRING);
+        return cell.getStringCellValue().trim();
+    }
+
+    /**
+     * Creates a new Shift object.
+     *
+     * @param user  the user associated with the shift
+     * @param start the start time of the shift
+     * @param end   the end time of the shift
+     * @return a new Shift object
+     */
+    private Shift createShift(User user, LocalDateTime start, LocalDateTime end) {
+        return Shift.builder()
+                .user(user)
+                .start(start)
+                .end(end)
+                .published(false)
+                .build();
     }
 
     /**
      * Parses a time string and combines it with a given day to create a LocalDateTime.
      *
      * @param time the time string to parse, expected format: HH:mm
-     * @param day the day to combine with the parsed time
+     * @param day  the day to combine with the parsed time
      * @param cell the cell containing the time string, used for error reporting
      * @return a LocalDateTime combining the given day and parsed time
      * @throws InvalidCellException if the time string is invalid
@@ -99,49 +139,35 @@ public class ScheduleExcelImport implements ImportSchedule, ReadWorkbook {
     }
 
     /**
-     * Creates a Shift object for a given user and time range.
-     *
-     * @param users the list of active users.
-     * @param employeeId the employee ID of the user.
-     * @param start the start time of the shift.
-     * @param end the end time of the shift.
-     * @return a Shift object for the given user and time range.
-     * @throws IllegalArgumentException if the user is not found.
-     */
-    private Shift createShift(List<User> users, String employeeId, LocalDateTime start, LocalDateTime end) {
-        User user = users.stream()
-                .filter(u -> u.getEmployeeId().equals(employeeId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return Shift.builder()
-                .user(user)
-                .start(start)
-                .end(end)
-                .published(false)
-                .build();
-    }
-
-    /**
      * Extracts headers from the given header row.
      *
      * @param headerRow the row containing the headers.
      * @return a list of headers extracted from the row.
-     * @throws IllegalArgumentException if the "employee id" column is not found.
+     * @throws EmptyFileException if no headers are found in the Excel file.
+     * @throws InvalidCellException if the "employee id" column is not found or if a date cell has an invalid format.
      */
-    private List<String> extractHeaders(Row headerRow) {
-        List<String> headers = new ArrayList<>();
-        DataFormatter dataFormatter = new DataFormatter();
+    private List<LocalDateTime> extractHeaders(Row headerRow) {
+        List<LocalDateTime> headers = new ArrayList<>();
         short dataFormat = headerRow.getSheet().getWorkbook().getCreationHelper().createDataFormat().getFormat("yyyy-mm-dd");
-        for (Cell cell : headerRow) {
-            if (cell.getCellType() == CellType.STRING) {
-                headers.add(cell.getStringCellValue().toLowerCase());
-            } else {
-                cell.getCellStyle().setDataFormat(dataFormat);
-                headers.add(dataFormatter.formatCellValue(cell));
-            }
+
+        Iterator<Cell> cellIterator = headerRow.cellIterator();
+        if (!cellIterator.hasNext()) {
+            throw new EmptyFileException("No headers found in the Excel file");
         }
-        if (!headers.getFirst().equals("employee id")) {
-            throw new IllegalArgumentException("Employee ID column not found in the Excel file");
+        Cell cell = cellIterator.next();
+        if (!cell.getStringCellValue().equalsIgnoreCase("employee id")) {
+            throw new InvalidCellException("Invalid cell: " + cell.getAddress().formatAsString()
+                    + " - expected header: Employee ID");
+        }
+        while (cellIterator.hasNext()) {
+            cell = cellIterator.next();
+            cell.getCellStyle().setDataFormat(dataFormat);
+            try {
+                LocalDateTime date = cell.getLocalDateTimeCellValue();
+                headers.add(date);
+            } catch (IllegalStateException e) {
+                throw new InvalidCellException("Invalid cell: " + cell.getAddress().formatAsString() + " - expected date format");
+            }
         }
         return headers;
     }
