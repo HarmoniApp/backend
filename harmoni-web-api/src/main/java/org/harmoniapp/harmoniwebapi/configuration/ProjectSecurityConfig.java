@@ -133,7 +133,9 @@ public class ProjectSecurityConfig {
                         .requestMatchers("/user/simple/**",
                                 "/user/supervisor",
                                 "/user/search").hasRole("ADMIN")
-                        .requestMatchers(new AntPathRequestMatcher("/user/{id}/changePassword")).access(ownerAuthorizationManager)
+                        .requestMatchers(new AntPathRequestMatcher("/user/{id}/changePassword"),
+                                new AntPathRequestMatcher("/user/{id}/uploadPhoto"),
+                                new AntPathRequestMatcher("/user/{id}/defaultPhoto")).access(ownerAuthorizationManager)
                         .requestMatchers(new AntPathRequestMatcher("/user/{id}", "GET")).access(adminOrOwnerAuthorizationManager)
                         .requestMatchers("/user/**").hasRole("ADMIN")
                         .requestMatchers("/calendar/user/{id}/**").access(adminOrOwnerAuthorizationManager)

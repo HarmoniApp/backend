@@ -105,7 +105,7 @@ public class UserController {
      * @param file The MultipartFile representing the uploaded photo. Must be either JPG or PNG format.
      * @return The updated UserDto object with the new photo path.
      */
-    @PatchMapping("/{id}/upload-photo")
+    @PatchMapping("/{id}/uploadPhoto")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto uploadPhoto(@PathVariable long id, @RequestParam("file") MultipartFile file) {
         return service.uploadPhoto(id, file);
@@ -119,7 +119,7 @@ public class UserController {
      * @throws IllegalArgumentException if the user with the specified ID is not found.
      * @throws RuntimeException         if there is an error deleting the old photo file.
      */
-    @PatchMapping("/{id}/default-photo")
+    @PatchMapping("/{id}/defaultPhoto")
     public UserDto setDefaultPhoto(@PathVariable long id) {
         return service.setDefaultPhoto(id);
     }
