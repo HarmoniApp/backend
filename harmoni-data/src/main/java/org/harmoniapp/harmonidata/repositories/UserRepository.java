@@ -54,6 +54,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     Optional<User> findByEmail(String email);
 
-    List<User> findByRoles_IsSupTrue();
+    List<User> findByRoles_IsSupTrueAndIsActiveTrue();
 
 }

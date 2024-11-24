@@ -101,7 +101,7 @@ public class ProjectSecurityProdConfig {
 //        http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()); //Only HTTP
         http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()); //Only HTTPS
 
-        http.authorizeHttpRequests(request -> request.requestMatchers("/login", "/error").permitAll()
+        http.authorizeHttpRequests(request -> request.requestMatchers("/login", "/error", "/ws/**").permitAll()
                         .requestMatchers("/csrf").authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/absence/{id}/status/{statusId}", "DELETE")).access(adminOrOwnerAuthorizationManager)
                         .requestMatchers(new AntPathRequestMatcher("/absence", "POST"),
