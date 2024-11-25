@@ -367,6 +367,7 @@ public class UserService {
         user.setPasswordExpirationDate(LocalDate.now().plusMonths(6));
         user.setFailedLoginAttempts(0);
 
+        repositoryCollector.getUsers().save(user);
         return "Password changed successfully";
     }
 
