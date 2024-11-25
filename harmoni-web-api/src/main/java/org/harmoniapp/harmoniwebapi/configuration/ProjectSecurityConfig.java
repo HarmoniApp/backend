@@ -100,7 +100,6 @@ public class ProjectSecurityConfig {
         http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()); //Only HTTP
 //        http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()); //Only HTTPS
 
-        //TODO: Change '/ws/**' to require authentication
         http.authorizeHttpRequests(request -> request.requestMatchers("/login", "/error", "/ws/**").permitAll()
                         .requestMatchers("/csrf").authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/absence/{id}/status/{statusId}", "DELETE")).authenticated()

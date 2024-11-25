@@ -62,4 +62,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     List<User> findByLanguages_Id(Long ids);
 
     List<User> findByRoles_Id(Long ids);
+
+    List<User> findByRoles_IsSupTrueAndIsActiveTrue();
+
 }

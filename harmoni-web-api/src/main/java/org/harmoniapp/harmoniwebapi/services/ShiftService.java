@@ -1,6 +1,5 @@
 package org.harmoniapp.harmoniwebapi.services;
 
-import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.NotificationType;
 import org.harmoniapp.harmonidata.entities.Role;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service class for managing shifts.
