@@ -69,4 +69,16 @@ public class SecurityService {
         }
         return true;
     }
+
+    /**
+     * Checks if the authenticated user is the owner od an absence.
+     *
+     * @param id id of the absence to check
+     * @param authentication the {@link Authentication} object containing the user's authentication details
+     * @return {@code true} if the user is the owner of all absences, {@code false} otherwise
+     */
+    public boolean isAbsenceOwner(long id, Authentication authentication) {
+        Principle principle = (Principle) authentication.getPrincipal();
+        return repositoryCollector.getAbsences().existsByUserIdAndId(principle.id(), id);
+    }
 }
