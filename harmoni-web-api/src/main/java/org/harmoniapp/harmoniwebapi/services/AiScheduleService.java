@@ -178,7 +178,7 @@ public class AiScheduleService {
                         .findFirst()
                         .orElseThrow());
                 decodedShift.setRole(roles.stream()
-                        .filter(r -> r.getName().equals(employee.id()))
+                        .filter(r -> r.getName().equals(employee.role()))
                         .findFirst()
                         .orElseThrow());
                 decodedShift.setPublished(false);
