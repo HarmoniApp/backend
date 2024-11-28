@@ -66,6 +66,7 @@ public class RoleService {
         try {
             var role = repositoryCollector.getRoles().findAll(Sort.by("name"));
             return role.stream()
+                    .filter(r -> !r.getName().equals("admin"))
                     .map(RoleDto::fromEntity)
                     .toList();
         } catch (Exception e) {
