@@ -1,6 +1,7 @@
 package org.harmoniapp.harmonidata.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import org.hibernate.proxy.HibernateProxy;
 import java.util.Objects;
 
 @Entity
-@Table(name = "absence_type")
+@Table(name = "absence_type", schema = "public")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,6 +22,8 @@ public class AbsenceType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    @NotEmpty(message = "Name cannot be empty")
     private String name;
 
     @Override

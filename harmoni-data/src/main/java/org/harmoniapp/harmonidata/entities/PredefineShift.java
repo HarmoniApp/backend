@@ -1,6 +1,8 @@
 package org.harmoniapp.harmonidata.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,18 +19,21 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PredefineShift {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    @NotEmpty(message = "Name is required")
     private String name;
 
     @Column(name = "\"start\"")
-    @Temporal(TemporalType.TIME)
+    @NotNull(message = "Start time is required")
     private LocalTime start;
 
     @Column(name = "\"end\"")
-    @Temporal(TemporalType.TIME)
+    @NotNull(message = "End time is required")
     private LocalTime end;
 
     @Override

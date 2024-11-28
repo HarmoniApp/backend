@@ -2,11 +2,8 @@ package org.harmoniapp.harmoniwebapi.services;
 
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.ContractType;
-import org.harmoniapp.harmonidata.entities.Role;
-import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.ContractTypeDto;
-import org.harmoniapp.harmoniwebapi.contracts.RoleDto;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
@@ -88,12 +85,23 @@ public class ContractTypeService {
         }
     }
 
+    /**
+     * Deletes a contract type by its ID.
+     * If the contract type is associated with any users, it removes the contract type from those users before deleting it.
+     *
+     * @param id the ID of the contract type to delete
+     * @throws IllegalArgumentException if the contract type with the specified ID does not exist
+     */
     public void deleteContractType(long id) {
-        try {
-            repositoryCollector.getContractTypes().deleteById(id);
-        } catch (Exception e) {
-            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
+        if (!repositoryCollector.getContractTypes().existsById(id)) {
+            throw new IllegalArgumentException("ContractType with ID " + id + " not found");
         }
-    }
+        var users = repositoryCollector.getUsers().findByContractType_Id(id);
+        if (!users.isEmpty()) {
+            users.forEach(user -> user.setContractType(null));
+            repositoryCollector.getUsers().saveAll(users);
+        }
 
+        repositoryCollector.getContractTypes().deleteById(id);
+    }
 }

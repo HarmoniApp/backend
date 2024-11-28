@@ -57,7 +57,7 @@ public record NotificationDto(
                 notification.getTitle(),
                 notification.getMessage(),
                 notification.getType().getTypeName(),
-                notification.isRead(),
+                notification.getRead(),
                 notification.getCreatedAt()
         );
     }

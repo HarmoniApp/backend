@@ -135,7 +135,7 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Department with ID " + userDto.workAddress().id() + " not found"));
 
         user.setWorkAddress(workAddress);
-        user.setActive(true);
+        user.setIsActive(true);
         user.setPhoto("default.jpg");
         user.setAvailableAbsenceDays(contractType.getAbsenceDays());
         user.setPasswordExpirationDate(LocalDate.now().minusDays(1));
@@ -312,11 +312,11 @@ public class UserService {
         var user = repositoryCollector.getUsers().findById(id)
                 .orElseThrow(IllegalArgumentException::new);
 
-        if (!user.isActive()) {
+        if (!user.getIsActive()) {
             throw new IllegalStateException("User is already deactivated.");
         }
 
-        user.setActive(false);
+        user.setIsActive(false);
         repositoryCollector.getUsers().save(user);
     }
 

@@ -172,6 +172,8 @@ public class AbsenceController {
      * @param id the ID of the absence to be deleted
      */
     @DeleteMapping("/{id}/status/{statusId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@securityService.isAbsenceOwner(#id, authentication)")
     public void deleteAbsence(@PathVariable long id, @PathVariable long statusId) {
         absenceService.deleteAbsence(id, statusId);
     }

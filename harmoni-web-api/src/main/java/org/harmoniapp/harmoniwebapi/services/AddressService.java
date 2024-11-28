@@ -3,6 +3,7 @@ package org.harmoniapp.harmoniwebapi.services;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.Address;
+import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.AddressDto;
 import org.springframework.stereotype.Service;
@@ -121,15 +122,27 @@ public class AddressService {
 
     /**
      * Deletes an address by its ID.
+     * If the address is associated with any users, it removes the address from those users before deleting it.
      *
      * @param id The ID of the address to delete.
      * @throws EntityNotFoundException if the address with the specified ID is not found.
      */
     public void deleteAddress(long id) {
-        Address address = repositoryCollector.getAddresses()
-                .findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+        if(!repositoryCollector.getAddresses().existsById(id)) {
+            throw new EntityNotFoundException("Address with ID " + id + " not found");
+        }
 
-        repositoryCollector.getAddresses().delete(address);
+        List<User> userList = repositoryCollector.getUsers().findByResidence_IdOrWorkAddress_Id(id);
+        for (User user : userList) {
+            if (user.getResidence().getId().equals(id)) {
+                user.setResidence(null);
+            }
+            if (user.getWorkAddress().getId().equals(id)) {
+                user.setWorkAddress(null);
+            }
+        }
+        repositoryCollector.getUsers().saveAll(userList);
+
+        repositoryCollector.getAddresses().deleteById(id);
     }
 }
