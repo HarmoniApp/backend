@@ -124,7 +124,8 @@ public class ProjectSecurityConfig {
                         .requestMatchers("/notification/**").authenticated()
                         .requestMatchers("/pdf/**").hasRole("ADMIN")
                         .requestMatchers("/predefine-shift/**").hasRole("ADMIN")
-                        .requestMatchers("/role/**").hasRole("ADMIN") // role/user/{id} only for admin?
+                        .requestMatchers("/role/user/{id}/**").access(adminOrOwnerAuthorizationManager)
+                        .requestMatchers("/role/**").hasRole("ADMIN")
                         .requestMatchers("/shift/range").access(adminOrOwnerQueryParamAuthorizationManager)
                         .requestMatchers(new AntPathRequestMatcher("/shift/{id}", "GET")).authenticated()
                         .requestMatchers("/shift/**").hasRole("ADMIN")
@@ -136,7 +137,7 @@ public class ProjectSecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/user/{id}/changePassword"),
                                 new AntPathRequestMatcher("/user/{id}/uploadPhoto"),
                                 new AntPathRequestMatcher("/user/{id}/defaultPhoto")).access(ownerAuthorizationManager)
-                        .requestMatchers(new AntPathRequestMatcher("/user/{id}", "GET")).access(adminOrOwnerAuthorizationManager)
+                        .requestMatchers(new AntPathRequestMatcher("/user/{id}/**", "GET")).access(adminOrOwnerAuthorizationManager)
                         .requestMatchers("/user/**").hasRole("ADMIN")
                         .requestMatchers("/calendar/user/{id}/**").access(adminOrOwnerAuthorizationManager)
                         .requestMatchers("/userPhoto/**").hasAnyRole("USER", "ADMIN")

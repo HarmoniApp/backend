@@ -122,7 +122,8 @@ public class ProjectSecurityProdConfig {
                         .requestMatchers("/notification/**").authenticated()
                         .requestMatchers("/pdf/**").hasRole("ADMIN")
                         .requestMatchers("/predefine-shift/**").hasRole("ADMIN")
-                        .requestMatchers("/role/**").hasRole("ADMIN") // role/user/{id} only for admin?
+                        .requestMatchers("/role/user/{id}/**").access(adminOrOwnerAuthorizationManager)
+                        .requestMatchers("/role/**").hasRole("ADMIN")
                         .requestMatchers("/shift/range").access(adminOrOwnerQueryParamAuthorizationManager)
                         .requestMatchers(new AntPathRequestMatcher("/shift/{id}", "GET")).authenticated()
                         .requestMatchers("/shift/**").hasRole("ADMIN")
@@ -133,7 +134,8 @@ public class ProjectSecurityProdConfig {
                                 "/user/search").hasRole("ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/user/{id}/changePassword"),
                                 new AntPathRequestMatcher("/user/{id}/uploadPhoto"),
-                                new AntPathRequestMatcher("/user/{id}/defaultPhoto")).access(ownerAuthorizationManager)                        .requestMatchers(new AntPathRequestMatcher("/user/{id}", "GET")).access(adminOrOwnerAuthorizationManager)
+                                new AntPathRequestMatcher("/user/{id}/defaultPhoto")).access(ownerAuthorizationManager)
+                        .requestMatchers(new AntPathRequestMatcher("/user/{id}/**", "GET")).access(adminOrOwnerAuthorizationManager)
                         .requestMatchers("/user/**").hasRole("ADMIN")
                         .requestMatchers("/calendar/user/{id}/**").access(adminOrOwnerAuthorizationManager)
                         .requestMatchers("/userPhoto/**").hasAnyRole("USER", "ADMIN")
@@ -144,7 +146,7 @@ public class ProjectSecurityProdConfig {
                         .requestMatchers("/group/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/message/history/**",
                                 "/message/last/**").access(conversationMemberQueryParamAuthorizationManager)
-//                        .requestMatchers("/message/chat-partners/**").access(ownerQueryParamAuthorizationManager
+//                        .requestMatchers("/message/chat-partners/**").access(ownerQueryParamAuthorizationManager)
                         .requestMatchers("/message/**").hasAnyRole("USER", "ADMIN")
                 )
                 .httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()))
