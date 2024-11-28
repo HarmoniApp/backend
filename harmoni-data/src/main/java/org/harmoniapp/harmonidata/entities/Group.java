@@ -1,11 +1,13 @@
 package org.harmoniapp.harmonidata.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import java.util.Objects;
 import java.util.Set;
@@ -21,6 +23,7 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotEmpty(message = "Group name cannot be empty")
     private String name;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -29,6 +32,7 @@ public class Group {
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
+    @UniqueElements(message = "Group members must be unique")
     private Set<User> members;
 
     @Override

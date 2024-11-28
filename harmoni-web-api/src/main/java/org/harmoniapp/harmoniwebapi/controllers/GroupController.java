@@ -16,7 +16,7 @@ public class GroupController {
     private final GroupService service;
 
     @GetMapping("/details/{groupId}")
-    public GroupDto getGroupById(@PathVariable("groupId") Long groupId) {
+    public GroupDto getGroupById(@PathVariable Long groupId) {
         return service.getGroupById(groupId);
     }
 

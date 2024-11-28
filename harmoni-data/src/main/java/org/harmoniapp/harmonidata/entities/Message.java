@@ -1,12 +1,14 @@
 package org.harmoniapp.harmonidata.entities;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
@@ -25,14 +27,13 @@ public class Message {
 
     @ManyToOne
     @JoinColumn(name = "sender_id")
+    @NotNull
     private User sender;
 
-    @Nullable
     @ManyToOne
     @JoinColumn(name = "receiver_id")
     private User receiver;
 
-    @Nullable
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
@@ -41,10 +42,12 @@ public class Message {
     private String content;
 
     @Column(name = "sent_at")
-    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private LocalDateTime sentAt;
 
     @Column(name ="is_read")
+    @ColumnDefault("false")
+    @NotNull
     private boolean isRead;
 
     @Override

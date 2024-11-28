@@ -11,6 +11,7 @@ import org.springframework.lang.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
@@ -19,7 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Page<User> findAllByIsActive(boolean active, Pageable pageable);
 
     List<User> findAllByIsActive(boolean isActive);
-
 
     @Query("""
             select u from User u left join u.roles roles left join u.languages languages
@@ -65,4 +65,5 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     List<User> findByRoles_IsSupTrueAndIsActiveTrue();
 
+    Set<User> findByIdInAndIsActiveTrue(Collection<Long> ids);
 }

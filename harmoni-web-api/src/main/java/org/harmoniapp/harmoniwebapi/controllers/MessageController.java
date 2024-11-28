@@ -3,7 +3,6 @@ package org.harmoniapp.harmoniwebapi.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.MessageDto;
-import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.harmoniapp.harmoniwebapi.services.MessageService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -15,11 +14,6 @@ import java.util.List;
 @RequestMapping("/message")
 public class MessageController {
     private final MessageService service;
-
-//    @GetMapping("/history")
-//    public List<MessageDto> getChatHistory(@RequestParam Long userId1, @RequestParam Long userId2) {
-//        return service.getChatHistory(userId1, userId2);
-//    }
 
     @GetMapping("/history")
     public List<MessageDto> getChatHistory(@RequestParam Long userId1,
@@ -47,11 +41,6 @@ public class MessageController {
     public MessageDto sendMessage(@Valid @RequestBody MessageDto messageDto) {
         return service.sendMessage(messageDto);
     }
-
-//    @PatchMapping("/{id}/read")
-//    public MessageDto markMessageAsRead(@PathVariable Long id) {
-//        return service.markMessageAsRead(id);
-//    }
 
     @PatchMapping("/mark-all-read")
     @PreAuthorize("@securityService.canMarkAllMessagesAsRead(#userId1, #groupId, authentication)")

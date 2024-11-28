@@ -32,7 +32,7 @@ public class GroupService {
                 .orElseThrow(() -> new IllegalArgumentException("Group not found"));
 
         return group.getMembers().stream()
-                .map(user -> new PartialUserWithEmpIdDto(user.getId(), user.getFirstname(), user.getSurname(), user.getPhoto(), user.getEmployeeId()))
+                .map(PartialUserWithEmpIdDto::fromEntity)
                 .toList();
     }
 
@@ -42,10 +42,12 @@ public class GroupService {
 
     @Transactional
     public GroupDto createGroup(GroupDto groupDto) {
-        Set<User> members = groupDto.membersIds().stream()
-                .map(memberId -> repositoryCollector.getUsers().findById(memberId)
-                        .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + memberId)))
-                .collect(Collectors.toSet());
+        Set<User> members = repositoryCollector.getUsers().findByIdInAndIsActiveTrue(groupDto.membersIds());
+        for (Long userId : groupDto.membersIds()) {
+            if (members.stream().noneMatch(user -> user.getId().equals(userId))) {
+                throw new IllegalArgumentException("User not found with ID: " + userId);
+            }
+        }
 
         Group group = groupDto.toEntity(members);
         Group savedGroup = repositoryCollector.getGroups().save(group);
@@ -57,7 +59,7 @@ public class GroupService {
         Group group = repositoryCollector.getGroups().findById(groupId)
                 .orElseThrow(() -> new IllegalArgumentException("Group not found"));
 
-        User user = repositoryCollector.getUsers().findById(userId)
+        User user = repositoryCollector.getUsers().findByIdAndIsActive(userId, true)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         group.getMembers().add(user);

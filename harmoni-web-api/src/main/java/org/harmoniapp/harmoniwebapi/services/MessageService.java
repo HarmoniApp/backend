@@ -7,16 +7,10 @@ import org.harmoniapp.harmonidata.entities.Message;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.MessageDto;
-import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -66,22 +60,22 @@ public class MessageService {
 
     @Transactional
     public MessageDto sendMessage(MessageDto messageDto) {
-        User sender = repositoryCollector.getUsers().findById(messageDto.senderId())
+        User sender = repositoryCollector.getUsers().findByIdAndIsActive(messageDto.senderId(), true)
                 .orElseThrow(() -> new IllegalArgumentException("Sender not found"));
 
         Message message = messageDto.toEntity();
         message.setSender(sender);
 
         if (messageDto.receiverId() != null) {
-            User receiver = repositoryCollector.getUsers().findById(messageDto.receiverId())
+            User receiver = repositoryCollector.getUsers().findByIdAndIsActive(messageDto.receiverId(), true)
                     .orElseThrow(() -> new IllegalArgumentException("Receiver not found"));
             message.setReceiver(receiver);
 
             Message savedMessage = repositoryCollector.getMessages().save(message);
 
-            messagingTemplate.convertAndSend("/client/messages/" + messageDto.receiverId(), MessageDto.fromEntity(savedMessage, null));
+            messagingTemplate.convertAndSend("/client/messages/" + messageDto.receiverId(), MessageDto.fromEntity(savedMessage));
 
-            return MessageDto.fromEntity(savedMessage, null);
+            return MessageDto.fromEntity(savedMessage);
         } else if (messageDto.groupId() != null) {
             Group group = repositoryCollector.getGroups().findById(messageDto.groupId())
                     .orElseThrow(() -> new IllegalArgumentException("Group not found"));
@@ -93,31 +87,16 @@ public class MessageService {
                 if (!member.getId().equals(sender.getId())) {
                     messagingTemplate.convertAndSend(
                             "/client/groupMessages/" + member.getId(),
-                            MessageDto.fromEntity(savedMessage, null)
+                            MessageDto.fromEntity(savedMessage)
                     );
                 }
             }
 
-            return MessageDto.fromEntity(savedMessage, null);
+            return MessageDto.fromEntity(savedMessage);
         } else {
             throw new IllegalArgumentException("receiverId or groupId must be provided.");
         }
     }
-
-
-
-//    @Transactional
-//    public MessageDto markMessageAsRead(Long messageId) {
-//        Message message = repositoryCollector.getMessages().findById(messageId)
-//                .orElseThrow(() -> new IllegalArgumentException("Message not found"));
-//
-//        message.setRead(true);
-//        Message updatedMessage = repositoryCollector.getMessages().save(message);
-//
-//        messagingTemplate.convertAndSend("/client/messages/read-status/" + message.getSender().getId(), MessageDto.fromEntity(updatedMessage));
-//
-//        return MessageDto.fromEntity(updatedMessage);
-//    }
 
     @Transactional
     public List<MessageDto> markAllMessagesAsRead(Long userId1, Long userId2, Long groupId) {
@@ -133,7 +112,7 @@ public class MessageService {
         messages = repositoryCollector.getMessages().saveAll(messages);
 
         List<MessageDto> messagesDto = messages.stream()
-                .map(m -> MessageDto.fromEntity(m, null))
+                .map(MessageDto::fromEntity)
                 .toList();
 
         if (groupId != null) {
@@ -151,5 +130,4 @@ public class MessageService {
 
         return messagesDto;
     }
-
 }
