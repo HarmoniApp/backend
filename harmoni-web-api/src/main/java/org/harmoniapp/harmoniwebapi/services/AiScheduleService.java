@@ -7,8 +7,8 @@ import org.harmoniapp.harmoniwebapi.configuration.Principle;
 import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.*;
 import org.harmoniapp.harmoniwebapi.contracts.NotificationDto;
 import org.harmoniapp.harmoniwebapi.exception.NotEnoughEmployees;
-import org.harmoniapp.harmoniwebapi.geneticAlgorithm.*;
 import org.harmoniapp.harmoniwebapi.geneticAlgorithm.Shift;
+import org.harmoniapp.harmoniwebapi.geneticAlgorithm.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -52,6 +52,7 @@ public class AiScheduleService {
         List<Shift> shifts = prepareShifts(requirementsDto, predefineShifts, roles);
 
         Principle principle = (Principle) authentication.getPrincipal();
+        //TODO: Possible change
         User receiver = repositoryCollector.getUsers().findById(principle.id()).orElseThrow();
         GenerationListener listener = new AiGenerationListener(messagingTemplate, receiver.getId());
         GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(1000, listener);
@@ -69,7 +70,7 @@ public class AiScheduleService {
                 .map(org.harmoniapp.harmonidata.entities.Shift::getId)
                 .toList();
 
-        createAndSendSuccesfuleNotification(receiver);
+        createAndSendSuccessfulNotification(receiver);
         return new AiSchedulerResponse(
                 "Układanie grafiku zakończone pomyślnie", true
         );
@@ -239,7 +240,7 @@ public class AiScheduleService {
      */
     @Transactional
     public AiSchedulerResponse revokeSchedule() {
-        if (lastGeneratedShiftIds.isEmpty()) {
+        if (lastGeneratedShiftIds == null || lastGeneratedShiftIds.isEmpty()) {
             return new AiSchedulerResponse(
                     "Nie ma żadnego grafiku do usunięcia", null
             );
@@ -260,7 +261,7 @@ public class AiScheduleService {
      *
      * @param user the user to whom the notification will be sent
      */
-    private void createAndSendSuccesfuleNotification(User user) {
+    private void createAndSendSuccessfulNotification(User user) {
         NotificationType type = repositoryCollector.getNotificationTypes().findById(8L).orElseThrow();
         Notification notification = Notification.builder()
                 .user(user)
