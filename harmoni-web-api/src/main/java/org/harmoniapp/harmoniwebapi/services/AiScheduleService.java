@@ -52,7 +52,6 @@ public class AiScheduleService {
         List<Shift> shifts = prepareShifts(requirementsDto, predefineShifts, roles);
 
         Principle principle = (Principle) authentication.getPrincipal();
-        //TODO: Possible change
         User receiver = repositoryCollector.getUsers().findById(principle.id()).orElseThrow();
         GenerationListener listener = new AiGenerationListener(messagingTemplate, receiver.getId());
         GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(1000, listener);
@@ -199,8 +198,33 @@ public class AiScheduleService {
     private void verifyUserQuantity(List<ScheduleRequirement> requirementsDto, Map<String, List<Employee>> employees,
                                     List<Role> roles) throws NotEnoughEmployees {
         Map<String, Integer> required = summarizeRequiredEmployees(requirementsDto, roles);
-        Map<String, Integer> available = employees.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().size() * 5));
+        Map<String, Integer> available = calculateAvailableEmployees(requirementsDto, employees);
+        checkEmployeeAvailability(required, available);
+    }
+
+    /**
+     * Calculates the available employees for the schedule generation.
+     *
+     * @param requirementsDto the list of schedule requirements
+     * @param employees       the map of employees grouped by role
+     * @return a map of roles and available employees
+     */
+    private Map<String, Integer> calculateAvailableEmployees(List<ScheduleRequirement> requirementsDto, Map<String, List<Employee>> employees) {
+        return employees.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> {
+                    int multiplier = (requirementsDto.size() < 5) ? requirementsDto.size() : (5 * (requirementsDto.size() / 7 + 1));
+                    return e.getValue().size() * multiplier;
+                }));
+    }
+
+    /**
+     * Checks if there are enough employees available to meet the schedule requirements.
+     *
+     * @param required  a map of roles and the number of required employees for each role
+     * @param available a map of roles and the number of available employees for each role
+     * @throws NotEnoughEmployees if there are not enough employees available to meet the requirements
+     */
+    private void checkEmployeeAvailability(Map<String, Integer> required, Map<String, Integer> available) throws NotEnoughEmployees {
         required.forEach((role, requiredCount) -> {
             int availableCount = available.getOrDefault(role, 0);
             if (availableCount < requiredCount) {

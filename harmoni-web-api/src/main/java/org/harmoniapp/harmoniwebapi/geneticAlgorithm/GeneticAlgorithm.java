@@ -216,6 +216,12 @@ public class GeneticAlgorithm {
     private List<Employee> selectRandomEmployees(List<Requirements> requirements, Map<String, List<Employee>> employees) {
         List<Employee> employeesForShift = new ArrayList<>();
         for (Requirements req : requirements) {
+            if (!employees.containsKey(req.role())) {
+                throw new IllegalArgumentException("No employees with role " + req.role());
+            }
+            if (employees.get(req.role()).size() < req.employeesNumber()) {
+                throw new IllegalArgumentException("Not enough employees with role " + req.role());
+            }
             List<Employee> copy = new ArrayList<>(employees.get(req.role()));
             for (int j = 0; j < req.employeesNumber(); j++) {
                 int randomIndex = random.nextInt(copy.size());

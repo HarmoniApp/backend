@@ -59,7 +59,11 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
         select u from User u
         where u.isActive = true and u not in (
             select a.user from Absence a
-            where a.status.name='approved' and (a.start <= ?2 or a.end >= ?1)
+            where a.status.name='approved' and (
+                    (a.start <= ?1 and a.end >= ?1) or
+                    (a.start >= ?1 and a.end >= ?2) or
+                    (a.start <= ?2 and a.end >= ?2)
+                    )
         )""")
     List<User> findAllActiveWithoutAbsenceInDateRange(LocalDate startDate, LocalDate endDate);
 }
