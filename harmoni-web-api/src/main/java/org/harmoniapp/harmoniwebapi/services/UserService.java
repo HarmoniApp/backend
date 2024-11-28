@@ -11,10 +11,13 @@ import org.harmoniapp.harmoniwebapi.contracts.UserNewPassword;
 import org.harmoniapp.harmoniwebapi.exception.EasyPasswordException;
 import org.harmoniapp.harmoniwebapi.utils.PasswordManager;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,7 +48,7 @@ public class UserService {
     private final PasswordManager passwordManager;
     private final PasswordEncoder passwordEncoder;
     private final CompromisedPasswordChecker passwordChecker;
-    private final String photoDirPath = "./harmoni-web-api/src/main/resources/static/userPhoto/";
+    private final String photoDirPath = "harmoni-web-api/src/main/resources/static/userPhoto/";
 
     /**
      * Retrieves a paginated list of UserDto objects based on specified criteria.
@@ -299,6 +303,34 @@ public class UserService {
         }
 
         return UserDto.fromEntity(user);
+    }
+
+    /**
+     * Retrieves the photo of a specific user by their ID.
+     *
+     * @param id The ID of the user whose photo is to be retrieved.
+     * @return A ResponseEntity containing the InputStreamResource of the user's photo.
+     * @throws IllegalArgumentException if the user with the specified ID is not found.
+     * @throws RuntimeException if there is an error reading the photo file.
+     */
+    public ResponseEntity<InputStreamResource> getUserPhoto(long id) {
+        User user = repositoryCollector.getUsers().findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User with ID " + id + " not found"));
+
+        String photo = user.getPhoto();
+        MediaType contentType = photo.endsWith(".png") ? MediaType.IMAGE_PNG : MediaType.IMAGE_JPEG;
+
+        String uploadDirectory = new File(photoDirPath).getAbsolutePath();
+        Path path = Paths.get(uploadDirectory, photo);
+        if (!Files.exists(path)) {
+            path = Paths.get(uploadDirectory, "default.jpg");
+        }
+
+        try (InputStream in = Files.newInputStream(path)) {
+            return ResponseEntity.ok().contentType(contentType).body(new InputStreamResource(in));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read photo file", e);
+        }
     }
 
     /**

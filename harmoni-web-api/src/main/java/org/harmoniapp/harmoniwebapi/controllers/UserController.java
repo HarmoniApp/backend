@@ -6,7 +6,9 @@ import org.harmoniapp.harmoniwebapi.contracts.PageDto;
 import org.harmoniapp.harmoniwebapi.contracts.UserDto;
 import org.harmoniapp.harmoniwebapi.contracts.UserNewPassword;
 import org.harmoniapp.harmoniwebapi.services.UserService;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -122,6 +124,18 @@ public class UserController {
     @PatchMapping("/{id}/defaultPhoto")
     public UserDto setDefaultPhoto(@PathVariable long id) {
         return service.setDefaultPhoto(id);
+    }
+
+    /**
+     * Retrieves the photo of a specific user by their ID.
+     *
+     * @param id The ID of the user whose photo is to be retrieved.
+     * @return A ResponseEntity containing the InputStreamResource of the user's photo.
+     */
+    @GetMapping("/{id}/photo")
+    @ResponseBody
+    public ResponseEntity<InputStreamResource> getUserPhoto(@PathVariable long id) {
+        return service.getUserPhoto(id);
     }
 
     /**
