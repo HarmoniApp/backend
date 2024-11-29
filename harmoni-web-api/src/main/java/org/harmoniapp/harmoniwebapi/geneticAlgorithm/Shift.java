@@ -3,6 +3,7 @@ package org.harmoniapp.harmoniwebapi.geneticAlgorithm;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 public class Shift {
     private final int id;
     private final int day;
+    private final LocalTime startTime;
     private List<Employee> employees;
     private final List<Requirements> requirements;
 
@@ -24,9 +26,10 @@ public class Shift {
      * @param day          the day of the shift
      * @param requirements the requirements for the shift
      */
-    public Shift(int id, int day, List<Requirements> requirements) {
+    public Shift(int id, int day, LocalTime time, List<Requirements> requirements) {
         this.id = id;
         this.day = day;
+        this.startTime = time;
         this.employees = new ArrayList<>();
         this.requirements = requirements;
     }

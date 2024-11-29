@@ -125,6 +125,11 @@ public class AiScheduleService {
                 List<Requirements> requirements = prepareRequirements(reqShiftDto.roles(), roles);
                 shifts.add(new Shift(reqShiftDto.shiftId().intValue(),
                         scheduleRequirement.date().getDayOfYear(),
+                        predefineShifts.stream()
+                                .filter(ps -> ps.getId().equals(reqShiftDto.shiftId()))
+                                .findFirst()
+                                .orElseThrow()
+                                .getStart(),
                         requirements));
             }
         }

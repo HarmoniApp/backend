@@ -165,15 +165,17 @@ public class ConstraintChecker {
         for (int i = 0; i < days.size() - 1; i++) {
             List<Shift> currentDayShifts = days.get(i);
             List<Shift> nextDayShifts = days.get(i + 1);
-            if (nextDayShifts.isEmpty()) {
+            if (currentDayShifts.isEmpty() || nextDayShifts.isEmpty()) {
                 continue;
             }
             for (Shift currentDayShift : currentDayShifts) {
                 for (Employee emp : currentDayShift.getEmployees()) {
                     for (Shift nextDayShift : nextDayShifts) {
-                        if (nextDayShift.getEmployees().contains(emp)) {
-                            violations += softPenalty;
-                            break;
+                        if (nextDayShift.getStartTime().isBefore(currentDayShift.getStartTime())) {
+                            if (nextDayShift.getEmployees().contains(emp)) {
+                                violations += softPenalty;
+                                break;
+                            }
                         }
                     }
                 }
