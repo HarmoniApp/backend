@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -326,7 +327,8 @@ public class UserService {
             path = Paths.get(uploadDirectory, "default.jpg");
         }
 
-        try (InputStream in = Files.newInputStream(path)) {
+        try {
+            InputStream in = new FileInputStream(path.toString());
             return ResponseEntity.ok().contentType(contentType).body(new InputStreamResource(in));
         } catch (IOException e) {
             throw new RuntimeException("Failed to read photo file", e);
