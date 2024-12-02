@@ -49,7 +49,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     @Query("""
         select u from User u left join u.roles roles
-        where roles.isSup = true and u.isActive = true""")
+        where upper(roles.name) like upper('ADMIN') and u.isActive = true""")
     Page<User> findSupervisors(Pageable pageable);
 
     Optional<User> findByEmail(String email);
@@ -63,6 +63,10 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     List<User> findByRoles_Id(Long ids);
 
-    List<User> findByRoles_IsSupTrueAndIsActiveTrue();
+    @Query("""
+            select u from User u inner join u.roles roles
+            where upper(roles.name) like upper('ADMIN') and u.isActive = true""")
+    List<User> findAllActiveSupervisors();
+
 
 }

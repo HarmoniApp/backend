@@ -28,11 +28,6 @@ public class Role {
     @NotEmpty(message = "Name is required")
     private String name;
 
-    @Column(name = "is_sup")
-    @ColumnDefault("false")
-    @NotEmpty(message = "Is supervisor is required")
-    private Boolean isSup;
-
     @NotEmpty(message = "Color is required")
     @Pattern(regexp = "^#([A-Fa-f0-9]{6})$", message = "Color must be a valid hex color")
     private String color;

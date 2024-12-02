@@ -119,7 +119,7 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
      * @param savedUsers the list of saved user DTOs.
      */
     private void updateSupervisors(Sheet sheet, List<String> headers, List<UserDto> savedUsers) {
-        List<User> supervisors = repositoryCollector.getUsers().findByRoles_IsSupTrueAndIsActiveTrue();
+        List<User> supervisors = repositoryCollector.getUsers().findAllActiveSupervisors();
         List<User> usersToUpdate = new ArrayList<>();
         for (int i = 0; i < savedUsers.size(); i++) {
             UserDto userDto = savedUsers.get(i);
@@ -249,7 +249,7 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
         List<Role> roles = repositoryCollector.getRoles().findAll();
         List<Language> languages = repositoryCollector.getLanguages().findAll();
         List<ContractType> contractTypes = repositoryCollector.getContractTypes().findAll();
-        List<User> supervisors = repositoryCollector.getUsers().findByRoles_IsSupTrueAndIsActiveTrue();
+        List<User> supervisors = repositoryCollector.getUsers().findAllActiveSupervisors();
         List<Address> departments = repositoryCollector.getAddresses().findByDepartmentNameNotNull();
         List<UserDto> userDtoList = new ArrayList<>();
 
