@@ -2,6 +2,7 @@ package org.harmoniapp.harmoniwebapi.services;
 
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.Role;
+import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.RoleDto;
@@ -135,6 +136,12 @@ public class RoleService {
         if(!users.isEmpty()) {
             users.forEach((user -> user.getRoles().remove(role)));
             repositoryCollector.getUsers().saveAll(users);
+        }
+
+        List<Shift> shifts = repositoryCollector.getShifts().findByRole_Id(id);
+        if(!shifts.isEmpty()) {
+            shifts.forEach((shift -> shift.setRole(null)));
+            repositoryCollector.getShifts().saveAll(shifts);
         }
 
         repositoryCollector.getRoles().deleteById(id);

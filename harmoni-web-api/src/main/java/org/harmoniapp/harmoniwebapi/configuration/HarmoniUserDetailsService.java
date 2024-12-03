@@ -55,7 +55,7 @@ public class HarmoniUserDetailsService implements UserDetailsService {
         }
 
         List<GrantedAuthority> authorities;
-        if (user.getRoles().stream().anyMatch(Role::getIsSup)) {
+        if (user.getRoles().stream().anyMatch(r -> r.getName().equalsIgnoreCase("ADMIN"))) {
             authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
         } else {
             authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
