@@ -112,7 +112,7 @@ public class GeneticAlgorithm {
         List<Shift> gens = new ArrayList<>(shifts.size());
         for (Shift shift : shifts) {
             List<Employee> employeesForShift = selectRandomEmployees(shift.getRequirements(), employees);
-            gens.add(new Shift(shift.getId(), shift.getDay(), employeesForShift, shift.getRequirements()));
+            gens.add(new Shift(shift.getId(), shift.getDay(), shift.getStartTime(), employeesForShift, shift.getRequirements()));
         }
         return new Chromosome(gens, constraintChecker);
     }
@@ -200,7 +200,7 @@ public class GeneticAlgorithm {
             if (random.nextDouble() > mutationRate) continue;
 
             List<Employee> employeesForShift = selectRandomEmployees(gens.get(i).getRequirements(), employees);
-            gens.set(i, new Shift(gens.get(i).getId(), gens.get(i).getDay(), employeesForShift, gens.get(i).getRequirements()));
+            gens.set(i, new Shift(gens.get(i).getId(), gens.get(i).getDay(), gens.get(i).getStartTime(), employeesForShift, gens.get(i).getRequirements()));
 
         }
         return new Chromosome(gens, constraintChecker);
