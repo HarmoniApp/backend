@@ -31,10 +31,10 @@ public class ConstraintChecker {
      * @param chromosome the chromosome to check
      * @return the total penalty of the violations
      */
-    public double checkViolations(List<Shift> chromosome) {
+    public double checkViolations(List<Gen> chromosome) {
         double violations = 0.0;
 
-        for (Shift shift : chromosome) {
+        for (Gen shift : chromosome) {
             violations += violationsEmployeeCount(shift) ? hardPenalty : 0;
             violations += violationsUniqueEmployee(shift) ? hardPenalty : 0;
             violations += violationsRoleMatch(shift) ? hardPenalty : 0;
@@ -42,7 +42,7 @@ public class ConstraintChecker {
 
         violations += violationsMaxShiftPerWeek(chromosome);
 
-        List<List<Shift>> shiftsByDay = groupByDay(chromosome);
+        List<List<Gen>> shiftsByDay = groupByDay(chromosome);
         violations += checkQuantityOfShiftsPerDay(shiftsByDay);
         violations += checkEarlierShiftNextDay(shiftsByDay);
 
@@ -55,12 +55,12 @@ public class ConstraintChecker {
      * @param shiftsByDay the shifts grouped by day
      * @return the total penalty of the violations
      */
-    private double checkQuantityOfShiftsPerDay(List<List<Shift>> shiftsByDay) {
+    private double checkQuantityOfShiftsPerDay(List<List<Gen>> shiftsByDay) {
         double violations = 0.0;
 
-        for (List<Shift> shifts : shiftsByDay) {
+        for (List<Gen> shifts : shiftsByDay) {
             Map<Employee, Integer> employeeShifts = new HashMap<>();
-            for (Shift shift : shifts) {
+            for (Gen shift : shifts) {
                 for (Employee emp : shift.getEmployees()) {
                     employeeShifts.put(emp, employeeShifts.getOrDefault(emp, 0) + 1);
                 }
@@ -81,9 +81,9 @@ public class ConstraintChecker {
      * @param chromosome the chromosome to group
      * @return the shifts grouped by day
      */
-    private List<List<Shift>> groupByDay(List<Shift> chromosome) {
-        Map<Integer, List<Shift>> shiftsByDay = new HashMap<>();
-        for (Shift shift : chromosome) {
+    private List<List<Gen>> groupByDay(List<Gen> chromosome) {
+        Map<Integer, List<Gen>> shiftsByDay = new HashMap<>();
+        for (Gen shift : chromosome) {
             shiftsByDay.computeIfAbsent(shift.getDay(), k -> new ArrayList<>()).add(shift);
         }
         return new ArrayList<>(shiftsByDay.values());
@@ -95,7 +95,7 @@ public class ConstraintChecker {
      * @param shift the shift to check
      * @return true if the employee count is violated, false otherwise
      */
-    private boolean violationsEmployeeCount(Shift shift) {
+    private boolean violationsEmployeeCount(Gen shift) {
         return shift.getEmployees().size() != shift.getRequirements().stream().mapToInt(Requirements::employeesNumber).sum();
     }
 
@@ -105,7 +105,7 @@ public class ConstraintChecker {
      * @param shift the shift to check
      * @return true if the unique employee is violated, false otherwise
      */
-    private boolean violationsUniqueEmployee(Shift shift) {
+    private boolean violationsUniqueEmployee(Gen shift) {
         return shift.getEmployees().size() != shift.getEmployees().stream().distinct().count();
     }
 
@@ -115,11 +115,11 @@ public class ConstraintChecker {
      * @param chromosome the chromosome to check
      * @return the total penalty of the violations
      */
-    private double violationsMaxShiftPerWeek(List<Shift> chromosome) {
+    private double violationsMaxShiftPerWeek(List<Gen> chromosome) {
         double violations = 0.0;
 
         Map<Employee, Integer> totalEmployeeCount = new HashMap<>();
-        for (Shift shift : chromosome) {
+        for (Gen shift : chromosome) {
             for (Employee emp : shift.getEmployees()) {
                 totalEmployeeCount.put(emp, totalEmployeeCount.getOrDefault(emp, 0) + 1);
             }
@@ -140,7 +140,7 @@ public class ConstraintChecker {
      * @param shift the shift to check
      * @return true if the role match is violated, false otherwise
      */
-    private boolean violationsRoleMatch(Shift shift) {
+    private boolean violationsRoleMatch(Gen shift) {
         for (Requirements req : shift.getRequirements()) {
             long count = shift.getEmployees().stream()
                     .filter(emp -> emp.role().equals(req.role()))
@@ -159,18 +159,18 @@ public class ConstraintChecker {
      * @param days the shifts grouped by day
      * @return the total penalty of the violations
      */
-    private double checkEarlierShiftNextDay(List<List<Shift>> days) {
+    private double checkEarlierShiftNextDay(List<List<Gen>> days) {
         double violations = 0.0;
 
         for (int i = 0; i < days.size() - 1; i++) {
-            List<Shift> currentDayShifts = days.get(i);
-            List<Shift> nextDayShifts = days.get(i + 1);
+            List<Gen> currentDayShifts = days.get(i);
+            List<Gen> nextDayShifts = days.get(i + 1);
             if (currentDayShifts.isEmpty() || nextDayShifts.isEmpty()) {
                 continue;
             }
-            for (Shift currentDayShift : currentDayShifts) {
+            for (Gen currentDayShift : currentDayShifts) {
                 for (Employee emp : currentDayShift.getEmployees()) {
-                    for (Shift nextDayShift : nextDayShifts) {
+                    for (Gen nextDayShift : nextDayShifts) {
                         if (nextDayShift.getStartTime().isBefore(currentDayShift.getStartTime())) {
                             if (nextDayShift.getEmployees().contains(emp)) {
                                 violations += softPenalty;

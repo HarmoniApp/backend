@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Data
 @AllArgsConstructor
-public class Shift {
+public class Gen {
     private final int id;
     private final int day;
     private final LocalTime startTime;
@@ -26,7 +26,7 @@ public class Shift {
      * @param day          the day of the shift
      * @param requirements the requirements for the shift
      */
-    public Shift(int id, int day, LocalTime time, List<Requirements> requirements) {
+    public Gen(int id, int day, LocalTime time, List<Requirements> requirements) {
         this.id = id;
         this.day = day;
         this.startTime = time;

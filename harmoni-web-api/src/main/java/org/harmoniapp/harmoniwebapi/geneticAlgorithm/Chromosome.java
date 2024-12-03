@@ -9,10 +9,10 @@ import java.util.List;
  */
 @Data
 public class Chromosome {
-    private List<Shift> gens;
+    private List<Gen> gens;
     private double fitness;
 
-    public Chromosome(List<Shift> gens, ConstraintChecker checker) {
+    public Chromosome(List<Gen> gens, ConstraintChecker checker) {
         this.gens = gens;
         evaluateFitness(checker);
     }

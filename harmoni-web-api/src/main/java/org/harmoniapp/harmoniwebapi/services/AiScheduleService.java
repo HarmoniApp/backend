@@ -7,7 +7,7 @@ import org.harmoniapp.harmoniwebapi.configuration.Principle;
 import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.*;
 import org.harmoniapp.harmoniwebapi.contracts.NotificationDto;
 import org.harmoniapp.harmoniwebapi.exception.NotEnoughEmployees;
-import org.harmoniapp.harmoniwebapi.geneticAlgorithm.Shift;
+import org.harmoniapp.harmoniwebapi.geneticAlgorithm.Gen;
 import org.harmoniapp.harmoniwebapi.geneticAlgorithm.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
@@ -49,7 +49,7 @@ public class AiScheduleService {
         Map<String, List<Employee>> employees = prepareEmployees(requirementsDto, users);
         verifyUserQuantity(requirementsDto, employees, roles);
 
-        List<Shift> shifts = prepareShifts(requirementsDto, predefineShifts, roles);
+        List<Gen> shifts = prepareShifts(requirementsDto, predefineShifts, roles);
 
         Principle principle = (Principle) authentication.getPrincipal();
         User receiver = repositoryCollector.getUsers().findById(principle.id()).orElseThrow();
@@ -64,9 +64,9 @@ public class AiScheduleService {
             );
         }
 
-        List<org.harmoniapp.harmonidata.entities.Shift> decodedShifts = decodeShifts(chromosome.getGens(), users, predefineShifts, roles);
+        List<Shift> decodedShifts = decodeShifts(chromosome.getGens(), users, predefineShifts, roles);
         lastGeneratedShiftIds = repositoryCollector.getShifts().saveAll(decodedShifts).stream()
-                .map(org.harmoniapp.harmonidata.entities.Shift::getId)
+                .map(Shift::getId)
                 .toList();
 
         createAndSendSuccessfulNotification(receiver);
@@ -108,9 +108,9 @@ public class AiScheduleService {
      * @param scheduleRequirements the list of schedule requirements
      * @return a list of shifts
      */
-    private List<Shift> prepareShifts(List<ScheduleRequirement> scheduleRequirements, List<PredefineShift> predefineShifts,
-                                      List<Role> roles) {
-        List<Shift> shifts = new ArrayList<>();
+    private List<Gen> prepareShifts(List<ScheduleRequirement> scheduleRequirements, List<PredefineShift> predefineShifts,
+                                    List<Role> roles) {
+        List<Gen> shifts = new ArrayList<>();
 
         for (ScheduleRequirement scheduleRequirement : scheduleRequirements) {
 
@@ -123,7 +123,7 @@ public class AiScheduleService {
                     );
             for (ReqShiftDto reqShiftDto : scheduleRequirement.shifts()) {
                 List<Requirements> requirements = prepareRequirements(reqShiftDto.roles(), roles);
-                shifts.add(new Shift(reqShiftDto.shiftId().intValue(),
+                shifts.add(new Gen(reqShiftDto.shiftId().intValue(),
                         scheduleRequirement.date().getDayOfYear(),
                         predefineShifts.stream()
                                 .filter(ps -> ps.getId().equals(reqShiftDto.shiftId()))
@@ -157,12 +157,12 @@ public class AiScheduleService {
      * @param shifts the list of shifts
      * @return a list of decoded shifts
      */
-    private List<org.harmoniapp.harmonidata.entities.Shift> decodeShifts(List<Shift> shifts, List<User> users,
+    private List<Shift> decodeShifts(List<Gen> shifts, List<User> users,
                                                                          List<PredefineShift> predefineShifts, List<Role> roles) {
-        List<org.harmoniapp.harmonidata.entities.Shift> decodedShiftList = new ArrayList<>(shifts.size());
+        List<Shift> decodedShiftList = new ArrayList<>(shifts.size());
         LocalDate now = LocalDate.now();
 
-        for (Shift shift : shifts) {
+        for (Gen shift : shifts) {
             PredefineShift predShift = predefineShifts.stream()
                     .filter(ps -> ps.getId().equals((long) shift.getId()))
                     .findFirst()
@@ -175,7 +175,7 @@ public class AiScheduleService {
             );
 
             for (Employee employee : shift.getEmployees()) {
-                org.harmoniapp.harmonidata.entities.Shift decodedShift = new org.harmoniapp.harmonidata.entities.Shift();
+                Shift decodedShift = new Shift();
                 decodedShift.setStart(start);
                 decodedShift.setEnd(end);
                 decodedShift.setUser(users.stream()
@@ -275,8 +275,8 @@ public class AiScheduleService {
             );
         }
 
-        List<org.harmoniapp.harmonidata.entities.Shift> shifts = repositoryCollector.getShifts().findAllById(lastGeneratedShiftIds);
-        shifts.removeIf(org.harmoniapp.harmonidata.entities.Shift::isPublished);
+        List<Shift> shifts = repositoryCollector.getShifts().findAllById(lastGeneratedShiftIds);
+        shifts.removeIf(Shift::isPublished);
         repositoryCollector.getShifts().deleteAll(shifts);
         lastGeneratedShiftIds = null;
 

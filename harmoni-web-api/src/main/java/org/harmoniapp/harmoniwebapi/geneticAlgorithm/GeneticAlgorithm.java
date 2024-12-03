@@ -59,7 +59,7 @@ public class GeneticAlgorithm {
      * @param employees the list of employees to generate the schedule from
      * @return the generated schedule
      */
-    public Chromosome run(List<Shift> shifts, Map<String, List<Employee>> employees) {
+    public Chromosome run(List<Gen> shifts, Map<String, List<Employee>> employees) {
         List<Chromosome> population = initializePopulation(shifts, employees);
 
         assert !population.isEmpty();
@@ -75,7 +75,7 @@ public class GeneticAlgorithm {
             }
 
             if ((i % reportInterval == 0 || bestChromosome.getFitness() == 1) && listener != null) {
-                listener.onGenerationUpdate(i/this.maxGenerations, bestChromosome.getFitness());
+                listener.onGenerationUpdate(i / this.maxGenerations, bestChromosome.getFitness());
             }
 
             if (bestChromosome.getFitness() == 1) {
@@ -93,7 +93,7 @@ public class GeneticAlgorithm {
      * @param employees the list of employees to generate the schedule from
      * @return the initialized population
      */
-    private List<Chromosome> initializePopulation(List<Shift> shifts, Map<String, List<Employee>> employees) {
+    private List<Chromosome> initializePopulation(List<Gen> shifts, Map<String, List<Employee>> employees) {
         List<Chromosome> population = new ArrayList<>(shifts.size());
         for (int i = 0; i < populationSize; i++) {
             population.add(generateRandomChromosome(shifts, employees));
@@ -108,11 +108,11 @@ public class GeneticAlgorithm {
      * @param employees the list of employees to generate the chromosome from
      * @return the generated chromosome
      */
-    private Chromosome generateRandomChromosome(List<Shift> shifts, Map<String, List<Employee>> employees) {
-        List<Shift> gens = new ArrayList<>(shifts.size());
-        for (Shift shift : shifts) {
+    private Chromosome generateRandomChromosome(List<Gen> shifts, Map<String, List<Employee>> employees) {
+        List<Gen> gens = new ArrayList<>(shifts.size());
+        for (Gen shift : shifts) {
             List<Employee> employeesForShift = selectRandomEmployees(shift.getRequirements(), employees);
-            gens.add(new Shift(shift.getId(), shift.getDay(), shift.getStartTime(), employeesForShift, shift.getRequirements()));
+            gens.add(new Gen(shift.getId(), shift.getDay(), shift.getStartTime(), employeesForShift, shift.getRequirements()));
         }
         return new Chromosome(gens, constraintChecker);
     }
@@ -120,7 +120,7 @@ public class GeneticAlgorithm {
     /**
      * Evolves the population of chromosomes.
      *
-     * @param population    the population to evolve
+     * @param population      the population to evolve
      * @param employeesByRole the list of employees grouped by role
      * @return the evolved population
      */
@@ -171,10 +171,10 @@ public class GeneticAlgorithm {
             return Arrays.asList(parent1, parent2);
         }
 
-        List<Shift> gens1 = parent1.getGens();
-        List<Shift> gens2 = parent2.getGens();
-        List<Shift> childGens1 = new ArrayList<>(gens1.size());
-        List<Shift> childGens2 = new ArrayList<>(gens1.size());
+        List<Gen> gens1 = parent1.getGens();
+        List<Gen> gens2 = parent2.getGens();
+        List<Gen> childGens1 = new ArrayList<>(gens1.size());
+        List<Gen> childGens2 = new ArrayList<>(gens1.size());
         for (int i = 0; i < gens1.size(); i++) {
             if (random.nextDouble() < 0.5) {
                 childGens1.add(gens2.get(i));
@@ -195,12 +195,12 @@ public class GeneticAlgorithm {
      * @return the mutated chromosome
      */
     private Chromosome mutate(Chromosome chromosome, Map<String, List<Employee>> employees) {
-        List<Shift> gens = chromosome.getGens();
+        List<Gen> gens = chromosome.getGens();
         for (int i = 0; i < gens.size(); i++) {
             if (random.nextDouble() > mutationRate) continue;
 
             List<Employee> employeesForShift = selectRandomEmployees(gens.get(i).getRequirements(), employees);
-            gens.set(i, new Shift(gens.get(i).getId(), gens.get(i).getDay(), gens.get(i).getStartTime(), employeesForShift, gens.get(i).getRequirements()));
+            gens.set(i, new Gen(gens.get(i).getId(), gens.get(i).getDay(), gens.get(i).getStartTime(), employeesForShift, gens.get(i).getRequirements()));
 
         }
         return new Chromosome(gens, constraintChecker);
