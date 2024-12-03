@@ -48,10 +48,12 @@ import java.util.Collections;
 @Profile("prod")
 @RequiredArgsConstructor
 public class ProjectSecurityProdConfig {
-
     private final AuthorizationManager<RequestAuthorizationContext> adminOrOwnerAuthorizationManager;
     private final AuthorizationManager<RequestAuthorizationContext> ownerAuthorizationManager;
     private final AuthorizationManager<RequestAuthorizationContext> adminOrOwnerQueryParamAuthorizationManager;
+    private final AuthorizationManager<RequestAuthorizationContext> ownerQueryParamAuthorizationManager;
+    private final AuthorizationManager<RequestAuthorizationContext> groupMemberAuthorizationManager;
+    private final AuthorizationManager<RequestAuthorizationContext> conversationMemberQueryParamAuthorizationManager;
 
     private final JwtTokenUtil jwtTokenUtil;
     private final HarmoniUserDetailsService harmoniUserDetailsService;
@@ -115,24 +117,37 @@ public class ProjectSecurityProdConfig {
                         .requestMatchers("/archived-shifts/**").hasRole("ADMIN")
                         .requestMatchers("/contract-type/**").hasRole("ADMIN")
                         .requestMatchers("/excel/**").hasRole("ADMIN")
-                        .requestMatchers("/language/**").hasRole("ADMIN")
+                        .requestMatchers("/language/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/notification/user/{id}/**").access(ownerAuthorizationManager)
                         .requestMatchers("/notification/**").authenticated()
-                        .requestMatchers("pdf/**").hasRole("ADMIN")
+                        .requestMatchers("/pdf/**").hasRole("ADMIN")
                         .requestMatchers("/predefine-shift/**").hasRole("ADMIN")
-                        .requestMatchers("/role/**").hasRole("ADMIN") // role/user/{id} only for admin?
+                        .requestMatchers("/role/user/{id}/**").access(adminOrOwnerAuthorizationManager)
+                        .requestMatchers("/role/**").hasRole("ADMIN")
                         .requestMatchers("/shift/range").access(adminOrOwnerQueryParamAuthorizationManager)
                         .requestMatchers(new AntPathRequestMatcher("/shift/{id}", "GET")).authenticated()
                         .requestMatchers("/shift/**").hasRole("ADMIN")
                         .requestMatchers("/status").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/user/simple/empId/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/user/simple/**",
                                 "/user/supervisor",
                                 "/user/search").hasRole("ADMIN")
-                        .requestMatchers(new AntPathRequestMatcher("/user/{id}/changePassword")).access(ownerAuthorizationManager)
-                        .requestMatchers(new AntPathRequestMatcher("/user/{id}", "GET")).access(adminOrOwnerAuthorizationManager)
+                        .requestMatchers(new AntPathRequestMatcher("/user/{id}/changePassword"),
+                                new AntPathRequestMatcher("/user/{id}/uploadPhoto"),
+                                new AntPathRequestMatcher("/user/{id}/defaultPhoto")).access(ownerAuthorizationManager)
+                        .requestMatchers(new AntPathRequestMatcher("/user/{id}/**", "GET")).access(adminOrOwnerAuthorizationManager)
                         .requestMatchers("/user/**").hasRole("ADMIN")
                         .requestMatchers("/calendar/user/{id}/**").access(adminOrOwnerAuthorizationManager)
                         .requestMatchers("/userPhoto/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/group/chat-partners/**").access(ownerQueryParamAuthorizationManager)
+                        .requestMatchers(new AntPathRequestMatcher("/group", "POST")).hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/group/details/{groupId}/**",
+                                "/group/{groupId}/**").access(groupMemberAuthorizationManager)
+                        .requestMatchers("/group/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/message/history/**",
+                                "/message/last/**").access(conversationMemberQueryParamAuthorizationManager)
+//                        .requestMatchers("/message/chat-partners/**").access(ownerQueryParamAuthorizationManager)
+                        .requestMatchers("/message/**").hasAnyRole("USER", "ADMIN")
                 )
                 .httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()))
                 .exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));

@@ -6,7 +6,7 @@ import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.configuration.Principle;
 import org.harmoniapp.harmoniwebapi.contracts.AbsenceDto;
-import org.harmoniapp.harmoniwebapi.contracts.PageDto;
+import org.harmoniapp.harmoniwebapi.contracts.MessageDto;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -80,5 +80,54 @@ public class SecurityService {
     public boolean isAbsenceOwner(long id, Authentication authentication) {
         Principle principle = (Principle) authentication.getPrincipal();
         return repositoryCollector.getAbsences().existsByUserIdAndId(principle.id(), id);
+    }
+
+    /**
+     * Checks if the authenticated user can send a message.
+     *
+     * @param messageDto the {@link MessageDto} containing the message details
+     * @param authentication the {@link Authentication} object containing the user's authentication details
+     * @return {@code true} if the user can send the message, {@code false} otherwise
+     */
+    public boolean canSendMessage(MessageDto messageDto, Authentication authentication) {
+        Principle principle = (Principle) authentication.getPrincipal();
+        if (!messageDto.senderId().equals(principle.id())) {
+            return false;
+        }
+        if (messageDto.groupId() != null) {
+            return repositoryCollector.getGroups().findById(messageDto.groupId())
+                    .map(group -> group.getMembers().stream().anyMatch(user -> user.getId().equals(principle.id())))
+                    .orElse(false);
+        }
+        return true;
+    }
+
+    /**
+     * Checks if the authenticated user can mark all messages as read.
+     *
+     * @param userId1 the ID of the user to check
+     * @param groupId the ID of the group to check
+     * @param authentication the {@link Authentication} object containing the user's authentication details
+     * @return {@code true} if the user can mark all messages as read, {@code false} otherwise
+     */
+    public boolean canMarkAllMessagesAsRead(Long userId1, Long groupId, Authentication authentication) {
+        Principle principle = (Principle) authentication.getPrincipal();
+        if (groupId != null && !isGroupMember(groupId, principle.id())) {
+            return false;
+        }
+        return userId1.equals(principle.id());
+    }
+
+    /**
+     * Checks if the user is a member of the specified group.
+     *
+     * @param groupId the ID of the group to check
+     * @param userId the ID of the user to check
+     * @return {@code true} if the user is a member of the group, {@code false} otherwise
+     */
+    private boolean isGroupMember(Long groupId, Long userId) {
+        return repositoryCollector.getGroups().findById(groupId)
+                .map(group -> group.getMembers().stream().anyMatch(user -> user.getId().equals(userId)))
+                .orElse(false);
     }
 }

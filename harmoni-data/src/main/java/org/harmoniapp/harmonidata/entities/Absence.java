@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDate;
@@ -57,6 +58,7 @@ public class Absence {
 
     @NotNull(message = "Updated date cannot be null")
     @PastOrPresent(message = "Updated date must be in the past or present")
+    @UpdateTimestamp
     private LocalDate updated;
 
     @Column(name = "working_days")

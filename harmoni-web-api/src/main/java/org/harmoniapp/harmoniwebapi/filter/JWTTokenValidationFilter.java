@@ -86,8 +86,7 @@ public class JWTTokenValidationFilter extends OncePerRequestFilter {
      */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        //TODO: Remove '/ws/' from the list of paths to skip, after the WebSocket configuration is updated
-        return request.getServletPath().equals("/login")
-               || request.getServletPath().startsWith("/ws/"); //login path
+        return request.getServletPath().equals("/login") //login path
+               || request.getServletPath().startsWith("/ws/"); //websocket path
     }
 }

@@ -12,7 +12,9 @@ public class BasicRepositoryCollector implements RepositoryCollector {
     private final AddressRepository addresses;
     private final ArchivedShiftRepository archivedShifts;
     private final ContractTypeRepository contractTypes;
+    private final GroupRepository groups;
     private final LanguageRepository languages;
+    private final MessageRepository messages;
     private final NotificationRepository notifications;
     private final NotificationTypeRepository notificationTypes;
     private final PredefineShiftRepository predefineShifts;
