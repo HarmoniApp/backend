@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
@@ -20,7 +21,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Page<User> findAllByIsActive(boolean active, Pageable pageable);
 
     List<User> findAllByIsActive(boolean isActive);
-
 
     @Query("""
             select u from User u left join u.roles roles left join u.languages languages
@@ -50,7 +50,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     @Query("""
         select u from User u left join u.roles roles
-        where roles.isSup = true and u.isActive = true""")
+        where upper(roles.name) like upper('ADMIN') and u.isActive = true""")
     Page<User> findSupervisors(Pageable pageable);
 
     Optional<User> findByEmail(String email);
@@ -66,4 +66,21 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
                     )
         )""")
     List<User> findAllActiveWithoutAbsenceInDateRange(LocalDate startDate, LocalDate endDate);
+
+    @Query("select u from User u where u.residence.id = ?1 or u.workAddress.id = ?1")
+    List<User> findByResidence_IdOrWorkAddress_Id(Long id);
+
+    List<User> findByContractType_Id(Long id);
+
+    List<User> findByLanguages_Id(Long ids);
+
+    List<User> findByRoles_Id(Long ids);
+
+    @Query("""
+            select u from User u inner join u.roles roles
+            where upper(roles.name) like upper('ADMIN') and u.isActive = true""")
+    List<User> findAllActiveSupervisors();
+
+
+    Set<User> findByIdInAndIsActiveTrue(Collection<Long> ids);
 }

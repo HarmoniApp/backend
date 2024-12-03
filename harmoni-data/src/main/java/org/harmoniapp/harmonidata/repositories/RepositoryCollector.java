@@ -10,11 +10,13 @@ public interface RepositoryCollector {
 
     ArchivedShiftRepository getArchivedShifts();
 
-    AvailabilityRepository getAvailabilities();
-
     ContractTypeRepository getContractTypes();
 
+    GroupRepository getGroups();
+
     LanguageRepository getLanguages();
+
+    MessageRepository getMessages();
 
     NotificationRepository getNotifications();
 

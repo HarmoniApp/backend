@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import org.harmoniapp.harmonidata.entities.Address;
 
 /**
@@ -17,6 +18,7 @@ import org.harmoniapp.harmonidata.entities.Address;
  * @param apartment      The apartment number of the address, if applicable.
  * @param departmentName The department name of the company
  */
+@Builder
 public record AddressDto(
         long id,
 

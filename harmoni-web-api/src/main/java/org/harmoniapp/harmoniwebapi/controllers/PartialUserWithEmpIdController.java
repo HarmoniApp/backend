@@ -14,8 +14,7 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("user/simple/empId")
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/user/simple/empId")
 public class PartialUserWithEmpIdController {
     private final PartialUserWithEmpIdService partialUserWithEmpIdService;
 
@@ -30,6 +29,11 @@ public class PartialUserWithEmpIdController {
     public PageDto<PartialUserWithEmpIdDto> getAllPartialUsers(@RequestParam(name = "pageNumber", required = false, defaultValue = "1") int pageNumber,
                                                                @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
         return partialUserWithEmpIdService.getAllPartialUsers(pageNumber, pageSize);
+    }
+
+    @GetMapping("/{id}")
+    public PartialUserWithEmpIdDto getPartialUserById(@PathVariable long id) {
+        return partialUserWithEmpIdService.getPartialUserById(id);
     }
 
     /**

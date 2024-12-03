@@ -1,17 +1,18 @@
 package org.harmoniapp.harmonidata.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "contract_type")
+@Table(name = "contract_type", schema = "public")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,10 +23,13 @@ public class ContractType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    @NotEmpty(message = "Name is required")
     private String name;
 
     @Column(name = "absence_days")
-    private int absenceDays;
+    @ColumnDefault("0")
+    private Integer absenceDays;
 
     @Override
     public final boolean equals(Object o) {

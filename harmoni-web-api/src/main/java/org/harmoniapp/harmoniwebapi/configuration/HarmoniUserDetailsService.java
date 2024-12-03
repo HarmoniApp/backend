@@ -46,7 +46,7 @@ public class HarmoniUserDetailsService implements UserDetailsService {
         org.harmoniapp.harmonidata.entities.User user = repositoryCollector.getUsers().findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User details not found for the user: " + username));
 
-        if (!user.isActive()) {
+        if (!user.getIsActive()) {
             throw new UsernameNotFoundException("User account is inactive.");
         }
 
@@ -59,7 +59,7 @@ public class HarmoniUserDetailsService implements UserDetailsService {
         }
 
         List<GrantedAuthority> authorities;
-        if (user.getRoles().stream().anyMatch(Role::isSup)) {
+        if (user.getRoles().stream().anyMatch(r -> r.getName().equalsIgnoreCase("ADMIN"))) {
             authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
         } else {
             authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));

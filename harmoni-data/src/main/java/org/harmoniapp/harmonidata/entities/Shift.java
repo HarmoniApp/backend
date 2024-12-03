@@ -1,42 +1,47 @@
 package org.harmoniapp.harmonidata.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "shift")
+@Table(name = "shift", schema = "public")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Shift {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Temporal(TemporalType.TIMESTAMP)
+
+    @Column(name = "\"start\"")
+    @NotNull(message = "Start cannot be null")
     private LocalDateTime start;
 
     @Column(name = "\"end\"")
-    @Temporal(TemporalType.TIMESTAMP)
+    @NotNull(message = "End cannot be null")
     private LocalDateTime end;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @NotNull(message = "User cannot be null")
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
 
-    private boolean published;
+    @ColumnDefault("false")
+    @NotNull(message = "Published cannot be null")
+    private Boolean published;
 
     @Override
     public final boolean equals(Object o) {

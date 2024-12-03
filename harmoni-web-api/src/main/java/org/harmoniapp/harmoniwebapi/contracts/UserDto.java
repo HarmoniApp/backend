@@ -3,6 +3,7 @@ package org.harmoniapp.harmoniwebapi.contracts;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 import org.harmoniapp.harmonidata.entities.ContractType;
 import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.User;
@@ -29,8 +30,9 @@ import java.util.List;
  * @param roles              The roles assigned to the user.
  * @param languages          The languages known by the user.
  */
+@Builder
 public record UserDto(
-        long id,
+        Long id,
 
         @NotEmpty(message = "First name cannot be empty")
         @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
@@ -78,9 +80,9 @@ public record UserDto(
 
         String photo,
 
-        @JsonProperty("is_active") boolean isActive,
+        @JsonProperty("is_active") Boolean isActive,
 
-        @JsonProperty("available_absence_days") int availableAbsenceDays,
+        @JsonProperty("available_absence_days") Integer availableAbsenceDays,
         @JsonProperty("unused_absence_days") Integer unusedAbsenceDays,
 
         @NotEmpty(message = "Roles cannot be null or empty")
@@ -111,7 +113,7 @@ public record UserDto(
                 user.getPhoneNumber(),
                 user.getEmployeeId(),
                 user.getPhoto(),
-                user.isActive(),
+                user.getIsActive(),
                 user.getAvailableAbsenceDays(),
                 user.getUnusedAbsenceDays(),
                 user.getRoles().stream().toList(),
@@ -142,7 +144,7 @@ public record UserDto(
                 user.getPhoneNumber(),
                 user.getEmployeeId(),
                 user.getPhoto(),
-                user.isActive(),
+                user.getIsActive(),
                 user.getAvailableAbsenceDays(),
                 user.getUnusedAbsenceDays(),
                 user.getRoles().stream().toList(),

@@ -1,37 +1,39 @@
 package org.harmoniapp.harmonidata.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.validator.constraints.UniqueElements;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
-@Table(name = "availability")
+@Table(name = "group", schema = "public")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Availability {
+public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @NotEmpty(message = "Group name cannot be empty")
+    private String name;
 
-    @Column(name = "\"start\"")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime start;
-
-    @Column(name = "\"end\"")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime end;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "group_members",
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @UniqueElements(message = "Group members must be unique")
+    private Set<User> members;
 
     @Override
     public final boolean equals(Object o) {
@@ -42,14 +44,12 @@ public class Availability {
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ?
                 ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Availability availability = (Availability) o;
-        return getId() != null && Objects.equals(getId(), availability.getId());
+        Group group = (Group) o;
+        return getId() != null && Objects.equals(getId(), group.getId());
     }
-
 
     @Override
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }
-

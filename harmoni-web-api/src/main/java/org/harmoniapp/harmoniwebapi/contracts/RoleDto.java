@@ -11,7 +11,6 @@ import org.harmoniapp.harmonidata.entities.Role;
  *
  * @param id    the unique identifier of the role
  * @param name  the name of the role
- * @param isSup indicates whether the role is a superior role.
  */
 public record RoleDto(
         long id,
@@ -19,8 +18,6 @@ public record RoleDto(
         @NotEmpty(message = "Role name cannot be empty")
         @Pattern(regexp = "^[a-zA-Z0-9 ]+$", message = "Role name must contain only letters, digits, and spaces")
         String name,
-
-        @JsonProperty("is_sup") boolean isSup,
 
         @Size(min = 7, max = 7, message = "Color must be exactly 7 characters long")
         @Pattern(regexp = "^#[0-9a-fA-F]{6}$", message = "Color must be a valid hex code in the format #RRGGBB")
@@ -36,7 +33,6 @@ public record RoleDto(
         return new RoleDto(
                 role.getId(),
                 role.getName(),
-                role.isSup(),
                 role.getColor());
     }
 
@@ -49,7 +45,6 @@ public record RoleDto(
         return new Role(
                 this.id,
                 this.name,
-                this.isSup,
                 this.color
         );
     }
