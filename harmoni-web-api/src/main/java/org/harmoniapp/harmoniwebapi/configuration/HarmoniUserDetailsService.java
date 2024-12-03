@@ -50,6 +50,10 @@ public class HarmoniUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User account is inactive.");
         }
 
+        if (user.getPassword() == null) {
+            throw new UsernameNotFoundException("Invalid credentials.");
+        }
+
         if (user.getFailedLoginAttempts() >= 3) {
             throw new UsernameNotFoundException("User account is locked due to multiple failed login attempts.");
         }

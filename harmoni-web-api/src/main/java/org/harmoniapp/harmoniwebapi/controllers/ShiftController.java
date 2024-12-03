@@ -3,10 +3,12 @@ package org.harmoniapp.harmoniwebapi.controllers;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmoniwebapi.contracts.ShiftDto;
 import org.harmoniapp.harmoniwebapi.services.ShiftService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -75,15 +77,17 @@ public class ShiftController {
     }
 
     /**
-     * Publishes an existing shift by its ID.
+     * Publishes existing shifts within the specified date range.
      *
-     * @param id the ID of the shift to publish
-     * @return the updated ShiftDto with the 'published' status set to true
+     * @param start the start date of the range
+     * @param end   the end date of the range
+     * @return a list of ShiftDto with the 'published' status set to true
      */
-    @PatchMapping("/{id}")
+    @PatchMapping("/{start}/{end}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ShiftDto publishShift(@PathVariable long id) {
-        return shiftService.publishShift(id);
+    public List<ShiftDto> publishShifts(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
+                                        @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+        return shiftService.publishShifts(start, end);
     }
 
     /**

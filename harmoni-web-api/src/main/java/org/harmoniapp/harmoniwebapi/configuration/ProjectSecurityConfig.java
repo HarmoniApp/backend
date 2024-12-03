@@ -115,6 +115,7 @@ public class ProjectSecurityConfig {
                         .requestMatchers("/absence/**").hasRole("ADMIN")
                         .requestMatchers("/absence-type/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/address/**").hasRole("ADMIN")
+                        .requestMatchers("/aiSchedule/**").hasRole("ADMIN")
                         .requestMatchers("/archived-shifts/**").hasRole("ADMIN")
                         .requestMatchers("/contract-type/**").hasRole("ADMIN")
                         .requestMatchers("/excel/**").hasRole("ADMIN")

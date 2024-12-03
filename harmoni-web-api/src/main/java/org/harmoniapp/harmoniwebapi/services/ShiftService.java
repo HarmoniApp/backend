@@ -9,9 +9,11 @@ import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.NotificationDto;
 import org.harmoniapp.harmoniwebapi.contracts.ShiftDto;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -131,23 +133,24 @@ public class ShiftService {
     }
 
     /**
-     * Publishes an existing shift by setting its 'published' status to true.
+     * Publishes all shifts within the specified date range by setting their 'published' status to true.
      *
-     * @param shiftId the ID of the shift to publish
-     * @return the updated ShiftDto after setting the published status to true
-     * @throws IllegalArgumentException if the shift with the given ID is not found
+     * @param start the start date of the range
+     * @param end   the end date of the range
+     * @return a list of ShiftDto containing the details of the published shifts
+     * @throws RuntimeException if an error occurs while publishing shifts
      */
     @Transactional
-    public ShiftDto publishShift(long shiftId) {
-        Shift existingShift = repositoryCollector.getShifts().findById(shiftId)
-                .orElseThrow(() -> new IllegalArgumentException("Shift not found"));
+    public List<ShiftDto> publishShifts(LocalDate start, LocalDate end) {
+        List<Shift> shifts = repositoryCollector.getShifts().findAllByDateRange(start.atStartOfDay(), end.atTime(23, 59, 59));
+        shifts.forEach(shift -> shift.setPublished(true));
 
-        existingShift.setPublished(true);
-        Shift updatedShift = repositoryCollector.getShifts().save(existingShift);
+        List<Shift> updatedShifts = repositoryCollector.getShifts().saveAllAndFlush(shifts);
+        updatedShifts.forEach(this::publishedShiftNotification);
 
-        publishedShiftNotification(shiftId);
-
-        return ShiftDto.fromEntity(updatedShift);
+        return updatedShifts.stream()
+                .map(ShiftDto::fromEntity)
+                .toList();
     }
 
     /**
@@ -174,15 +177,12 @@ public class ShiftService {
     /**
      * Sends a notification to the user when a new shift is published.
      *
-     * @param shiftId the ID of the published shift
+     * @param publishedShift the Shift object that was published
      * @throws RuntimeException if the shift or notification type is not found
      */
-    private void publishedShiftNotification(long shiftId) {
+    private void publishedShiftNotification(Shift publishedShift) {
         NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(1L) //1 is Shift Published
                 .orElseThrow(() -> new RuntimeException("Notification type not found"));
-
-        Shift publishedShift = repositoryCollector.getShifts().findById(shiftId)
-                .orElseThrow(() -> new RuntimeException("Shift not found"));
 
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
