@@ -1,4 +1,4 @@
-package org.harmoniapp.harmoniwebapi.geneticAlgorithm;
+package org.harmoniapp.harmoniwebapi.geneticalgorithm;
 
 import lombok.AllArgsConstructor;
 
@@ -11,7 +11,7 @@ import java.util.Map;
  * Represents a constraint checker for the schedule.
  */
 @AllArgsConstructor
-public class ConstraintChecker {
+public class ConstraintChecker implements CheckConstraint {
     private final double hardPenalty;
     private final double softPenalty;
     private final int maxShiftPerWeek;
@@ -31,6 +31,7 @@ public class ConstraintChecker {
      * @param chromosome the chromosome to check
      * @return the total penalty of the violations
      */
+    @Override
     public double checkViolations(List<Gen> chromosome) {
         double violations = 0.0;
 
@@ -61,7 +62,7 @@ public class ConstraintChecker {
         for (List<Gen> shifts : shiftsByDay) {
             Map<Employee, Integer> employeeShifts = new HashMap<>();
             for (Gen shift : shifts) {
-                for (Employee emp : shift.getEmployees()) {
+                for (Employee emp : shift.employees()) {
                     employeeShifts.put(emp, employeeShifts.getOrDefault(emp, 0) + 1);
                 }
             }
@@ -84,7 +85,7 @@ public class ConstraintChecker {
     private List<List<Gen>> groupByDay(List<Gen> chromosome) {
         Map<Integer, List<Gen>> shiftsByDay = new HashMap<>();
         for (Gen shift : chromosome) {
-            shiftsByDay.computeIfAbsent(shift.getDay(), k -> new ArrayList<>()).add(shift);
+            shiftsByDay.computeIfAbsent(shift.day(), k -> new ArrayList<>()).add(shift);
         }
         return new ArrayList<>(shiftsByDay.values());
     }
@@ -96,7 +97,7 @@ public class ConstraintChecker {
      * @return true if the employee count is violated, false otherwise
      */
     private boolean violationsEmployeeCount(Gen shift) {
-        return shift.getEmployees().size() != shift.getRequirements().stream().mapToInt(Requirements::employeesNumber).sum();
+        return shift.employees().size() != shift.requirements().stream().mapToInt(Requirements::employeesNumber).sum();
     }
 
     /**
@@ -106,7 +107,7 @@ public class ConstraintChecker {
      * @return true if the unique employee is violated, false otherwise
      */
     private boolean violationsUniqueEmployee(Gen shift) {
-        return shift.getEmployees().size() != shift.getEmployees().stream().distinct().count();
+        return shift.employees().size() != shift.employees().stream().distinct().count();
     }
 
     /**
@@ -120,7 +121,7 @@ public class ConstraintChecker {
 
         Map<Employee, Integer> totalEmployeeCount = new HashMap<>();
         for (Gen shift : chromosome) {
-            for (Employee emp : shift.getEmployees()) {
+            for (Employee emp : shift.employees()) {
                 totalEmployeeCount.put(emp, totalEmployeeCount.getOrDefault(emp, 0) + 1);
             }
         }
@@ -141,8 +142,8 @@ public class ConstraintChecker {
      * @return true if the role match is violated, false otherwise
      */
     private boolean violationsRoleMatch(Gen shift) {
-        for (Requirements req : shift.getRequirements()) {
-            long count = shift.getEmployees().stream()
+        for (Requirements req : shift.requirements()) {
+            long count = shift.employees().stream()
                     .filter(emp -> emp.role().equals(req.role()))
                     .count();
 
@@ -169,10 +170,10 @@ public class ConstraintChecker {
                 continue;
             }
             for (Gen currentDayShift : currentDayShifts) {
-                for (Employee emp : currentDayShift.getEmployees()) {
+                for (Employee emp : currentDayShift.employees()) {
                     for (Gen nextDayShift : nextDayShifts) {
-                        if (nextDayShift.getStartTime().isBefore(currentDayShift.getStartTime())) {
-                            if (nextDayShift.getEmployees().contains(emp)) {
+                        if (nextDayShift.startTime().isBefore(currentDayShift.startTime())) {
+                            if (nextDayShift.employees().contains(emp)) {
                                 violations += softPenalty;
                                 break;
                             }

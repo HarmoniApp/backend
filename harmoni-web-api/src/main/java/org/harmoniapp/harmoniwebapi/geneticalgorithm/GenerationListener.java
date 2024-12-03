@@ -1,4 +1,4 @@
-package org.harmoniapp.harmoniwebapi.geneticAlgorithm;
+package org.harmoniapp.harmoniwebapi.geneticalgorithm;
 
 /**
  * Listener interface for receiving updates during the genetic algorithm's execution.

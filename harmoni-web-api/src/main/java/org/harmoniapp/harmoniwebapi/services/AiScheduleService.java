@@ -7,8 +7,7 @@ import org.harmoniapp.harmoniwebapi.configuration.Principle;
 import org.harmoniapp.harmoniwebapi.contracts.AiSchedule.*;
 import org.harmoniapp.harmoniwebapi.contracts.NotificationDto;
 import org.harmoniapp.harmoniwebapi.exception.NotEnoughEmployees;
-import org.harmoniapp.harmoniwebapi.geneticAlgorithm.Gen;
-import org.harmoniapp.harmoniwebapi.geneticAlgorithm.*;
+import org.harmoniapp.harmoniwebapi.geneticalgorithm.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -54,7 +53,7 @@ public class AiScheduleService {
         Principle principle = (Principle) authentication.getPrincipal();
         User receiver = repositoryCollector.getUsers().findById(principle.id()).orElseThrow();
         GenerationListener listener = new AiGenerationListener(messagingTemplate, receiver.getId());
-        GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(1000, listener);
+        Algorithm geneticAlgorithm = new GeneticAlgorithm(1000, listener);
         Chromosome chromosome = geneticAlgorithm.run(shifts, employees);
 
         if (chromosome.getFitness() < 0.9) {
@@ -130,6 +129,7 @@ public class AiScheduleService {
                                 .findFirst()
                                 .orElseThrow()
                                 .getStart(),
+                        null,
                         requirements));
             }
         }
@@ -164,17 +164,17 @@ public class AiScheduleService {
 
         for (Gen shift : shifts) {
             PredefineShift predShift = predefineShifts.stream()
-                    .filter(ps -> ps.getId().equals((long) shift.getId()))
+                    .filter(ps -> ps.getId().equals((long) shift.id()))
                     .findFirst()
                     .orElseThrow();
             LocalDate date = LocalDate.ofYearDay(
-                    (now.getDayOfYear() <= shift.getDay()) ? now.getYear() : now.getYear() + 1, shift.getDay());
+                    (now.getDayOfYear() <= shift.day()) ? now.getYear() : now.getYear() + 1, shift.day());
             LocalDateTime start = LocalDateTime.of(date, predShift.getStart());
             LocalDateTime end = LocalDateTime.of(
                     (predShift.getStart().isBefore(predShift.getEnd())) ? date : date.plusDays(1), predShift.getEnd()
             );
 
-            for (Employee employee : shift.getEmployees()) {
+            for (Employee employee : shift.employees()) {
                 Shift decodedShift = new Shift();
                 decodedShift.setStart(start);
                 decodedShift.setEnd(end);

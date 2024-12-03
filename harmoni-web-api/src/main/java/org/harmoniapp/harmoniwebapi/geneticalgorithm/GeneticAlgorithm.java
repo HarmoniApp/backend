@@ -1,4 +1,4 @@
-package org.harmoniapp.harmoniwebapi.geneticAlgorithm;
+package org.harmoniapp.harmoniwebapi.geneticalgorithm;
 
 import lombok.AllArgsConstructor;
 
@@ -8,13 +8,13 @@ import java.util.*;
  * Represents the genetic algorithm used to generate schedules.
  */
 @AllArgsConstructor
-public class GeneticAlgorithm {
+public class GeneticAlgorithm implements Algorithm {
     private final int populationSize;
     private final int tournamentSize;
     private final int maxGenerations;
     private final double mutationRate;
     private final double crossoverRate;
-    private final ConstraintChecker constraintChecker;
+    private final CheckConstraint constraintChecker;
     private final Random random;
     private final int reportInterval;
     private final GenerationListener listener;
@@ -59,6 +59,7 @@ public class GeneticAlgorithm {
      * @param employees the list of employees to generate the schedule from
      * @return the generated schedule
      */
+    @Override
     public Chromosome run(List<Gen> shifts, Map<String, List<Employee>> employees) {
         List<Chromosome> population = initializePopulation(shifts, employees);
 
@@ -111,8 +112,8 @@ public class GeneticAlgorithm {
     private Chromosome generateRandomChromosome(List<Gen> shifts, Map<String, List<Employee>> employees) {
         List<Gen> gens = new ArrayList<>(shifts.size());
         for (Gen shift : shifts) {
-            List<Employee> employeesForShift = selectRandomEmployees(shift.getRequirements(), employees);
-            gens.add(new Gen(shift.getId(), shift.getDay(), shift.getStartTime(), employeesForShift, shift.getRequirements()));
+            List<Employee> employeesForShift = selectRandomEmployees(shift.requirements(), employees);
+            gens.add(new Gen(shift.id(), shift.day(), shift.startTime(), employeesForShift, shift.requirements()));
         }
         return new Chromosome(gens, constraintChecker);
     }
@@ -199,8 +200,8 @@ public class GeneticAlgorithm {
         for (int i = 0; i < gens.size(); i++) {
             if (random.nextDouble() > mutationRate) continue;
 
-            List<Employee> employeesForShift = selectRandomEmployees(gens.get(i).getRequirements(), employees);
-            gens.set(i, new Gen(gens.get(i).getId(), gens.get(i).getDay(), gens.get(i).getStartTime(), employeesForShift, gens.get(i).getRequirements()));
+            List<Employee> employeesForShift = selectRandomEmployees(gens.get(i).requirements(), employees);
+            gens.set(i, new Gen(gens.get(i).id(), gens.get(i).day(), gens.get(i).startTime(), employeesForShift, gens.get(i).requirements()));
 
         }
         return new Chromosome(gens, constraintChecker);
