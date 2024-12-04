@@ -276,7 +276,7 @@ public class AiScheduleService {
         }
 
         List<Shift> shifts = repositoryCollector.getShifts().findAllById(lastGeneratedShiftIds);
-        shifts.removeIf(Shift::isPublished);
+        shifts.removeIf(Shift::getPublished);
         repositoryCollector.getShifts().deleteAll(shifts);
         lastGeneratedShiftIds = null;
 
