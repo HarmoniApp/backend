@@ -25,11 +25,6 @@ public class MessageController {
         return service.getChatHistory(userId1, userId2, groupId, translate, targetLanguage);
     }
 
-//    @GetMapping("/chat-partners")
-//    public List<Long> getChatPartners(@RequestParam Long userId) {
-//        return service.getChatPartners(userId);
-//    }
-
     @GetMapping("/all-chat-partners")
     public List<ChatPartnerDto> getAllChatPartners(@RequestParam Long userId) {
         return service.getAllChatPartners(userId);

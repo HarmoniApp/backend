@@ -44,11 +44,6 @@ public class MessageService {
                 .toList();
     }
 
-//
-//    public List<Long> getChatPartners(Long userId) {
-//        return repositoryCollector.getMessages().findChatPartners(userId);
-//    }
-
     public List<ChatPartnerDto> getAllChatPartners(Long userId) {
         List<Object[]> results = repositoryCollector.getMessages().findAllChatPartners(userId);
         return results.stream()
