@@ -49,7 +49,7 @@ public class UserService {
     private final PasswordManager passwordManager;
     private final PasswordEncoder passwordEncoder;
     private final CompromisedPasswordChecker passwordChecker;
-    private final String photoDirPath = "harmoni-web-api/src/main/resources/static/userPhoto/";
+    private final String photoDirPath = "src/main/resources/static/userPhoto/";
 
     /**
      * Retrieves a paginated list of UserDto objects based on specified criteria.
