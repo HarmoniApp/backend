@@ -1,14 +1,13 @@
 package org.harmoniapp.services;
 
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.contracts.PartialAbsenceDto;
+import org.harmoniapp.contracts.ShiftDto;
+import org.harmoniapp.contracts.UserScheduleDto;
 import org.harmoniapp.entities.Absence;
 import org.harmoniapp.entities.Shift;
 import org.harmoniapp.entities.User;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.harmoniapp.contracts.PartialAbsenceDto;
-import org.harmoniapp.contracts.ShiftDto;
-import org.harmoniapp.contracts.UserScheduleDto;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,7 +20,6 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class UserScheduleService {
     private final RepositoryCollector repositoryCollector;
 

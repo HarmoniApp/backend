@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class ExcelService {
     private final RepositoryCollector repositoryCollector;
 

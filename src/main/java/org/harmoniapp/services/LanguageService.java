@@ -1,11 +1,10 @@
 package org.harmoniapp.services;
 
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.contracts.LanguageDto;
 import org.harmoniapp.entities.Language;
 import org.harmoniapp.entities.User;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.harmoniapp.contracts.LanguageDto;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +16,6 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class LanguageService {
     private final RepositoryCollector repositoryCollector;
 

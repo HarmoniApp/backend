@@ -1,9 +1,8 @@
 package org.harmoniapp.services;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.contracts.StatusDto;
-import org.springframework.context.annotation.ComponentScan;
+import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,6 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class StatusService {
     private final RepositoryCollector repositoryCollector;
 

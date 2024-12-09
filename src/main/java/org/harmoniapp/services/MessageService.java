@@ -2,12 +2,11 @@ package org.harmoniapp.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.contracts.MessageDto;
 import org.harmoniapp.entities.Group;
 import org.harmoniapp.entities.Message;
 import org.harmoniapp.entities.User;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.harmoniapp.contracts.MessageDto;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class MessageService {
     private final RepositoryCollector repositoryCollector;
     private final SimpMessagingTemplate messagingTemplate;

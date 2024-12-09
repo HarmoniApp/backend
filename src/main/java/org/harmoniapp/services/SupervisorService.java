@@ -1,11 +1,10 @@
 package org.harmoniapp.services;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.entities.User;
-import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.contracts.PageDto;
 import org.harmoniapp.contracts.SupervisorDto;
-import org.springframework.context.annotation.ComponentScan;
+import org.harmoniapp.entities.User;
+import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class SupervisorService {
     private final RepositoryCollector repositories;
 

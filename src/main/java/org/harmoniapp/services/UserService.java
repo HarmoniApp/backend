@@ -1,16 +1,15 @@
 package org.harmoniapp.services;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.entities.Address;
-import org.harmoniapp.entities.ContractType;
-import org.harmoniapp.entities.User;
-import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.contracts.PageDto;
 import org.harmoniapp.contracts.UserDto;
 import org.harmoniapp.contracts.UserNewPassword;
+import org.harmoniapp.entities.Address;
+import org.harmoniapp.entities.ContractType;
+import org.harmoniapp.entities.User;
 import org.harmoniapp.exception.EasyPasswordException;
+import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.utils.PasswordManager;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,9 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,7 +41,6 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class UserService {
     private final RepositoryCollector repositoryCollector;
     private final AddressService addressService;

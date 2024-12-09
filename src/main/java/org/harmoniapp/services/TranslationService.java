@@ -3,10 +3,9 @@ package org.harmoniapp.services;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
-import okhttp3.*;
 import lombok.RequiredArgsConstructor;
+import okhttp3.*;
 import org.harmoniapp.utils.LanguageCodeMapper;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class TranslationService {
 
     private final OkHttpClient client = new OkHttpClient();

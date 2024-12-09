@@ -1,10 +1,9 @@
 package org.harmoniapp.services;
 
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.contracts.PredefineShiftDto;
 import org.harmoniapp.entities.PredefineShift;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.harmoniapp.contracts.PredefineShiftDto;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class PredefineShiftService {
     private final RepositoryCollector repositoryCollector;
 

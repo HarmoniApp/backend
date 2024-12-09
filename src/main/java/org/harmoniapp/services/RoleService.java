@@ -1,12 +1,11 @@
 package org.harmoniapp.services;
 
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.contracts.RoleDto;
 import org.harmoniapp.entities.Role;
 import org.harmoniapp.entities.Shift;
 import org.harmoniapp.entities.User;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.harmoniapp.contracts.RoleDto;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,6 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class RoleService {
     private final RepositoryCollector repositoryCollector;
 

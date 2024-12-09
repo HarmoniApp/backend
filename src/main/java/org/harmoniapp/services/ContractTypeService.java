@@ -1,10 +1,9 @@
 package org.harmoniapp.services;
 
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.contracts.ContractTypeDto;
 import org.harmoniapp.entities.ContractType;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.harmoniapp.contracts.ContractTypeDto;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -16,7 +15,6 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class ContractTypeService {
     private final RepositoryCollector repositoryCollector;
 

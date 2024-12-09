@@ -1,14 +1,13 @@
 package org.harmoniapp.services;
 
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.contracts.NotificationDto;
+import org.harmoniapp.contracts.ShiftDto;
 import org.harmoniapp.entities.NotificationType;
 import org.harmoniapp.entities.Role;
 import org.harmoniapp.entities.Shift;
 import org.harmoniapp.entities.User;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.harmoniapp.contracts.NotificationDto;
-import org.harmoniapp.contracts.ShiftDto;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +21,6 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class ShiftService {
     private final RepositoryCollector repositoryCollector;
     private final NotificationService notificationService;

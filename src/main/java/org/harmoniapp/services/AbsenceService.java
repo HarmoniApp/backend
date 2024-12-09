@@ -1,13 +1,12 @@
 package org.harmoniapp.services;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.entities.*;
-import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.contracts.AbsenceDto;
 import org.harmoniapp.contracts.NotificationDto;
 import org.harmoniapp.contracts.PageDto;
+import org.harmoniapp.entities.*;
+import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.utils.HolidayCalculator;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class AbsenceService {
     private final RepositoryCollector repositoryCollector;
     private final NotificationService notificationService;

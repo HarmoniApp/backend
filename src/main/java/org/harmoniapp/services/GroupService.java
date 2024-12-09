@@ -2,12 +2,11 @@ package org.harmoniapp.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.contracts.GroupDto;
+import org.harmoniapp.contracts.PartialUserWithEmpIdDto;
 import org.harmoniapp.entities.Group;
 import org.harmoniapp.entities.User;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.harmoniapp.contracts.GroupDto;
-import org.harmoniapp.contracts.PartialUserWithEmpIdDto;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackages = {"org.harmoniapp.harmonidata"})
 public class GroupService {
     private final RepositoryCollector repositoryCollector;
 
