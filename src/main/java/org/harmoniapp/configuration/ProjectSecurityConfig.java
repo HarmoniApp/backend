@@ -2,7 +2,7 @@ package org.harmoniapp.configuration;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.repositories.UserRepository;
+import org.harmoniapp.repositories.user.UserRepository;
 import org.harmoniapp.exceptionhandling.CustomAccessDeniedHandler;
 import org.harmoniapp.exceptionhandling.CustomBasicAuthenticationEntryPoint;
 import org.harmoniapp.filter.AuthoritiesLoggingAfterFilter;

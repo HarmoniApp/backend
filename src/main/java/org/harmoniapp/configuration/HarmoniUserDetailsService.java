@@ -3,7 +3,7 @@ package org.harmoniapp.configuration;
 
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.harmoniapp.entities.User;
+import org.harmoniapp.entities.user.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

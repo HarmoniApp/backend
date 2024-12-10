@@ -2,8 +2,8 @@ package org.harmoniapp.services.importexport;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
-import org.harmoniapp.entities.Shift;
-import org.harmoniapp.entities.User;
+import org.harmoniapp.entities.schedule.Shift;
+import org.harmoniapp.entities.user.User;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.exception.EmptyFileException;
 import org.harmoniapp.exception.InvalidCellException;
