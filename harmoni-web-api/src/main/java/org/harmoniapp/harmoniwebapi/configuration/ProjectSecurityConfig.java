@@ -138,9 +138,10 @@ public class ProjectSecurityConfig {
                                 new AntPathRequestMatcher("/user/{id}/uploadPhoto"),
                                 new AntPathRequestMatcher("/user/{id}/defaultPhoto")).access(ownerAuthorizationManager)
                         .requestMatchers(new AntPathRequestMatcher("/user/{id}/**", "GET")).access(adminOrOwnerAuthorizationManager)
+                        .requestMatchers("user/{id}/photo").authenticated()
                         .requestMatchers("/user/**").hasRole("ADMIN")
                         .requestMatchers("/calendar/user/{id}/**").access(adminOrOwnerAuthorizationManager)
-                        .requestMatchers("/userPhoto/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/userPhoto/**").hasAnyRole("USER", "ADMIN") //TODO: remove
                         .requestMatchers("/group/chat-partners/**").access(ownerQueryParamAuthorizationManager)
                         .requestMatchers(new AntPathRequestMatcher("/group", "POST")).hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/group/details/{groupId}/**",
