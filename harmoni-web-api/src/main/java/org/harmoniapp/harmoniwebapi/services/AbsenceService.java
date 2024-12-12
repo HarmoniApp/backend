@@ -145,7 +145,7 @@ public class AbsenceService {
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("updated").descending());
 
-        var absence = repositoryCollector.getAbsences().findAll(pageable);
+        var absence = repositoryCollector.getAbsences().findAllWithActiveUsers(pageable);
         return new PageDto<>(absence.stream().map(AbsenceDto::fromEntity).toList(),
                 absence.getSize(),
                 absence.getNumber()+1,
