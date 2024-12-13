@@ -176,10 +176,10 @@ public class AbsenceService {
                 .orElseThrow(IllegalArgumentException::new);
 
         if (absenceDto.start().isBefore(LocalDate.now()) || absenceDto.end().isBefore(LocalDate.now())) {
-            throw new RuntimeException("An error occurred: You can't start or end the absence in the past.");
+            throw new RuntimeException("Błąd: Nie można rozpocząć ani zakończyć urlopu w przeszłości.");
         }
         if (absenceDto.end().isBefore(absenceDto.start())) {
-            throw new RuntimeException("An error occurred: You can't end the absence before it starts.");
+            throw new RuntimeException("Błąd: Nie można zakończyć urlopu przed jego rozpoczęciem");
         }
 
         Absence absence = absenceDto.toEntity(user, absenceType, status);
@@ -191,7 +191,7 @@ public class AbsenceService {
         int availableDays = user.getAvailableAbsenceDays() + user.getUnusedAbsenceDays();
 
         if (requestedDays > availableDays) {
-            throw new RuntimeException("An error occurred: You can't take more days than available.");
+            throw new RuntimeException("Błąd: Nie można wziąć więcej dni niż jest dostępnych");
         }
 
         if (requestedDays <= user.getUnusedAbsenceDays()) {
