@@ -187,10 +187,10 @@ public class ShiftService {
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
                 publishedShift.getUser().getId(),
-                "New Shift Published",
-                "New shift published. Shift " +
+                "Nowa zmiana opublikowana",
+                "Nowa zmiana opublikowana. Zmiana " +
                         publishedShift.getStart() + " - " + publishedShift.getEnd() +
-                        " is published. Please check your schedule.",
+                        "opublikowana. Zapoznaj sie ze swoim grafikiem.",
                 notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()
@@ -215,10 +215,10 @@ public class ShiftService {
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
                 publishedShift.getUser().getId(),
-                "Shift Was Deleted",
-                "Shift Was Deleted. Shift " +
+                "Zmiana usunięta",
+                "Zmiana usunięta. Zmiana " +
                         publishedShift.getStart() + " - " + publishedShift.getEnd() +
-                        " was deleted. Please check your schedule.",
+                        " usunięta. Zapoznaj sie ze swoim grafikiem.",
                 notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()

@@ -359,8 +359,8 @@ public class AbsenceService {
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
                 savedAbsence.getUser().getSupervisor().getId(),
-                "New Absence Awaiting",
-                "New absence awaiting. Employee " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " requested for absence.",
+                "Nowy wniosek o urlop",
+                "Nowy wniosek o urlop. Pracownik " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " złożył wniosek o urlop. Zapoznaj się ze zmianami",
                 notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()
@@ -381,8 +381,8 @@ public class AbsenceService {
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
                 savedAbsence.getUser().getSupervisor().getId(),
-                "Absence is updated",
-                "Absence is updated. Employee " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " has changed their absence. Please review the changes.",
+                "Urlop zaaktualizowany",
+                "Urlop zaaktualizowany. Pracownik " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " zmienił swoją nieobecność. Zapoznaj się ze zmianami.",
                 notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()
@@ -403,11 +403,11 @@ public class AbsenceService {
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
                 savedAbsence.getUser().getId(),
-                "Absence Status is updated",
-                "Absence status is updated. Status for absence " +
+                "Status urlopu zaaktualizowany",
+                "Status urlopu zaaktualizowany. Status urlopu " +
                         savedAbsence.getStart() + "-" + savedAbsence.getEnd() +
-                        " is " + savedAbsence.getStatus().getName() +
-                        " Please review the changes.",
+                        " to " + savedAbsence.getStatus().getName() +
+                        " Zapoznaj się ze zmianami.",
                 notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()
@@ -458,11 +458,11 @@ public class AbsenceService {
         User user;
         if(statusId == 3){ // employer gets notification
             user = absence.getUser().getSupervisor();
-            message = "Employee " + absence.getUser().getFirstname() + " "
-                    + absence.getUser().getSurname() + " cancelled absence";
+            message = "Pracownik " + absence.getUser().getFirstname() + " "
+                    + absence.getUser().getSurname() + "anulował urlop";
         } else if (statusId == 4) { // employee gets notification
             user = absence.getUser();
-            message = "Absence " + absence.getStart() + " - " + absence.getEnd() + " is rejected";
+            message = "Urlop " + absence.getStart() + " - " + absence.getEnd() + " odrzucony";
         } else {
             throw new RuntimeException("Invalid status for notification");
         }
@@ -470,7 +470,7 @@ public class AbsenceService {
         NotificationDto notificationDto = new NotificationDto(
                                 0L, // id is set automatically by the database
                                 user.getId(),
-                                "Absence update",
+                                "Urlop zaaktualizowany",
                                 message,
                                 notificationType.getTypeName(),
                                 false,
