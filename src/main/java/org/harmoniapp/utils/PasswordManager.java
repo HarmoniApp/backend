@@ -2,7 +2,6 @@ package org.harmoniapp.utils;
 
 
 import org.apache.commons.text.RandomStringGenerator;
-import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.stream.Collectors;
  * This component provides methods to generate random passwords with a mix of special characters, numbers, and alphabets.
  * </p>
  */
-@Component
 public class PasswordManager {
 
     /**
@@ -22,7 +20,7 @@ public class PasswordManager {
      *
      * @return a randomly generated password as a {@link String}.
      */
-    public String generateCommonTextPassword() {
+    public static String generateCommonTextPassword() {
         String pwString = generateRandomSpecialCharacters(2)
                 .concat(generateRandomNumbers(2))
                 .concat(generateRandomAlphabet(2, true))
@@ -43,7 +41,7 @@ public class PasswordManager {
      * @param length the number of special characters to generate.
      * @return a random string of special characters.
      */
-    public String generateRandomSpecialCharacters(int length) {
+    public static String generateRandomSpecialCharacters(int length) {
         RandomStringGenerator generator = new RandomStringGenerator.Builder().withinRange(33, 46).get();
         return generator.generate(length);
     }
@@ -54,7 +52,7 @@ public class PasswordManager {
      * @param length the number of digits to generate.
      * @return a random string of numbers.
      */
-    public String generateRandomNumbers(int length) {
+    public static String generateRandomNumbers(int length) {
         RandomStringGenerator generator = new RandomStringGenerator.Builder().withinRange(48, 57).get();
         return generator.generate(length);
     }
@@ -67,7 +65,7 @@ public class PasswordManager {
      * @param isUppercase {@code true} for uppercase letters, {@code false} for lowercase letters.
      * @return a random string of alphabetic characters.
      */
-    public String generateRandomAlphabet(int length, boolean isUppercase) {
+    public static String generateRandomAlphabet(int length, boolean isUppercase) {
         int lowerRange;
         int upperRange;
         if (isUppercase) {
@@ -87,7 +85,7 @@ public class PasswordManager {
      * @param length the number of characters to generate.
      * @return a random string of printable ASCII characters.
      */
-    public String generateRandomCharacters(int length) {
+    public static String generateRandomCharacters(int length) {
         RandomStringGenerator generator = new RandomStringGenerator.Builder().withinRange(33, 125).get();
         return generator.generate(length);
     }

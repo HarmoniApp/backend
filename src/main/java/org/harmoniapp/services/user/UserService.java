@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 public class UserService {
     private final RepositoryCollector repositoryCollector;
     private final AddressService addressService;
-    private final PasswordManager passwordManager;
     private final PasswordEncoder passwordEncoder;
     private final CompromisedPasswordChecker passwordChecker;
     private final String photoDirPath = "src/main/resources/static/userPhoto/";
@@ -155,7 +154,7 @@ public class UserService {
                         .collect(Collectors.toSet())
         );
 
-        String rawPwd = passwordManager.generateCommonTextPassword();
+        String rawPwd = PasswordManager.generateCommonTextPassword();
         String hashedPwd = passwordEncoder.encode(rawPwd);
         user.setPassword(hashedPwd);
 
@@ -419,7 +418,7 @@ public class UserService {
         User user = repositoryCollector.getUsers().findById(id)
                 .orElseThrow(IllegalArgumentException::new);
 
-        String pwd = passwordManager.generateCommonTextPassword();
+        String pwd = PasswordManager.generateCommonTextPassword();
         String hashedPwd = passwordEncoder.encode(pwd);
         user.setPassword(hashedPwd);
         user.setPasswordExpirationDate(LocalDate.now().minusDays(1));

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @Getter
-public class JwtTokenUtil {
+public final class JwtTokenUtil {
 
     private final String AUTH_HEADER = "Authorization";
     private final String JWT_ISSUER = "HarmoniApp";
@@ -44,14 +43,14 @@ public class JwtTokenUtil {
      * Generates a JWT token for the authenticated user with extra claims.
      *
      * @param authentication the {@link Authentication} object containing user details.
-     * @param extraClaims additional claims to add to the token.
-     * @param isOTP flag indicating if the token is a one-time password (OTP) token.
+     * @param extraClaims    additional claims to add to the token.
+     * @param isOTP          flag indicating if the token is a one-time password (OTP) token.
      * @return a signed JWT token as a {@link String}.
      */
     public String generateToken(Authentication authentication, Map<String, Object> extraClaims, boolean isOTP) {
         SecretKey secretKey = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
-        long exp = isOTP ? OTP_EXPIRATION: DEFAULT_EXPIRATION;
+        long exp = isOTP ? OTP_EXPIRATION : DEFAULT_EXPIRATION;
         Date expDate = new Date((new Date()).getTime() + exp);
 
         return Jwts.builder().issuer(JWT_ISSUER).subject(authentication.getName())
@@ -120,7 +119,7 @@ public class JwtTokenUtil {
     /**
      * Validates a JWT token based on the user details and expiration data.
      *
-     * @param token the JWT token to validate.
+     * @param token       the JWT token to validate.
      * @param userDetails the {@link UserDetails} object containing user details.
      * @return {@code true} if the token is valid, {@code false} otherwise.
      */
