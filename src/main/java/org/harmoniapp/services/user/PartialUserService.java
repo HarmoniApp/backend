@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Service interface for partial user operations.
  */
-public interface PartialUserService extends FindUser {
+public interface PartialUserService {
     /**
      * Retrieves a user by their ID.
      *

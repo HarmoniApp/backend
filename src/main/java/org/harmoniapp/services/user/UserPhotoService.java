@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Service interface for managing user photos.
  */
-public interface UserPhotoService extends FindUser {
+public interface UserPhotoService  {
 
     /**
      * Uploads a photo for the user with the given ID.

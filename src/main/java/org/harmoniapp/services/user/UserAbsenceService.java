@@ -5,7 +5,7 @@ import org.harmoniapp.entities.user.User;
 /**
  * Service interface for managing user absences.
  */
-public interface UserAbsenceService extends FindUser {
+public interface UserAbsenceService  {
     /**
      * Retrieves the number of available absence days for a user.
      *

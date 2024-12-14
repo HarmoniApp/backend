@@ -2,10 +2,12 @@ package org.harmoniapp.services.user;
 
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.repositories.RepositoryCollector;
+import org.springframework.stereotype.Component;
 
 /**
  * Interface for finding users.
  */
+@Component
 public interface FindUser {
 
     /**

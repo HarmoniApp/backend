@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Service interface for managing users.
  */
-public interface UserService extends FindUser {
+public interface UserService {
 
     /**
      * Retrieves a user by their ID.

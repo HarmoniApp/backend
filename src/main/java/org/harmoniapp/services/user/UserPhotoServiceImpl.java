@@ -26,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserPhotoServiceImpl implements UserPhotoService {
     private final RepositoryCollector repositoryCollector;
+    private final FindUser findUser;
     private final String photoDirPath = "src/main/resources/static/userPhoto/";
 
     /**
@@ -37,7 +38,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      * @throws RuntimeException         if there is an error reading the photo file.
      */
     public ResponseEntity<InputStreamResource> getUserPhoto(long id) {
-        User user = getUserById(id, repositoryCollector);
+        User user = findUser.getUserById(id, repositoryCollector);
         String photo = user.getPhoto();
         MediaType contentType = determineContentType(photo);
 
@@ -65,7 +66,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      */
     public UserDto uploadPhoto(long id, MultipartFile file) {
         validateFileFormat(file);
-        User user = getUserById(id, repositoryCollector);
+        User user = findUser.getUserById(id, repositoryCollector);
         String uploadDirectory = createUploadDirectory();
 
         try {
@@ -90,7 +91,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      * @throws RuntimeException         if there is an error deleting the old photo file.
      */
     public UserDto setDefaultPhoto(long id) {
-        User user = getUserById(id, repositoryCollector);
+        User user = findUser.getUserById(id, repositoryCollector);
 
         if (isDefaultPhoto(user.getPhoto())) {
             return UserDto.fromEntity(user);

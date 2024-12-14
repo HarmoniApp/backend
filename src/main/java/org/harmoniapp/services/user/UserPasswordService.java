@@ -6,7 +6,7 @@ import org.harmoniapp.entities.user.User;
 /**
  * Service interface for managing user passwords.
  */
-public interface UserPasswordService extends FindUser {
+public interface UserPasswordService {
 
     /**
      * Sets a new password for the given user.

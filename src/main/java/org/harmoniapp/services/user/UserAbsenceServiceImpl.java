@@ -17,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserAbsenceServiceImpl implements UserAbsenceService {
     private final RepositoryCollector repositoryCollector;
+    private final FindUser findUser;
 
     /**
      * Retrieves the total number of available absence days for a user.
@@ -26,7 +27,7 @@ public class UserAbsenceServiceImpl implements UserAbsenceService {
      */
     @Override
     public int getUserAvailableAbsenceDays(long id) {
-        User user = getUserById(id, repositoryCollector);
+        User user = findUser.getUserById(id, repositoryCollector);
         return user.getAvailableAbsenceDays() + user.getUnusedAbsenceDays();
     }
 

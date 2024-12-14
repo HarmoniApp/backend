@@ -19,6 +19,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class UserPasswordServiceImpl implements UserPasswordService {
     private final RepositoryCollector repositoryCollector;
+    private final FindUser findUser;
     private final PasswordEncoder passwordEncoder;
     private final CompromisedPasswordChecker passwordChecker;
 
@@ -62,7 +63,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     @Override
     public String changePassword(long id, UserNewPassword pwd) throws EasyPasswordException {
         validatePassword(pwd.newPassword());
-        User user = getUserById(id, repositoryCollector);
+        User user = findUser.getUserById(id, repositoryCollector);
         updatePassword(user, pwd.newPassword());
         return "Hasło zmienione pomyślnie";
     }
@@ -75,7 +76,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
      */
     @Override
     public String generateNewPassword(long id) {
-        User user = getUserById(id, repositoryCollector);
+        User user = findUser.getUserById(id, repositoryCollector);
         String rawPass = setPassword(user);
         repositoryCollector.getUsers().save(user);
         return rawPass;

@@ -32,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final UserPasswordServiceImpl userPassword;
     private final AddressService addressService;
     private final UserSearchService userSearchService;
+    private final FindUser findUser;
 
     /**
      * Retrieves a specific user by their ID.
@@ -41,7 +42,7 @@ public class UserServiceImpl implements UserService {
      * @throws EntityNotFound if the user with the specified ID is not found.
      */
     public UserDto get(long id) {
-        User user = getUserById(id, repositoryCollector);
+        User user = findUser.getUserById(id, repositoryCollector);
         return UserDto.fromEntity(user);
     }
 
@@ -116,7 +117,7 @@ public class UserServiceImpl implements UserService {
     public UserDto update(long id, UserDto userDto) {
         validateContractDates(userDto);
 
-        User existingUser = getUserById(id, repositoryCollector);
+        User existingUser = findUser.getUserById(id, repositoryCollector);
         updateUserDetails(existingUser, userDto);
         updateUserAddresses(existingUser, userDto);
         setContractType(existingUser, userDto);
