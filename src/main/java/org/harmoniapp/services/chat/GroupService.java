@@ -3,7 +3,7 @@ package org.harmoniapp.services.chat;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.chat.GroupDto;
-import org.harmoniapp.contracts.user.PartialUserWithEmpIdDto;
+import org.harmoniapp.contracts.user.PartialUserDto;
 import org.harmoniapp.entities.chat.Group;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.repositories.RepositoryCollector;
@@ -24,12 +24,12 @@ public class GroupService {
         return GroupDto.fromEntity(group);
     }
 
-    public List<PartialUserWithEmpIdDto> getGroupMembersByGroupId(Long groupId) {
+    public List<PartialUserDto> getGroupMembersByGroupId(Long groupId) {
         Group group = repositoryCollector.getGroups().findById(groupId)
                 .orElseThrow(() -> new IllegalArgumentException("Group not found"));
 
         return group.getMembers().stream()
-                .map(PartialUserWithEmpIdDto::fromEntity)
+                .map(PartialUserDto::fromEntity)
                 .toList();
     }
 

@@ -5,6 +5,7 @@ import org.harmoniapp.contracts.profile.LanguageDto;
 import org.harmoniapp.entities.profile.Language;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.repositories.RepositoryCollector;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +55,7 @@ public class LanguageService {
      * @return the created {@link LanguageDto}.
      * @throws IllegalArgumentException if a language with the same name already exists.
      */
+    @CacheEvict(value = "languages", allEntries = true)
     public LanguageDto createLanguage(LanguageDto languageDto) {
         Language language = languageDto.toEntity();
 
@@ -73,6 +75,7 @@ public class LanguageService {
      * @param languageDto the {@link LanguageDto} containing the updated details of the language.
      * @return the updated {@link LanguageDto}.
      */
+    @CacheEvict(value = "languages", allEntries = true)
     public LanguageDto updateLanguage(long id, LanguageDto languageDto) {
         Language language = repositoryCollector.getLanguages().findById(id).orElse(null);
 
@@ -94,6 +97,7 @@ public class LanguageService {
      * @param id the ID of the language to delete.
      * @throws IllegalArgumentException if the language with the specified ID does not exist.
      */
+    @CacheEvict(value = "languages", allEntries = true)
     public void deleteLanguage(long id) {
         Language language = repositoryCollector.getLanguages().findById(id).orElseThrow(IllegalArgumentException::new);
 

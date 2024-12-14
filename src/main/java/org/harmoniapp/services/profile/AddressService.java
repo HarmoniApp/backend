@@ -2,10 +2,12 @@ package org.harmoniapp.services.profile;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.math3.analysis.function.Add;
 import org.harmoniapp.entities.profile.Address;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.contracts.profile.AddressDto;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -98,12 +100,12 @@ public class AddressService {
      * @return The updated AddressDto object.
      */
     public AddressDto updateAddress(long id, AddressDto addressDto) {
-        var existingAddress = repositoryCollector.getAddresses().findById(id);
+        Address existingAddress = repositoryCollector.getAddresses()
+                .findById(id)
+                .orElse(null);
+        Address updatedAddress = updateAddress(existingAddress, addressDto);
 
-        Address newAddress = addressDto.toEntity();
-        newAddress.setId(existingAddress.map(Address::getId).orElse(null));
-
-        return AddressDto.fromEntity(repositoryCollector.getAddresses().save(newAddress));
+        return AddressDto.fromEntity(repositoryCollector.getAddresses().save(updatedAddress));
     }
 
     /**
@@ -113,9 +115,9 @@ public class AddressService {
      * @param addressDto      The AddressDto object containing the updated address data.
      * @return The updated Address entity.
      */
-    public Address updateAddress(Address existingAddress, AddressDto addressDto) {
+    public Address updateAddress(@Nullable Address existingAddress, AddressDto addressDto) {
         Address newAddress = addressDto.toEntity();
-        newAddress.setId(existingAddress.getId());
+        newAddress.setId((existingAddress != null) ? existingAddress.getId() : null);
 
         return repositoryCollector.getAddresses().save(newAddress);
     }

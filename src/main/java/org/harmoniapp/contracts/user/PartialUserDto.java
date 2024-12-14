@@ -1,5 +1,6 @@
 package org.harmoniapp.contracts.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.harmoniapp.contracts.profile.LanguageDto;
 import org.harmoniapp.entities.user.User;
 
@@ -17,8 +18,9 @@ import java.util.stream.Collectors;
 public record PartialUserDto(long id,
                              String firstname,
                              String surname,
-                             String photo,
-                             Set<LanguageDto> languages) {
+                             String photo, //TODO: Verify if this field is needed
+                             Set<LanguageDto> languages,
+                             @JsonProperty("employee_id") String employeeId) {
 
     public static PartialUserDto fromEntity(User user) {
         return new PartialUserDto(
@@ -27,8 +29,9 @@ public record PartialUserDto(long id,
                 user.getSurname(),
                 user.getPhoto(),
                 user.getLanguages().stream()
-                        .map(p -> new LanguageDto(p.getId(), p.getName(), p.getCode()))
-                        .collect(Collectors.toSet())
+                        .map(LanguageDto::fromEntity)
+                        .collect(Collectors.toSet()),
+                user.getEmployeeId()
         );
     }
 }

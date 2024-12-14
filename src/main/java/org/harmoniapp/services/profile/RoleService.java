@@ -6,6 +6,7 @@ import org.harmoniapp.entities.profile.Role;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.repositories.RepositoryCollector;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,6 +82,7 @@ public class RoleService {
      * @return the created RoleDto
      * @throws RuntimeException if an error occurs during creation
      */
+    @CacheEvict(value = "roles", allEntries = true)
     public RoleDto createRole(RoleDto roleDto) {
         try {
             Role role = roleDto.toEntity();
@@ -101,6 +103,7 @@ public class RoleService {
      * @throws RuntimeException if an error occurs during update
      */
     @Transactional
+    @CacheEvict(value = "roles", allEntries = true)
     public RoleDto updateRole(long id, RoleDto roleDto) {
         Optional<Role> optionalRole = repositoryCollector.getRoles().findById(id);
         Role newRole = roleDto.toEntity();
@@ -124,6 +127,7 @@ public class RoleService {
      * @param id the ID of the Role to be deleted
      * @throws IllegalArgumentException if the role with the specified ID does not exist or if the role is the admin role
      */
+    @CacheEvict(value = "roles", allEntries = true)
     public void deleteRole(long id) {
         Role role = repositoryCollector.getRoles().findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Role not found"));

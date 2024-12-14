@@ -6,8 +6,8 @@ import jakarta.validation.constraints.*;
 import lombok.Builder;
 import org.harmoniapp.contracts.profile.AddressDto;
 import org.harmoniapp.contracts.profile.LanguageDto;
+import org.harmoniapp.contracts.profile.RoleDto;
 import org.harmoniapp.entities.profile.ContractType;
-import org.harmoniapp.entities.profile.Role;
 import org.harmoniapp.entities.user.User;
 
 import java.time.LocalDate;
@@ -88,7 +88,7 @@ public record UserDto(
         @JsonProperty("unused_absence_days") Integer unusedAbsenceDays,
 
         @NotEmpty(message = "Roles cannot be null or empty")
-        List<Role> roles,
+        List<RoleDto> roles,
 
         @NotEmpty(message = "Languages cannot be null or empty")
         List<LanguageDto> languages) {
@@ -100,27 +100,7 @@ public record UserDto(
      * @return A UserDto representing the User entity.
      */
     public static UserDto fromEntity(User user) {
-        return new UserDto(
-                user.getId(),
-                user.getFirstname(),
-                user.getSurname(),
-                user.getEmail(),
-                null,
-                user.getContractType(),
-                user.getContractSignature(),
-                user.getContractExpiration(),
-                AddressDto.fromEntity(user.getResidence()),
-                AddressDto.fromEntity(user.getWorkAddress()),
-                (user.getSupervisor() != null) ? user.getSupervisor().getId() : null,
-                user.getPhoneNumber(),
-                user.getEmployeeId(),
-                user.getPhoto(),
-                user.getIsActive(),
-                user.getAvailableAbsenceDays(),
-                user.getUnusedAbsenceDays(),
-                user.getRoles().stream().toList(),
-                user.getLanguages().stream().map(p -> new LanguageDto(p.getId(), p.getName(), p.getCode())).toList()
-        );
+        return fromEntity(user, null);
     }
 
     /**
@@ -130,28 +110,28 @@ public record UserDto(
      * @param password The user password in plain text
      * @return A UserDto representing the User entity.
      */
-    public static UserDto fromEntityWithPassword(User user, String password) {
-        return new UserDto(
-                user.getId(),
-                user.getFirstname(),
-                user.getSurname(),
-                user.getEmail(),
-                password,
-                user.getContractType(),
-                user.getContractSignature(),
-                user.getContractExpiration(),
-                AddressDto.fromEntity(user.getResidence()),
-                AddressDto.fromEntity(user.getWorkAddress()),
-                (user.getSupervisor() != null) ? user.getSupervisor().getId() : null,
-                user.getPhoneNumber(),
-                user.getEmployeeId(),
-                user.getPhoto(),
-                user.getIsActive(),
-                user.getAvailableAbsenceDays(),
-                user.getUnusedAbsenceDays(),
-                user.getRoles().stream().toList(),
-                user.getLanguages().stream().map(p -> new LanguageDto(p.getId(), p.getName(), p.getCode())).toList()
-        );
+    public static UserDto fromEntity(User user, String password) {
+        return UserDto.builder()
+                .id(user.getId())
+                .firstname(user.getFirstname())
+                .surname(user.getSurname())
+                .email(user.getEmail())
+                .password(password)
+                .contractType(user.getContractType())
+                .contractSignature(user.getContractSignature())
+                .contractExpiration(user.getContractExpiration())
+                .residence(AddressDto.fromEntity(user.getResidence()))
+                .workAddress(AddressDto.fromEntity(user.getWorkAddress()))
+                .supervisorId((user.getSupervisor() != null) ? user.getSupervisor().getId() : null)
+                .phoneNumber(user.getPhoneNumber())
+                .employeeId(user.getEmployeeId())
+                .photo(user.getPhoto())
+                .isActive(user.getIsActive())
+                .availableAbsenceDays(user.getAvailableAbsenceDays())
+                .unusedAbsenceDays(user.getUnusedAbsenceDays())
+                .roles(user.getRoles().stream().map(RoleDto::fromEntity).toList())
+                .languages(user.getLanguages().stream().map(LanguageDto::fromEntity).toList())
+                .build();
     }
 
     /**
@@ -160,29 +140,22 @@ public record UserDto(
      * @return A User entity representing this UserDto.
      */
     public User toEntity() {
-        return new User(
-                this.id,
-                this.firstname,
-                this.surname,
-                this.email,
-                this.password,
-                this.contractType,
-                this.contractSignature,
-                this.contractExpiration,
-                null,
-                null,
-                null,
-                this.phoneNumber,
-                this.employeeId,
-                this.photo,
-                0,
-                LocalDate.now(),
-                this.isActive,
-                this.availableAbsenceDays,
-                0,
-                null,
-                null,
-                null
-        );
+        return User.builder()
+                .id(this.id)
+                .firstname(this.firstname)
+                .surname(this.surname)
+                .email(this.email)
+                .password(this.password)
+                .contractType(this.contractType)
+                .contractSignature(this.contractSignature)
+                .contractExpiration(this.contractExpiration)
+                .phoneNumber(this.phoneNumber)
+                .employeeId(this.employeeId)
+                .photo(this.photo)
+                .failedLoginAttempts(0)
+                .passwordExpirationDate(LocalDate.now().minusDays(1))
+                .isActive(this.isActive)
+                .availableAbsenceDays(this.availableAbsenceDays)
+                .build();
     }
 }

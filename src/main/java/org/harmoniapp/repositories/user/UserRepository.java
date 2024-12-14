@@ -27,11 +27,10 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
             where ((u.contractType.id in ?1 or ?1 is null) and
                   (roles.id in ?2 or ?2 is null) and
                   (languages.id in ?3 or ?3 is null))
-                  and u.isActive = ?4""")
+                  and u.isActive = true""")
     Page<User> findAllByContractAndRoleAndLanguageAndIsActive(@Nullable Collection<Long> contract,
                                                               @Nullable Collection<Long> role,
                                                               @Nullable Collection<Long> language,
-                                                              boolean active,
                                                               Pageable pageable);
 
     @Query("""

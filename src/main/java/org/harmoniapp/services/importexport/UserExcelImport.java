@@ -11,6 +11,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.harmoniapp.contracts.profile.RoleDto;
 import org.harmoniapp.entities.profile.Address;
 import org.harmoniapp.entities.profile.Language;
 import org.harmoniapp.entities.profile.Role;
@@ -23,7 +24,7 @@ import org.harmoniapp.contracts.user.UserDto;
 import org.harmoniapp.exception.EmptyFileException;
 import org.harmoniapp.exception.InvalidCellException;
 import org.harmoniapp.exception.PdfGenerationException;
-import org.harmoniapp.services.user.UserService;
+import org.harmoniapp.services.user.UserServiceImpl;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserExcelImport implements ImportUser, ReadWorkbook {
     private final RepositoryCollector repositoryCollector;
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private final List<String> expectedHeaders = List.of("employee id", "first name", "surname", "email",
             "phone number", "city", "street", "apartment", "zip code", "building number", "roles", "languages",
             "contract type", "contract signature", "contract expiration", "supervisor employee id", "department name");
@@ -106,7 +107,7 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
         for (UserDto userDto : userDtoList) {
             try {
                 //TODO: improve adding users to the database
-                UserDto newUser = userService.add(userDto);
+                UserDto newUser = userService.create(userDto);
                 savedUsers.add(newUser);
             } catch (Exception e) {
                 throw new InvalidCellException("Invalid row: " + (userDtoList.indexOf(userDto) + 2));
@@ -357,9 +358,10 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
      * @param roleList the list of roles to filter from.
      * @return a list of roles that match the provided names.
      */
-    private List<Role> getRoles(String roles, List<Role> roleList) {
+    private List<RoleDto> getRoles(String roles, List<Role> roleList) {
         return roleList.stream()
                 .filter(r -> List.of(roles.split(",")).contains(r.getName()))
+                .map(RoleDto::fromEntity)
                 .toList();
     }
 

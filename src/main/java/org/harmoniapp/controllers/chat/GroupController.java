@@ -3,7 +3,8 @@ package org.harmoniapp.controllers.chat;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.chat.GroupDto;
-import org.harmoniapp.contracts.user.PartialUserWithEmpIdDto;
+
+import org.harmoniapp.contracts.user.PartialUserDto;
 import org.harmoniapp.services.chat.GroupService;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class GroupController {
     }
 
     @GetMapping("/{groupId}/members")
-    public List<PartialUserWithEmpIdDto> getGroupMembersByGroupId(@PathVariable Long groupId) {
+    public List<PartialUserDto> getGroupMembersByGroupId(@PathVariable Long groupId) {
         return service.getGroupMembersByGroupId(groupId);
     }
 

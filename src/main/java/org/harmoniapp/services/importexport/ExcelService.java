@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.harmoniapp.contracts.profile.RoleDto;
 import org.harmoniapp.entities.profile.Role;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.repositories.RepositoryCollector;
@@ -65,7 +66,7 @@ public class ExcelService {
                 row.createCell(9).setCellValue(user.residence().buildingNumber());
                 row.createCell(10).setCellValue(
                         user.roles().stream()
-                                .map(Role::getName)
+                                .map(RoleDto::name)
                                 .collect(Collectors.joining(", "))
                 );
                 row.createCell(11).setCellValue(
