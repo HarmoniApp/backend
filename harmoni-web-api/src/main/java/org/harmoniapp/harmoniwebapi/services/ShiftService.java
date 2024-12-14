@@ -1,7 +1,6 @@
 package org.harmoniapp.harmoniwebapi.services;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.harmonidata.entities.NotificationType;
 import org.harmoniapp.harmonidata.entities.Role;
 import org.harmoniapp.harmonidata.entities.Shift;
 import org.harmoniapp.harmonidata.entities.User;
@@ -9,7 +8,6 @@ import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.NotificationDto;
 import org.harmoniapp.harmoniwebapi.contracts.ShiftDto;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -181,9 +179,6 @@ public class ShiftService {
      * @throws RuntimeException if the shift or notification type is not found
      */
     private void publishedShiftNotification(Shift publishedShift) {
-        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(1L) //1 is Shift Published
-                .orElseThrow(() -> new RuntimeException("Notification type not found"));
-
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
                 publishedShift.getUser().getId(),
@@ -191,7 +186,6 @@ public class ShiftService {
                 "Nowa zmiana opublikowana. Zmiana " +
                         publishedShift.getStart() + " - " + publishedShift.getEnd() +
                         "opublikowana. Zapoznaj sie ze swoim grafikiem.",
-                notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()
         );
@@ -206,9 +200,6 @@ public class ShiftService {
      * @throws RuntimeException if the shift or notification type is not found
      */
     private void deletedShiftNotification(Shift shift) {
-        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(6L) //6 is Shift Deleted
-                .orElseThrow(() -> new RuntimeException("Notification type not found"));
-
         Shift publishedShift = repositoryCollector.getShifts().findById(shift.getId())
                 .orElseThrow(() -> new RuntimeException("Shift not found"));
 
@@ -219,7 +210,6 @@ public class ShiftService {
                 "Zmiana usunięta. Zmiana " +
                         publishedShift.getStart() + " - " + publishedShift.getEnd() +
                         " usunięta. Zapoznaj sie ze swoim grafikiem.",
-                notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()
         );

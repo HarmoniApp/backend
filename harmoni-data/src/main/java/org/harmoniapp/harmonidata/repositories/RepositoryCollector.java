@@ -20,8 +20,6 @@ public interface RepositoryCollector {
 
     NotificationRepository getNotifications();
 
-    NotificationTypeRepository getNotificationTypes();
-
     PredefineShiftRepository getPredefineShifts();
 
     RoleRepository getRoles();

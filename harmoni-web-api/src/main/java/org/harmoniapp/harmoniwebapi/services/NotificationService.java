@@ -3,7 +3,6 @@ package org.harmoniapp.harmoniwebapi.services;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.harmonidata.entities.Notification;
-import org.harmoniapp.harmonidata.entities.NotificationType;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
 import org.harmoniapp.harmoniwebapi.contracts.NotificationDto;
@@ -11,7 +10,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -62,9 +60,7 @@ public class NotificationService {
         User user = repositoryCollector.getUsers().findById(notificationDto.userId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        NotificationType type = repositoryCollector.getNotificationTypes().findByTypeName(notificationDto.typeName());
-
-        Notification notification = notificationDto.toEntity(user, type);
+        Notification notification = notificationDto.toEntity(user);
         Notification savedNotification = repositoryCollector.getNotifications().save(notification);
 
         messagingTemplate.convertAndSend("/client/notifications/" + user.getId(), NotificationDto.fromEntity(savedNotification));

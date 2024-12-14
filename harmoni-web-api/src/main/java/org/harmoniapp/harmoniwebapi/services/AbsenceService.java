@@ -353,15 +353,11 @@ public class AbsenceService {
      * @param savedAbsence the saved absence
      */
     private void newAbsenceCreatedNotification(Absence savedAbsence) {
-        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(2L) //2 is Awaiting Absence
-                .orElseThrow(() -> new RuntimeException("Notification type not found"));
-
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
                 savedAbsence.getUser().getSupervisor().getId(),
                 "Nowy wniosek o urlop",
                 "Nowy wniosek o urlop. Pracownik " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " złożył wniosek o urlop. Zapoznaj się ze zmianami",
-                notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()
         );
@@ -375,15 +371,11 @@ public class AbsenceService {
      * @param savedAbsence the saved absence
      */
     private void employeeUpdatedAbsenceNotification(Absence savedAbsence) {
-        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(5L) //5 is Absence Updated
-                .orElseThrow(() -> new RuntimeException("Notification type not found"));
-
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
                 savedAbsence.getUser().getSupervisor().getId(),
                 "Urlop zaaktualizowany",
                 "Urlop zaaktualizowany. Pracownik " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " zmienił swoją nieobecność. Zapoznaj się ze zmianami.",
-                notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()
         );
@@ -397,9 +389,6 @@ public class AbsenceService {
      * @param savedAbsence the saved absence
      */
     private void employerChangeAbsenceStatusNotification(Absence savedAbsence) {
-        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(3L) //3 is Absence Status Updated
-                .orElseThrow(() -> new RuntimeException("Notification type not found"));
-
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
                 savedAbsence.getUser().getId(),
@@ -408,7 +397,6 @@ public class AbsenceService {
                         savedAbsence.getStart() + "-" + savedAbsence.getEnd() +
                         " to " + savedAbsence.getStatus().getName() +
                         " Zapoznaj się ze zmianami.",
-                notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()
         );
@@ -448,9 +436,6 @@ public class AbsenceService {
      * @throws RuntimeException if the absence or notification type is not found
      */
     private void deleteAbsenceNotification(long absenceId, long statusId) {
-        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(5L) //5 is Absence Updated
-                        .orElseThrow(() -> new RuntimeException("Notification type not found"));
-
         Absence absence = repositoryCollector.getAbsences().findById(absenceId)
                 .orElseThrow(() -> new RuntimeException("Absence not found"));
 
@@ -472,7 +457,6 @@ public class AbsenceService {
                                 user.getId(),
                                 "Urlop zaaktualizowany",
                                 message,
-                                notificationType.getTypeName(),
                                 false,
                                 LocalDateTime.now()
                         );
