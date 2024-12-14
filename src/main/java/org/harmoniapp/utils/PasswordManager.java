@@ -32,10 +32,9 @@ public class PasswordManager {
                 .mapToObj(data -> (char) data)
                 .collect(Collectors.toList());
         Collections.shuffle(pwChars);
-        String password = pwChars.stream()
+        return pwChars.stream()
                 .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
                 .toString();
-        return password;
     }
 
     /**
@@ -44,7 +43,7 @@ public class PasswordManager {
      * @param length the number of special characters to generate.
      * @return a random string of special characters.
      */
-    private String generateRandomSpecialCharacters(int length) {
+    public String generateRandomSpecialCharacters(int length) {
         RandomStringGenerator generator = new RandomStringGenerator.Builder().withinRange(33, 46).get();
         return generator.generate(length);
     }
@@ -55,7 +54,7 @@ public class PasswordManager {
      * @param length the number of digits to generate.
      * @return a random string of numbers.
      */
-    private String generateRandomNumbers(int length) {
+    public String generateRandomNumbers(int length) {
         RandomStringGenerator generator = new RandomStringGenerator.Builder().withinRange(48, 57).get();
         return generator.generate(length);
     }
@@ -68,7 +67,7 @@ public class PasswordManager {
      * @param isUppercase {@code true} for uppercase letters, {@code false} for lowercase letters.
      * @return a random string of alphabetic characters.
      */
-    private String generateRandomAlphabet(int length, boolean isUppercase) {
+    public String generateRandomAlphabet(int length, boolean isUppercase) {
         int lowerRange;
         int upperRange;
         if (isUppercase) {
@@ -88,7 +87,7 @@ public class PasswordManager {
      * @param length the number of characters to generate.
      * @return a random string of printable ASCII characters.
      */
-    private String generateRandomCharacters(int length) {
+    public String generateRandomCharacters(int length) {
         RandomStringGenerator generator = new RandomStringGenerator.Builder().withinRange(33, 125).get();
         return generator.generate(length);
     }
