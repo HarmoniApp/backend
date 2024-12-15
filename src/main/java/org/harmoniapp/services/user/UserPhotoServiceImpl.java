@@ -26,7 +26,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserPhotoServiceImpl implements UserPhotoService {
     private final RepositoryCollector repositoryCollector;
-    private final FindUser findUser;
     private final String photoDirPath = "src/main/resources/static/userPhoto/";
 
     /**
@@ -38,7 +37,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      * @throws RuntimeException         if there is an error reading the photo file.
      */
     public ResponseEntity<InputStreamResource> getUserPhoto(long id) {
-        User user = findUser.getUserById(id, repositoryCollector);
+        User user = getUserById(id);
         String photo = user.getPhoto();
         MediaType contentType = determineContentType(photo);
 
@@ -66,7 +65,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      */
     public UserDto uploadPhoto(long id, MultipartFile file) {
         validateFileFormat(file);
-        User user = findUser.getUserById(id, repositoryCollector);
+        User user = getUserById(id);
         String uploadDirectory = createUploadDirectory();
 
         try {
@@ -91,7 +90,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      * @throws RuntimeException         if there is an error deleting the old photo file.
      */
     public UserDto setDefaultPhoto(long id) {
-        User user = findUser.getUserById(id, repositoryCollector);
+        User user = getUserById(id);
 
         if (isDefaultPhoto(user.getPhoto())) {
             return UserDto.fromEntity(user);
@@ -104,6 +103,18 @@ public class UserPhotoServiceImpl implements UserPhotoService {
         repositoryCollector.getUsers().save(user);
 
         return UserDto.fromEntity(user);
+    }
+
+    /**
+     * Retrieves the user entity by its ID if it is active.
+     *
+     * @param id The ID of the user to retrieve.
+     * @return The user entity with the specified ID if it is active.
+     * @throws IllegalArgumentException if the user is not found.
+     */
+    private User getUserById(long id) {
+        return repositoryCollector.getUsers().findByIdAndIsActive(id, true)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
     /**

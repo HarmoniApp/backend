@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
  * @param userId    the ID of the user associated with the notification
  * @param title     the title of the notification
  * @param message   the message content of the notification
- * @param typeName  the type of the notification
  * @param read      indicates if the notification has been read
  * @param createdAt the timestamp when the notification was created
  */
@@ -36,9 +35,6 @@ public record NotificationDto(
         @Size(min = 1, max = 300, message = "Message must be between 1 and 300 characters")
         String message,
 
-        @NotNull(message = "Type name cannot be null")
-        @JsonProperty("type_name") String typeName,
-
         boolean read,
 
         @JsonProperty("created_at")LocalDateTime createdAt
@@ -56,7 +52,6 @@ public record NotificationDto(
                 notification.getUser().getId(),
                 notification.getTitle(),
                 notification.getMessage(),
-                notification.getType().getTypeName(),
                 notification.getRead(),
                 notification.getCreatedAt()
         );
@@ -66,16 +61,15 @@ public record NotificationDto(
      * Converts a NotificationDto to a Notification entity.
      *
      * @param user the user associated with the notification
-     * @param type the notification type entity
      * @return the resulting Notification entity
      */
-    public Notification toEntity(User user, NotificationType type) {
+    public Notification toEntity(User user) {
         return new Notification(
                 this.id,
                 user,
                 this.title,
                 this.message,
-                type,
+                null,
                 this.read,
                 this.createdAt != null ? this.createdAt : LocalDateTime.now()
         );

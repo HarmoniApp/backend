@@ -32,7 +32,6 @@ public class UserServiceImpl implements UserService {
     private final UserPasswordServiceImpl userPassword;
     private final AddressService addressService;
     private final UserSearchService userSearchService;
-    private final FindUser findUser;
 
     /**
      * Retrieves a specific user by their ID.
@@ -42,7 +41,7 @@ public class UserServiceImpl implements UserService {
      * @throws EntityNotFound if the user with the specified ID is not found.
      */
     public UserDto get(long id) {
-        User user = findUser.getUserById(id, repositoryCollector);
+        User user = getUserById(id);
         return UserDto.fromEntity(user);
     }
 
@@ -117,7 +116,7 @@ public class UserServiceImpl implements UserService {
     public UserDto update(long id, UserDto userDto) {
         validateContractDates(userDto);
 
-        User existingUser = findUser.getUserById(id, repositoryCollector);
+        User existingUser = getUserById(id);
         updateUserDetails(existingUser, userDto);
         updateUserAddresses(existingUser, userDto);
         setContractType(existingUser, userDto);
@@ -127,6 +126,18 @@ public class UserServiceImpl implements UserService {
 
         User response = repositoryCollector.getUsers().save(existingUser);
         return UserDto.fromEntity(response);
+    }
+
+    /**
+     * Retrieves a user by their ID.
+     *
+     * @param id The ID of the user to retrieve.
+     * @return The User entity corresponding to the specified ID.
+     * @throws IllegalArgumentException if the user with the specified ID is not found.
+     */
+    private User getUserById(long id) {
+        return repositoryCollector.getUsers().findByIdAndIsActive(id, true)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
     /**

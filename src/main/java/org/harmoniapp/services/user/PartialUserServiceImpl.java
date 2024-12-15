@@ -22,7 +22,6 @@ import java.util.List;
 public class PartialUserServiceImpl implements PartialUserService {
     private final RepositoryCollector repositoryCollector;
     private final UserSearchService userSearchService;
-    private final FindUser findUser;
 
     /**
      * Retrieves a user by their ID.
@@ -31,8 +30,19 @@ public class PartialUserServiceImpl implements PartialUserService {
      * @return the partial user data transfer object
      */
     public PartialUserDto getUser(long id) {
-        User user = findUser.getUserById(id, repositoryCollector);
+        User user = getUserById(id);
         return PartialUserDto.fromEntity(user);
+    }
+
+    /**
+     * Retrieves a user by their ID.
+     *
+     * @param id the ID of the user
+     * @return the user entity
+     */
+    private User getUserById(long id) {
+        return repositoryCollector.getUsers().findByIdAndIsActive(id, true)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
     /**

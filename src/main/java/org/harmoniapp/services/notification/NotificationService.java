@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.notification.NotificationDto;
 import org.harmoniapp.entities.notification.Notification;
-import org.harmoniapp.entities.notification.NotificationType;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -59,9 +58,7 @@ public class NotificationService {
         User user = repositoryCollector.getUsers().findById(notificationDto.userId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        NotificationType type = repositoryCollector.getNotificationTypes().findByTypeName(notificationDto.typeName());
-
-        Notification notification = notificationDto.toEntity(user, type);
+        Notification notification = notificationDto.toEntity(user);
         Notification savedNotification = repositoryCollector.getNotifications().save(notification);
 
         messagingTemplate.convertAndSend("/client/notifications/" + user.getId(), NotificationDto.fromEntity(savedNotification));

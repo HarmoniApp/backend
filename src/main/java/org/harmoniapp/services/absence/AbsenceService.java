@@ -355,15 +355,11 @@ public class AbsenceService {
      * @param savedAbsence the saved absence
      */
     private void newAbsenceCreatedNotification(Absence savedAbsence) {
-        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(2L) //2 is Awaiting Absence
-                .orElseThrow(() -> new RuntimeException("Notification type not found"));
-
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
                 savedAbsence.getUser().getSupervisor().getId(),
                 "New Absence Awaiting",
                 "New absence awaiting. Employee " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " requested for absence.",
-                notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()
         );
@@ -385,7 +381,6 @@ public class AbsenceService {
                 savedAbsence.getUser().getSupervisor().getId(),
                 "Absence is updated",
                 "Absence is updated. Employee " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " has changed their absence. Please review the changes.",
-                notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()
         );
@@ -410,7 +405,6 @@ public class AbsenceService {
                         savedAbsence.getStart() + "-" + savedAbsence.getEnd() +
                         " is " + savedAbsence.getStatus().getName() +
                         " Please review the changes.",
-                notificationType.getTypeName(),
                 false,
                 LocalDateTime.now()
         );
@@ -474,7 +468,6 @@ public class AbsenceService {
                                 user.getId(),
                                 "Absence update",
                                 message,
-                                notificationType.getTypeName(),
                                 false,
                                 LocalDateTime.now()
                         );

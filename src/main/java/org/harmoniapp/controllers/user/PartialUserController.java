@@ -5,7 +5,7 @@ import org.harmoniapp.contracts.PageDto;
 import org.harmoniapp.contracts.PageRequestDto;
 import org.harmoniapp.contracts.user.PartialUserDto;
 import org.harmoniapp.contracts.user.UserSearchParamsDto;
-import org.harmoniapp.services.user.PartialUserServiceImpl;
+import org.harmoniapp.services.user.PartialUserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("user/simple")
 public class PartialUserController {
-    private final PartialUserServiceImpl service;
+    private final PartialUserService service;
 
     /**
      * Retrieves a paginated list of PartialUserDto based on the specified filtering and sorting criteria.
