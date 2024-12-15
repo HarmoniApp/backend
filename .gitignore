@@ -256,4 +256,3 @@ gradle-app.setting
 .idea
 
 .DS_Store
-./harmoni-web-api/src/main/resources/static/userPhoto
