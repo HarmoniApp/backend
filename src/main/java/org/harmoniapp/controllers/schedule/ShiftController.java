@@ -9,7 +9,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -34,7 +33,7 @@ public class ShiftController {
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') || @securityService.isShiftOwner(#id, authentication)")
     public ShiftDto getShift(@PathVariable long id) {
-        return shiftService.getShift(id);
+        return shiftService.get(id);
     }
 
     /**
@@ -45,10 +44,10 @@ public class ShiftController {
      * @return a list of ShiftDto within the specified date range
      */
     @GetMapping("/range")
-    public List<ShiftDto> getShiftsByDateRangeAndUserId(@RequestParam("start") String start, @RequestParam("end") String end, @RequestParam("user_id") Long userId) {
-        LocalDateTime startDate = LocalDateTime.parse(start);
-        LocalDateTime endDate = LocalDateTime.parse(end);
-        return shiftService.getShiftsByDateRangeAndUserId(startDate, endDate, userId);
+    public List<ShiftDto> getShiftsByDateRangeAndUserId(@RequestParam("start") String start,
+                                                        @RequestParam("end") String end,
+                                                        @RequestParam("user_id") Long userId) {
+        return shiftService.getShiftsByDateRangeAndUserId(start, end, userId);
     }
 
     /**
@@ -60,7 +59,7 @@ public class ShiftController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ShiftDto addShift(@RequestBody ShiftDto shiftDto) {
-        return shiftService.createShift(shiftDto);
+        return shiftService.create(shiftDto);
     }
 
     /**
@@ -73,7 +72,7 @@ public class ShiftController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public ShiftDto updateShift(@PathVariable long id, @RequestBody ShiftDto shiftDto) {
-        return shiftService.updateShift(id, shiftDto);
+        return shiftService.update(id, shiftDto);
     }
 
     /**
@@ -87,7 +86,7 @@ public class ShiftController {
     @ResponseStatus(HttpStatus.CREATED)
     public List<ShiftDto> publishShifts(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
                                         @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
-        return shiftService.publishShifts(start, end);
+        return shiftService.publish(start, end);
     }
 
     /**
@@ -98,6 +97,6 @@ public class ShiftController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteShift(@PathVariable long id) {
-        shiftService.deleteShift(id);
+        shiftService.delete(id);
     }
 }

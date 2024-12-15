@@ -1,11 +1,10 @@
 package org.harmoniapp.controllers.schedule;
 
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.contracts.schedule.ScheduleRequestDto;
 import org.harmoniapp.contracts.schedule.UserScheduleDto;
-import org.harmoniapp.services.schedule.UserScheduleService;
+import org.harmoniapp.services.schedule.ScheduleServiceImpl;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 
 /**
  * REST controller for managing user schedules.
@@ -15,23 +14,19 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @RequestMapping("/calendar")
 public class UserScheduleController {
-    private final UserScheduleService userScheduleService;
+    private final ScheduleServiceImpl userScheduleService;
 
     /**
      * Retrieves the weekly schedule for a specific user within a given date range.
      *
-     * @param userId    the ID of the user for whom the schedule is being retrieved
-     * @param startDate the start date of the week (as LocalDateTime) to filter shifts and absences
-     * @param endDate   the end date of the week (as LocalDateTime) to filter shifts and absences
-     * @param published an optional parameter; if true, only published shifts are returned, otherwise all shifts
+     * @param userId             the ID of the user for whom the schedule is being retrieved
+     * @param scheduleRequestDto the request DTO containing the start date, end date, and published status
      * @return UserScheduleDto containing the user's details along with their shifts and absences for the specified week
      */
     @GetMapping("/user/{userId}/week")
     public UserScheduleDto getUserWeeklySchedule(
             @PathVariable Long userId,
-            @RequestParam("startDate") LocalDateTime startDate,
-            @RequestParam("endDate") LocalDateTime endDate,
-            @RequestParam(value = "published", required = false) boolean published) {
-        return userScheduleService.getUserWeeklySchedule(userId, startDate, endDate, published);
+            @ModelAttribute ScheduleRequestDto scheduleRequestDto) {
+        return userScheduleService.getUserWeeklySchedule(userId, scheduleRequestDto);
     }
 }

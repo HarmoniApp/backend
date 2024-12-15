@@ -1,6 +1,7 @@
 package org.harmoniapp.repositories.user;
 
 import org.harmoniapp.entities.user.User;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+
+    boolean existsById(@NotNull Long id);
 
     Optional<User> findByIdAndIsActive(Long id, boolean active);
 

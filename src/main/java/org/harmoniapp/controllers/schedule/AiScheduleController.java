@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.schedule.aischedule.AiSchedulerResponse;
 import org.harmoniapp.contracts.schedule.aischedule.ScheduleRequirement;
-import org.harmoniapp.services.schedule.AiScheduleService;
+import org.harmoniapp.services.schedule.aischedule.AiScheduleService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
