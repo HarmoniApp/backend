@@ -40,12 +40,12 @@ public class ExcelService {
                 .toList();
 
         try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Users");
+            Sheet sheet = workbook.createSheet("Pracownicy");
 
-            String[] headersCell = {"Employee ID", "First Name", "Surname", "Email", "Phone number", "City", "Street",
-                    "Apartment", "Zip code", "Building number", "Roles", "Languages",
-                    "Contract type", "Contract signature", "Contract expiration",
-                    "Supervisor employee ID", "Department name"};
+            String[] headersCell = {"ID Pracownika", "Imie", "Nazwisko", "Mail", "Numer telefonu", "Miasto", "Ulica",
+                    "Numer mieszkania", "Kod pocztowy", "Numer budynku", "Role", "Jezyki",
+                    "Typ umowy", "Podpisanie umowy", "Wygasniecie umowy",
+                    "ID Przelozonego", "Oddzial"};
 
             Row headerRow = sheet.createRow(0);
             for (int i = 0; i < headersCell.length; i++) {
@@ -78,11 +78,13 @@ public class ExcelService {
                 row.createCell(12).setCellValue(user.contractType().getName());
                 row.createCell(13).setCellValue(user.contractSignature().toString());
                 row.createCell(14).setCellValue(user.contractExpiration().toString());
-                String supervisorEmployeeId = repositoryCollector.getUsers()
-                        .findById(user.supervisorId())
-                        .map(User::getEmployeeId)
-                        .orElse("");
-
+                String supervisorEmployeeId = "";
+                if (user.supervisorId() != null) {
+                    supervisorEmployeeId = repositoryCollector.getUsers()
+                            .findById(user.supervisorId())
+                            .map(User::getEmployeeId)
+                            .orElse("");
+                }
                 row.createCell(15).setCellValue(supervisorEmployeeId);
                 row.createCell(16).setCellValue(user.workAddress().departmentName());
             }
@@ -97,7 +99,7 @@ public class ExcelService {
             ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Disposition", "attachment; filename=users.xlsx");
+            headers.add("Content-Disposition", "attachment; filename=pracownicy.xlsx");
 
             return ResponseEntity.ok()
                     .headers(headers)
@@ -126,10 +128,10 @@ public class ExcelService {
         }
 
         try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Shifts");
+            Sheet sheet = workbook.createSheet("Grafik");
 
             Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("Employee ID");
+            headerRow.createCell(0).setCellValue("ID Pracownika");
 
             LocalDate current = startDate;
             int colIdx = 1;
@@ -167,7 +169,7 @@ public class ExcelService {
             ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Disposition", "attachment; filename=shifts.xlsx");
+            headers.add("Content-Disposition", "attachment; filename=grafik.xlsx");
 
             return ResponseEntity.ok()
                     .headers(headers)
