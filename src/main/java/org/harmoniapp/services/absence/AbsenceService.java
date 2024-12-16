@@ -11,7 +11,7 @@ import org.harmoniapp.entities.notification.NotificationType;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.harmoniapp.services.notification.NotificationService;
+import org.harmoniapp.services.notification.NotificationServiceImpl;
 import org.harmoniapp.utils.HolidayCalculator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AbsenceService {
     private final RepositoryCollector repositoryCollector;
-    private final NotificationService notificationService;
+    private final NotificationServiceImpl notificationService;
 
     /**
      * Retrieves a paginated list of absences for a specific user.

@@ -26,7 +26,7 @@ public class NotificationController {
      */
     @GetMapping("/user/{id}")
     public List<NotificationDto> getAllNotificationsByUserId(@PathVariable Long id) {
-        return notificationService.getAllNotificationsByUserId(id);
+        return notificationService.getAllByUserId(id);
     }
 
     /**
@@ -37,7 +37,7 @@ public class NotificationController {
      */
     @GetMapping("/user/{id}/unread")
     public List<NotificationDto> getAllUnreadNotificationsByUserId(@PathVariable Long id) {
-        return notificationService.getAllUnreadNotificationsByUserId(id);
+        return notificationService.getAllUnreadByUserId(id);
     }
 
     /**
@@ -52,7 +52,7 @@ public class NotificationController {
     @PatchMapping("/{id}/read")
     @PreAuthorize("@securityService.isNotificationOwner(#id, authentication)")
     public NotificationDto markNotificationAsRead(@PathVariable Long id) {
-        return notificationService.markNotificationAsRead(id);
+        return notificationService.markAsReadById(id);
     }
 
     /**
@@ -63,7 +63,7 @@ public class NotificationController {
      */
     @PatchMapping("/user/{id}/read")
     public List<NotificationDto> markAllNotificationsAsRead(@PathVariable Long id) {
-        return notificationService.markAllNotificationsAsRead(id);
+        return notificationService.markAllAsReadByUserId(id);
     }
 
     /**
@@ -77,6 +77,6 @@ public class NotificationController {
     @DeleteMapping("/{id}")
     @PreAuthorize("@securityService.isNotificationOwner(#id, authentication)")
     public void deleteNotification(@PathVariable Long id) {
-        notificationService.deleteNotification(id);
+        notificationService.deleteById(id);
     }
 }
