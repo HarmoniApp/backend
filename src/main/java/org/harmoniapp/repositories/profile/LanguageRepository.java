@@ -5,7 +5,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface LanguageRepository extends JpaRepository<Language, Long> {
 
@@ -13,5 +12,5 @@ public interface LanguageRepository extends JpaRepository<Language, Long> {
     @Cacheable(value = "languages")
     List<Language> findAll();
 
-    Optional<Language> findByNameIgnoreCase(String name);
+    boolean existsByNameIgnoreCase(String name);
 }

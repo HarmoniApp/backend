@@ -3,12 +3,12 @@ package org.harmoniapp.controllers.profile;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.profile.AddressDto;
+import org.harmoniapp.contracts.profile.DepartmentDto;
 import org.harmoniapp.services.profile.AddressService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * REST controller for managing addresses.
@@ -27,7 +27,7 @@ public class AddressController {
      */
     @GetMapping
     public List<AddressDto> getAllAddresses() {
-        return service.getAllAddresses();
+        return service.getAll();
     }
 
     /**
@@ -36,7 +36,7 @@ public class AddressController {
      * @return A list of all departments.
      */
     @GetMapping("/departments")
-    public List<Map<String, Object>> getAllDepartments(){
+    public List<DepartmentDto> getAllDepartments(){
         return service.getAllDepartments();
     }
 
@@ -48,7 +48,7 @@ public class AddressController {
      */
     @GetMapping("/{id}")
     public AddressDto getAddress(@PathVariable long id) {
-        return service.getAddressById(id);
+        return service.getById(id);
     }
 
     /**
@@ -60,7 +60,7 @@ public class AddressController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AddressDto createAddress(@Valid @RequestBody AddressDto dto) {
-        return service.createAddress(dto);
+        return service.create(dto);
     }
 
     /**
@@ -73,7 +73,7 @@ public class AddressController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public AddressDto updateAddress(@PathVariable long id, @Valid @RequestBody AddressDto dto) {
-        return service.updateAddress(id, dto);
+        return service.updateById(id, dto);
     }
 
     /**
@@ -84,6 +84,6 @@ public class AddressController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAddress(@PathVariable long id) {
-        service.deleteAddress(id);
+        service.deleteById(id);
     }
 }

@@ -2,17 +2,21 @@ package org.harmoniapp.contracts.profile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import org.harmoniapp.entities.profile.ContractType;
 
 /**
  * Data Transfer Object for ContractType.
  *
- * @param id    the unique identifier of the ContractType
- * @param name  the name of the ContractType
+ * @param id   the unique identifier of the ContractType
+ * @param name the name of the ContractType
  */
 public record ContractTypeDto(
         long id,
+
+        @NotEmpty(message = "Name cannot be empty")
         String name,
+
         @Min(value = 0, message = "Absence days must be zero or a positive number")
         @JsonProperty("absence_days") int absenceDays) {
 

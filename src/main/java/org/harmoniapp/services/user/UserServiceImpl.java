@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final RepositoryCollector repositoryCollector;
-    private final UserPasswordServiceImpl userPassword;
+    private final UserPasswordService userPassword;
     private final AddressService addressService;
     private final UserSearchService userSearchService;
 
@@ -293,7 +293,7 @@ public class UserServiceImpl implements UserService {
      * @param userDto      The UserDto containing the updated address information.
      */
     private void updateUserAddresses(User existingUser, UserDto userDto) {
-        Address residence = addressService.updateAddress(existingUser.getResidence(), userDto.residence());
+        Address residence = addressService.update(existingUser.getResidence(), userDto.residence());
         existingUser.setResidence(residence);
 
         Address newDepartment = getDepartment(userDto.workAddress().id());

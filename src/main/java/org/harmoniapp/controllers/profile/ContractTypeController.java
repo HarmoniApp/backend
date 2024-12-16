@@ -2,7 +2,7 @@ package org.harmoniapp.controllers.profile;
 
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.profile.ContractTypeDto;
-import org.harmoniapp.services.profile.ContractTypeService;
+import org.harmoniapp.services.profile.ContractTypeServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/contract-type")
 public class ContractTypeController {
-    private final ContractTypeService contractTypeService;
+    private final ContractTypeServiceImpl contractTypeService;
 
     /**
      * Retrieves a contractType information by ID.
@@ -25,7 +25,7 @@ public class ContractTypeController {
      */
     @GetMapping("/{id}")
     public ContractTypeDto getContractType(@PathVariable long id) {
-        return contractTypeService.getContractType(id);
+        return contractTypeService.getById(id);
     }
 
     /**
@@ -35,22 +35,22 @@ public class ContractTypeController {
      */
     @GetMapping
     public List<ContractTypeDto> getAllContractTypes() {
-        return contractTypeService.getAllContractTypes();
+        return contractTypeService.getAll();
     }
 
     @PostMapping
     public ContractTypeDto createContractType(@RequestBody ContractTypeDto contractTypeDto) {
-        return contractTypeService.createContractType(contractTypeDto);
+        return contractTypeService.create(contractTypeDto);
     }
 
     @PutMapping("/{id}")
     public ContractTypeDto updateContractType(@PathVariable long id, @RequestBody ContractTypeDto contractTypeDto) {
-        return contractTypeService.updateContractType(id, contractTypeDto);
+        return contractTypeService.updateById(id, contractTypeDto);
     }
 
     @DeleteMapping("/{id}")
     public void deleteContractType(@PathVariable long id) {
-        contractTypeService.deleteContractType(id);
+        contractTypeService.deleteById(id);
     }
 
 }

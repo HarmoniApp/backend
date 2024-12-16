@@ -27,7 +27,7 @@ public class RoleController {
      */
     @GetMapping("/{id}")
     public RoleDto getRole(@PathVariable long id) {
-        return roleService.getRole(id);
+        return roleService.getById(id);
     }
 
     /**
@@ -48,7 +48,7 @@ public class RoleController {
      */
     @GetMapping
     public List<RoleDto> getAllRoles() {
-        return roleService.getAllRoles();
+        return roleService.getAll();
     }
 
     /**
@@ -60,20 +60,20 @@ public class RoleController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public RoleDto createRole(@Valid @RequestBody RoleDto roleDto) {
-        return roleService.createRole(roleDto);
+        return roleService.create(roleDto);
     }
 
     /**
      * Updates an existing role or creates a new one if it does not exist.
      *
-     * @param id the ID of the role to update
+     * @param id      the ID of the role to update
      * @param roleDto the RoleDto containing the updated details of the role
      * @return the updated or created RoleDto
      */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public RoleDto updateRole(@PathVariable long id, @Valid @RequestBody RoleDto roleDto) {
-        return roleService.updateRole(id, roleDto);
+        return roleService.updateById(id, roleDto);
     }
 
     /**
@@ -84,7 +84,7 @@ public class RoleController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteRole(@PathVariable long id) {
-        roleService.deleteRole(id);
+        roleService.deleteById(id);
     }
 
 }
