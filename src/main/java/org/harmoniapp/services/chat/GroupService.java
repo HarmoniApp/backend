@@ -1,86 +1,61 @@
 package org.harmoniapp.services.chat;
 
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.chat.GroupDto;
 import org.harmoniapp.contracts.user.PartialUserDto;
-import org.harmoniapp.entities.chat.Group;
-import org.harmoniapp.entities.user.User;
-import org.harmoniapp.repositories.RepositoryCollector;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
-@Service
-@RequiredArgsConstructor
-public class GroupService {
-    private final RepositoryCollector repositoryCollector;
+/**
+ * Service interface for managing groups.
+ */
+public interface GroupService {
 
-    public GroupDto getGroupById(Long groupId) {
-        Group group = repositoryCollector.getGroups().findById(groupId)
-                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
+    /**
+     * Retrieves a group by its ID.
+     *
+     * @param groupId the ID of the group
+     * @return the group DTO
+     */
+    GroupDto getById(long groupId);
 
-        return GroupDto.fromEntity(group);
-    }
+    /**
+     * Retrieves the members of a group by the group's ID.
+     *
+     * @param groupId the ID of the group
+     * @return a list of partial user DTOs
+     */
+    List<PartialUserDto> getMembersById(long groupId);
 
-    public List<PartialUserDto> getGroupMembersByGroupId(Long groupId) {
-        Group group = repositoryCollector.getGroups().findById(groupId)
-                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
+    /**
+     * Creates a new group.
+     *
+     * @param groupDto the group DTO
+     * @return the created group DTO
+     */
+    GroupDto create(GroupDto groupDto);
 
-        return group.getMembers().stream()
-                .map(PartialUserDto::fromEntity)
-                .toList();
-    }
+    /**
+     * Adds a member to a group.
+     *
+     * @param groupId the ID of the group
+     * @param userId  the ID of the user to add
+     * @return the updated group DTO
+     */
+    GroupDto addMember(long groupId, long userId);
 
-    @Transactional
-    public GroupDto createGroup(GroupDto groupDto) {
-        Set<User> members = repositoryCollector.getUsers().findByIdInAndIsActiveTrue(groupDto.membersIds());
-        for (Long userId : groupDto.membersIds()) {
-            if (members.stream().noneMatch(user -> user.getId().equals(userId))) {
-                throw new IllegalArgumentException("User not found with ID: " + userId);
-            }
-        }
+    /**
+     * Removes a member from a group.
+     *
+     * @param groupId the ID of the group
+     * @param userId  the ID of the user to remove
+     * @return the updated group DTO
+     */
+    GroupDto removeMember(long groupId, long userId);
 
-        Group group = groupDto.toEntity(members);
-        Group savedGroup = repositoryCollector.getGroups().save(group);
-        return GroupDto.fromEntity(savedGroup);
-    }
-
-    @Transactional
-    public GroupDto addMemberToGroup(Long groupId, Long userId) {
-        Group group = repositoryCollector.getGroups().findById(groupId)
-                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
-
-        User user = repositoryCollector.getUsers().findByIdAndIsActive(userId, true)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        group.getMembers().add(user);
-        Group savedGroup = repositoryCollector.getGroups().save(group);
-        return GroupDto.fromEntity(savedGroup);
-    }
-
-
-    @Transactional
-    public GroupDto removeMemberFromGroup(Long groupId, Long userId) {
-        Group group = repositoryCollector.getGroups().findById(groupId)
-                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
-
-        User user = repositoryCollector.getUsers().findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        group.getMembers().remove(user);
-        Group savedGroup = repositoryCollector.getGroups().save(group);
-        return GroupDto.fromEntity(savedGroup);
-    }
-
-    @Transactional
-    public void deleteGroup(Long groupId) {
-        try {
-            repositoryCollector.getMessages().deleteByGroupId(groupId);
-            repositoryCollector.getGroups().deleteById(groupId);
-        } catch (Exception e) {
-            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
-        }
-    }
+    /**
+     * Deletes a group by its ID.
+     *
+     * @param groupId the ID of the group
+     */
+    void delete(long groupId);
 }

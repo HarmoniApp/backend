@@ -43,7 +43,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
                   upper(u.firstname) like concat(?1, '%') or
                   upper(u.surname) like concat(?1, '%')
                   )""")
-    List<User> FindAllBySearch(String search, boolean active);
+    List<User> findAllBySearch(String search, boolean active);
 
     @Query("""
         select u from User u

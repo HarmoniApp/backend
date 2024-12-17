@@ -19,7 +19,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class TranslationServiceImpl implements TranslationService {
-
     private final OkHttpClient client = new OkHttpClient();
     private static final Dotenv dotenv = Dotenv.configure().filename(".env").load();
     private final String apiKey = dotenv.get("API_MS_TRANSLATOR_KEY");
@@ -30,7 +29,7 @@ public class TranslationServiceImpl implements TranslationService {
     /**
      * Translates the given text to the specified target language.
      *
-     * @param text the text to be translated
+     * @param text           the text to be translated
      * @param targetLanguage the target language code
      * @return the translated text
      * @throws TranslationException if an error occurs during translation
@@ -51,7 +50,7 @@ public class TranslationServiceImpl implements TranslationService {
      * @return the request body containing the JSON payload
      * @throws TranslationException if an error occurs while creating the JSON request body
      */
-    private RequestBody createRequestBody(String text){
+    private RequestBody createRequestBody(String text) {
         try {
             String requestBodyJson = objectMapper.writeValueAsString(List.of(Map.of("Text", text)));
             MediaType mediaType = MediaType.get("application/json");
@@ -79,7 +78,7 @@ public class TranslationServiceImpl implements TranslationService {
     /**
      * Creates an HTTP request for the translation API.
      *
-     * @param url the URL for the translation API
+     * @param url  the URL for the translation API
      * @param body the request body containing the JSON payload
      * @return the constructed HTTP request
      */

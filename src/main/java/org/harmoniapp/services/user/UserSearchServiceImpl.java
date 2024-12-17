@@ -69,7 +69,7 @@ public class UserSearchServiceImpl implements UserSearchService {
         if (qSplit.size() > 1) {
             return repositoryCollector.getUsers().findAllBySearchName(qSplit, true);
         } else {
-            return repositoryCollector.getUsers().FindAllBySearch(qSplit.getFirst(), true);
+            return repositoryCollector.getUsers().findAllBySearch(qSplit.getFirst(), true);
         }
     }
 
@@ -115,7 +115,7 @@ public class UserSearchServiceImpl implements UserSearchService {
         if (pageRequestDto.sortBy() != null) {
             return PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, pageRequestDto.sortBy()));
         } else {
-            return PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, "firstname", "surname"));
+            return PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, "surname", "firstname"));
         }
     }
 
