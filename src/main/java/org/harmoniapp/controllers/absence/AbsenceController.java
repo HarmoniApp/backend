@@ -38,23 +38,6 @@ public class AbsenceController {
         return absenceService.getAbsenceByUserId(id, pageNumber, pageSize);
     }
 
-//    /**
-//     * Retrieves a paginated list of absences for a specific user, filtered by archived status.
-//     *
-//     * @param id         the ID of the user whose absences are to be retrieved
-//     * @param archived   a boolean indicating whether to filter by archived absences
-//     * @param pageNumber the page number to retrieve (optional, default is 0)
-//     * @param pageSize   the number of items per page (optional, default is 50)
-//     * @return a PageDto containing a list of AbsenceDto objects representing the user's absences
-//     */
-//    @GetMapping("user/{id}/archived")
-//    public PageDto<AbsenceDto> getAbsenceByUserId(@PathVariable long id,
-//                                                  @RequestParam boolean archived,
-//                                                  @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-//                                                  @RequestParam(name = "pageSize", required = false, defaultValue = "50") int pageSize) {
-//        return absenceService.getAbsenceByUserIdAndArchive(id, archived, pageNumber, pageSize);
-//    }
-
     /**
      * Retrieves a paginated list of AbsenceDto filtered by the specified status ID.
      *
