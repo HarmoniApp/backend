@@ -41,7 +41,7 @@ public class MessageController {
     }
 
     @PatchMapping("/mark-all-read")
-    @PreAuthorize("@securityService.canMarkAllMessagesAsRead(#userId1, #groupId, authentication)") //TODO
+//    @PreAuthorize("@securityService.canMarkAllMessagesAsRead(#userId1, #groupId, authentication)") //TODO
     public List<MessageDto> markAllRead(@ModelAttribute ChatRequestDto chatRequestDto) {
         return service.markAllMessagesAsRead(chatRequestDto);
     }

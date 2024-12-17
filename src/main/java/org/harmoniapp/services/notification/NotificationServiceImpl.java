@@ -45,7 +45,7 @@ public class NotificationServiceImpl implements NotificationService {
      * @throws EntityNotFound if the user with the specified ID does not exist
      */
     private void verifyUserExist(long userId) {
-        if (repositoryCollector.getUsers().existsById(userId)) {
+        if (!repositoryCollector.getUsers().existsById(userId)) {
             throw new EntityNotFound("Nie znaleziono użytkownika o podanym ID: " + userId);
         }
     }

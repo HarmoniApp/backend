@@ -75,6 +75,9 @@ public class MessageServiceImpl implements MessageService {
     public List<MessageDto> markAllMessagesAsRead(ChatRequestDto chatRequestDto) {
         assert chatRequestDto.userId1() != null;
         List<Message> messages = getUnreadMessages(chatRequestDto);
+        if (messages.isEmpty()) {
+            return List.of();
+        }
         messages = markAsReadAndSave(messages);
 
         List<MessageDto> messagesDto = messages.stream()
@@ -86,10 +89,16 @@ public class MessageServiceImpl implements MessageService {
     }
 
     private List<Message> getMessages(ChatRequestDto chatRequestDto) {
-        if (chatRequestDto.groupId() != null) {
-            return repositoryCollector.getMessages().findGroupChatHistory(chatRequestDto.groupId());
+        Long groupId = chatRequestDto.groupId();
+        Long userId1 = chatRequestDto.userId1();
+        Long userId2 = chatRequestDto.userId2();
+        if (groupId != null) {
+            return repositoryCollector.getMessages().findGroupChatHistory(groupId);
+        } else if (userId1 != null && userId2 != null) {
+            return repositoryCollector.getMessages().findChatHistory(userId1, userId2);
         } else {
-            return repositoryCollector.getMessages().findChatHistory(chatRequestDto.userId1(), chatRequestDto.userId2());
+            //TODO
+            throw new IllegalArgumentException("userId2 or groupId must be provided");
         }
     }
 
@@ -163,13 +172,16 @@ public class MessageServiceImpl implements MessageService {
     }
 
     private List<Message> getUnreadMessages(ChatRequestDto chatRequestDto) {
-        long userId1 = chatRequestDto.userId1();
+        Long userId1 = chatRequestDto.userId1();
         Long userId2 = chatRequestDto.userId2();
         Long groupId = chatRequestDto.groupId();
-        if (chatRequestDto.groupId() != null) {
+        if (groupId != null) {
             return repositoryCollector.getMessages().findUnreadByGroupId(userId1, groupId);
-        } else {
+        } else if (userId1 != null && userId2 != null) {
             return repositoryCollector.getMessages().findUnreadByUsersIds(userId1, userId2);
+        } else {
+            //TODO
+            throw new IllegalArgumentException("userId2 or groupId must be provided");
         }
     }
 

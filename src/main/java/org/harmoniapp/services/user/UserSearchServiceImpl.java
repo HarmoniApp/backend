@@ -108,7 +108,7 @@ public class UserSearchServiceImpl implements UserSearchService {
         int pageSize = (pageRequestDto.pageSize() < 1) ? 10 : pageRequestDto.pageSize();
 
         Sort.Direction sortDirection =
-                (pageRequestDto.sortBy() == null || pageRequestDto.order().isEmpty() || pageRequestDto.sortBy().equalsIgnoreCase("asc"))
+                (pageRequestDto.order() == null || pageRequestDto.order().isEmpty() || pageRequestDto.order().equalsIgnoreCase("asc"))
                         ? Sort.Direction.ASC
                         : Sort.Direction.DESC;
 
