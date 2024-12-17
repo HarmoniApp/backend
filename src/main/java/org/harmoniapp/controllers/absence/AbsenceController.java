@@ -154,18 +154,6 @@ public class AbsenceController {
     }
 
     /**
-     * Updates the archived status of an existing Absence identified by its ID.
-     *
-     * @param id       the ID of the absence to be updated
-     * @param archived a boolean indicating the new archived status
-     * @return the updated AbsenceDto object representing the absence with the new archived status
-     */
-    @PatchMapping("/archive/{id}")
-    public AbsenceDto updateAbsenceArchived(@PathVariable long id, @RequestParam boolean archived) {
-        return absenceService.updateAbsenceArchived(id, archived);
-    }
-
-    /**
      * Deletes an absence by its ID.
      *
      * @param id the ID of the absence to be deleted
