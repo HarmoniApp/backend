@@ -103,15 +103,14 @@ public class UserSearchServiceImpl implements UserSearchService {
      * @param pageRequestDto The PageRequestDto containing pagination and sorting details.
      * @return A Pageable object with the specified page number, page size, and sorting direction.
      */
-    private Pageable createPageable(PageRequestDto pageRequestDto) {
-        int pageNumber = (pageRequestDto.pageNumber() < 1) ? 0 : pageRequestDto.pageNumber() - 1;
-        int pageSize = (pageRequestDto.pageSize() < 1) ? 10 : pageRequestDto.pageSize();
+    public Pageable createPageable(PageRequestDto pageRequestDto) {
+        int pageNumber = (pageRequestDto.pageNumber() == null || pageRequestDto.pageNumber() < 1) ? 0 : pageRequestDto.pageNumber() - 1;
+        int pageSize = (pageRequestDto.pageSize() == null || pageRequestDto.pageSize() < 1) ? 10 : pageRequestDto.pageSize();
 
         Sort.Direction sortDirection =
                 (pageRequestDto.order() == null || pageRequestDto.order().isEmpty() || pageRequestDto.order().equalsIgnoreCase("asc"))
                         ? Sort.Direction.ASC
                         : Sort.Direction.DESC;
-
 
         if (pageRequestDto.sortBy() != null) {
             return PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, pageRequestDto.sortBy()));
