@@ -36,10 +36,6 @@ public class GroupService {
                 .toList();
     }
 
-    public List<Long> getGroupChatPartners(Long userId){
-        return repositoryCollector.getMessages().findGroupChatPartners(userId);
-    }
-
     @Transactional
     public GroupDto createGroup(GroupDto groupDto) {
         Set<User> members = repositoryCollector.getUsers().findByIdInAndIsActiveTrue(groupDto.membersIds());

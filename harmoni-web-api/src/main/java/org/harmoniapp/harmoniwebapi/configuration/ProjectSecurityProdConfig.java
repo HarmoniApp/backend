@@ -133,6 +133,7 @@ public class ProjectSecurityProdConfig {
                         .requestMatchers("/user/simple/**",
                                 "/user/supervisor",
                                 "/user/search").hasRole("ADMIN")
+                        .requestMatchers("/user/{id}/photo").authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/user/{id}/changePassword"),
                                 new AntPathRequestMatcher("/user/{id}/uploadPhoto"),
                                 new AntPathRequestMatcher("/user/{id}/defaultPhoto")).access(ownerAuthorizationManager)

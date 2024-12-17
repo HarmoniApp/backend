@@ -2,6 +2,7 @@ package org.harmoniapp.harmoniwebapi.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.harmoniwebapi.contracts.ChatPartnerDto;
 import org.harmoniapp.harmoniwebapi.contracts.MessageDto;
 import org.harmoniapp.harmoniwebapi.services.MessageService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,9 +25,9 @@ public class MessageController {
         return service.getChatHistory(userId1, userId2, groupId, translate, targetLanguage);
     }
 
-    @GetMapping("/chat-partners")
-    public List<Long> getChatPartners(@RequestParam Long userId) {
-        return service.getChatPartners(userId);
+    @GetMapping("/all-chat-partners")
+    public List<ChatPartnerDto> getAllChatPartners(@RequestParam Long userId) {
+        return service.getAllChatPartners(userId);
     }
 
     @GetMapping("/last")

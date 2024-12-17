@@ -26,6 +26,29 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             "ORDER BY COALESCE(MAX(m.sent_at), TIMESTAMP '2020-01-01 00:00:00') DESC", nativeQuery = true)
     List<Long> findGroupChatPartners(@Param("userId") Long userId);
 
+    @Query(value = "SELECT partnerId, partnerType " +
+            "FROM (" +
+            "    SELECT CASE WHEN m.sender_id = :userId THEN m.receiver_id ELSE m.sender_id END AS partnerId, " +
+            "           'USER' AS partnerType, " +
+            "           MAX(m.sent_at) AS lastMessageDate " +
+            "    FROM message m " +
+            "    WHERE (m.sender_id = :userId OR m.receiver_id = :userId) " +
+            "    AND m.receiver_id IS NOT NULL " +
+            "    GROUP BY partnerId " +
+            "    UNION ALL " +
+            "    SELECT gm.group_id AS partnerId, " +
+            "           'GROUP' AS partnerType, " +
+            "           COALESCE(MAX(m.sent_at), TIMESTAMP '2020-01-01 00:00:00') AS lastMessageDate " +
+            "    FROM group_members gm " +
+            "    LEFT JOIN message m ON m.group_id = gm.group_id " +
+            "    WHERE gm.user_id = :userId " +
+            "    GROUP BY gm.group_id" +
+            ") AS combined " +
+            "ORDER BY lastMessageDate DESC", nativeQuery = true)
+    List<Object[]> findAllChatPartners(@Param("userId") Long userId);
+
+
+
     @Query("SELECT m FROM Message m WHERE " +
             "(m.sender.id = :userId1 AND m.receiver.id = :userId2) OR " +
             "(m.sender.id = :userId2 AND m.receiver.id = :userId1)" +

@@ -6,6 +6,7 @@ import org.harmoniapp.harmonidata.entities.Group;
 import org.harmoniapp.harmonidata.entities.Message;
 import org.harmoniapp.harmonidata.entities.User;
 import org.harmoniapp.harmonidata.repositories.RepositoryCollector;
+import org.harmoniapp.harmoniwebapi.contracts.ChatPartnerDto;
 import org.harmoniapp.harmoniwebapi.contracts.MessageDto;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -43,9 +44,11 @@ public class MessageService {
                 .toList();
     }
 
-
-    public List<Long> getChatPartners(Long userId) {
-        return repositoryCollector.getMessages().findChatPartners(userId);
+    public List<ChatPartnerDto> getAllChatPartners(Long userId) {
+        List<Object[]> results = repositoryCollector.getMessages().findAllChatPartners(userId);
+        return results.stream()
+                .map(row -> new ChatPartnerDto(((Number) row[0]).longValue(), (String) row[1]))
+                .toList();
     }
 
     public String getLasMessageByUsersId(Long userId1, Long userId2, Long groupId) {

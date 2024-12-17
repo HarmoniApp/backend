@@ -52,6 +52,10 @@ public class AddressService {
                 }).toList();
     }
 
+    public List<AddressDto> getAllDepartmentsAddress() {
+        List<Address> addresses = repositoryCollector.getAddresses().findByDepartmentNameNotNull();
+        return addresses.stream().map(AddressDto::fromEntity).toList();
+    }
 
     /**
      * Retrieves an address by its ID.

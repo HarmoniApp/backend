@@ -25,11 +25,6 @@ public class GroupController {
         return service.getGroupMembersByGroupId(groupId);
     }
 
-    @GetMapping("/chat-partners")
-    public List<Long> getGroupChatPartners(@RequestParam Long userId) {
-        return service.getGroupChatPartners(userId);
-    }
-
     @PostMapping
     public GroupDto createGroup(@Valid @RequestBody GroupDto groupDto) {
         return  service.createGroup(groupDto);
