@@ -11,6 +11,6 @@ public record ScheduleRequestDto(
 ) {
 
     public Boolean published() {
-        return published == null || published;
+        return published != null && published;
     }
 }
