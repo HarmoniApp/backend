@@ -340,7 +340,6 @@ public class AbsenceService {
             Absence existingAbsence = repositoryCollector.getAbsences().findById(id)
                     .orElseThrow(() -> new RuntimeException("You can only change archived if absence exists"));
 
-            existingAbsence.setArchived(archived);
             Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
             return AbsenceDto.fromEntity(updatedAbsence);
         } catch (Exception e) {
