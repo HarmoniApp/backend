@@ -4,6 +4,7 @@ import org.harmoniapp.contracts.PageRequestDto;
 import org.harmoniapp.contracts.user.UserSearchParamsDto;
 import org.harmoniapp.entities.user.User;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -36,4 +37,12 @@ public interface UserSearchService {
      * @return a paginated list of users
      */
     Page<User> findUsersPage(PageRequestDto pageRequestDto);
+
+    /**
+     * Creates a Pageable object based on the given PageRequestDto.
+     *
+     * @param pageRequestDto the page request details
+     * @return a Pageable object
+     */
+    Pageable createPageable(PageRequestDto pageRequestDto);
 }
