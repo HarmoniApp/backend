@@ -67,10 +67,6 @@ public class Absence {
     @PositiveOrZero(message = "Working days must be a positive number or zero")
     private Long workingDays;
 
-    @NotNull(message = "Archived cannot be null")
-    @ColumnDefault("false")
-    private Boolean archived;
-
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

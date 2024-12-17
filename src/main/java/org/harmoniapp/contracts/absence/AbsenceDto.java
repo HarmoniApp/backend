@@ -52,8 +52,6 @@ public record AbsenceDto(
 
         @JsonProperty("working_days") Long workingDays,
 
-        boolean archived,
-
         @JsonProperty("employee_id") String employeeId) {
 
     /**
@@ -73,7 +71,6 @@ public record AbsenceDto(
                 absence.getSubmission(),
                 absence.getUpdated(),
                 absence.getWorkingDays(),
-                absence.getArchived(),
                 absence.getUser().getEmployeeId()
         );
     }
@@ -96,8 +93,7 @@ public record AbsenceDto(
                 status,
                 this.submission,
                 this.updated,
-                this.workingDays,
-                this.archived
+                this.workingDays
         );
     }
 }
