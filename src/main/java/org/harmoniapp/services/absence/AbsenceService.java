@@ -56,6 +56,25 @@ public class AbsenceService {
                 userAbsences.getTotalPages());
     }
 
+//    /**
+//     * Retrieves a paginated list of absences for a specific user based on their archived status.
+//     *
+//     * @param id         the ID of the user whose absences are to be retrieved.
+//     * @param archived   a boolean indicating whether to retrieve archived or non-archived absences.
+//     * @param pageNumber the page number to retrieve.
+//     * @param pageSize   the number of items per page.
+//     * @return a PageDto containing the user's absences with the specified archived status.
+//     */
+//    public PageDto<AbsenceDto> getAbsenceByUserIdAndArchive(long id, boolean archived, int pageNumber, int pageSize) {
+//        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("updated").descending());
+//        Page<Absence> userAbsences = repositoryCollector.getAbsences().findByUserIdAndArchived(id, archived, pageable);
+//
+//        return new PageDto<>(userAbsences.stream().map(AbsenceDto::fromEntity).toList(),
+//                userAbsences.getSize(),
+//                userAbsences.getNumber(),
+//                userAbsences.getTotalPages());
+//    }
+
     /**
      * Retrieves a paginated list of absences filtered by status ID.
      *
@@ -300,6 +319,28 @@ public class AbsenceService {
 
             employerChangeAbsenceStatusNotification(updatedAbsence);
 
+            return AbsenceDto.fromEntity(updatedAbsence);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update absence status: " + e.getMessage(), e);
+        }
+    }
+
+    //TODO: check if we need this?
+    /**
+     * Updates the archived status of an existing absence.
+     *
+     * @param id       the ID of the absence to update
+     * @param archived a boolean indicating the new archived status to set
+     * @return the updated AbsenceDto object representing the absence with the modified archived status
+     * @throws RuntimeException if the absence does not exist or if an error occurs during the update process
+     */
+    @Transactional
+    public AbsenceDto updateAbsenceArchived(long id, boolean archived) {
+        try {
+            Absence existingAbsence = repositoryCollector.getAbsences().findById(id)
+                    .orElseThrow(() -> new RuntimeException("You can only change archived if absence exists"));
+
+            Absence updatedAbsence = repositoryCollector.getAbsences().save(existingAbsence);
             return AbsenceDto.fromEntity(updatedAbsence);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update absence status: " + e.getMessage(), e);

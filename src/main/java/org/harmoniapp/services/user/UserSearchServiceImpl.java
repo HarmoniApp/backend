@@ -115,7 +115,7 @@ public class UserSearchServiceImpl implements UserSearchService {
         if (pageRequestDto.sortBy() != null) {
             return PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, pageRequestDto.sortBy()));
         } else {
-            return PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, "firstname", "surname"));
+            return PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, "surname", "firstname"));
         }
     }
 
