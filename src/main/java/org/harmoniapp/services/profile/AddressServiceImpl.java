@@ -68,10 +68,17 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public List<DepartmentDto> getAllDepartments() { //TODO: add caching
         return repositoryCollector.getAddresses()
-                .findAll()
+                .findByDepartmentNameNotNull()
                 .stream()
-                .filter(address -> address.getDepartmentName() != null)
                 .map(DepartmentDto::fromEntity)
+                .toList();
+    }
+    //TODO: extract
+    public List<AddressDto> getAllDepartmentsAddress() {
+        return repositoryCollector.getAddresses()
+                .findByDepartmentNameNotNull()
+                .stream()
+                .map(AddressDto::fromEntity)
                 .toList();
     }
 

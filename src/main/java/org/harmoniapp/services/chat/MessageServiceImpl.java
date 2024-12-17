@@ -2,6 +2,7 @@ package org.harmoniapp.services.chat;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.contracts.chat.ChatPartnerDto;
 import org.harmoniapp.contracts.chat.ChatRequestDto;
 import org.harmoniapp.contracts.chat.MessageDto;
 import org.harmoniapp.contracts.chat.TranslationRequestDto;
@@ -31,8 +32,11 @@ public class MessageServiceImpl implements MessageService {
                 .toList();
     }
 
-    public List<Long> getChatPartnersByUserId(Long userId) {
-        return repositoryCollector.getMessages().findChatPartners(userId);
+    public List<ChatPartnerDto> getAllChatPartners(long userId) {
+        List<Object[]> results = repositoryCollector.getMessages().findAllChatPartners(userId);
+        return results.stream()
+                .map(row -> new ChatPartnerDto(((Number) row[0]).longValue(), (String) row[1]))
+                .toList();
     }
 
     public String getLastMessageByUsersId(ChatRequestDto chatRequestDto) {

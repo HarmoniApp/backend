@@ -10,7 +10,7 @@ import org.harmoniapp.entities.user.User;
 import org.harmoniapp.exception.EntityNotFound;
 import org.harmoniapp.exception.InvalidDateException;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.harmoniapp.services.notification.NotificationServiceImpl;
+import org.harmoniapp.services.notification.NotificationService;
 import org.harmoniapp.utils.ShiftNotificationManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ShiftServiceImpl implements ShiftService {
     private final RepositoryCollector repositoryCollector;
-    private final NotificationServiceImpl notificationService;
+    private final NotificationService notificationService;
 
     /**
      * Retrieves a ShiftDto for the shift with the specified ID.
@@ -307,7 +307,7 @@ public class ShiftServiceImpl implements ShiftService {
      */
     private void publishedShiftNotification(@NotNull Shift publishedShift) {
         NotificationDto notificationDto = ShiftNotificationManager.createPublishNotificationDto(publishedShift);
-        notificationService.createNotification(notificationDto);
+        notificationService.create(notificationDto);
     }
 
     /**
@@ -317,6 +317,6 @@ public class ShiftServiceImpl implements ShiftService {
      */
     private void deletedShiftNotification(@NotNull Shift shift) {
         NotificationDto notificationDto = ShiftNotificationManager.createDeletedNotificationDto(shift);
-        notificationService.createNotification(notificationDto);
+        notificationService.create(notificationDto);
     }
 }

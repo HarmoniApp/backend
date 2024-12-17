@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import org.harmoniapp.entities.notification.Notification;
-import org.harmoniapp.entities.notification.NotificationType;
 import org.harmoniapp.entities.user.User;
 
 import java.time.LocalDateTime;
@@ -69,7 +68,6 @@ public record NotificationDto(
                 user,
                 this.title,
                 this.message,
-                null,
                 this.read,
                 this.createdAt != null ? this.createdAt : LocalDateTime.now()
         );

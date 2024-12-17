@@ -270,3 +270,5 @@ build/
 HELP.md
 !**/src/main/**/target/
 !**/src/test/**/target/
+
+src/main/resources/static/userPhoto/*

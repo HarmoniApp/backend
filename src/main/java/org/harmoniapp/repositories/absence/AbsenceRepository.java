@@ -14,8 +14,10 @@ public interface AbsenceRepository extends JpaRepository<Absence, Long> {
     Page<Absence> findByUserId(long userId, Pageable pageable);
 
 //    Page<Absence> findByUserIdAndArchived(long userId, boolean archived, Pageable pageable);
+    @Query("SELECT a FROM Absence a WHERE a.user.isActive = true")
+    Page<Absence> findAllWithActiveUsers(Pageable pageable);
 
-    @Query("SELECT a FROM Absence a WHERE a.user.id = :userId AND (a.status.name = 'awaiting' OR a.status.name = 'approved')")
+    @Query("SELECT a FROM Absence a WHERE a.user.id = :userId AND (a.status.name = 'oczekuje' OR a.status.name = 'zatwierdzony')")
     Page<Absence> findAwaitingOrApprovedAbsenceByUserId(@Param("userId") long userId, Pageable pageable);
 
     @Query("SELECT a FROM Absence a WHERE a.status.id = :statusId")
@@ -24,7 +26,7 @@ public interface AbsenceRepository extends JpaRepository<Absence, Long> {
     @Query("SELECT a FROM Absence a WHERE a.user.id = :userId AND (a.start <= :endDate AND a.end >= :startDate)")
     List<Absence> findAbsenceByDateRangeAndUserId(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, @Param("userId") long userId);
 
-    @Query("SELECT a FROM Absence a WHERE a.user.id = :userId AND (a.start <= :endDate AND a.end >= :startDate) AND a.status.name = 'approved'")
+    @Query("SELECT a FROM Absence a WHERE a.user.id = :userId AND (a.start <= :endDate AND a.end >= :startDate) AND a.status.name = 'zatwierdzony'")
     List<Absence> findApprovedAbsenceByDateRangeAndUserId(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, @Param("userId") long userId);
 
     Boolean existsByUserIdAndId(long userId, long id);

@@ -35,61 +35,6 @@ import java.util.stream.Stream;
 public class PdfService {
     private final RepositoryCollector repositoryCollector;
 
-//    /**
-//     * Retrieves a list of all archived shifts.
-//     *
-//     * @return a list of ArchivedShiftDto containing details of all archived shifts
-//     */
-//    public List<ArchivedShiftDto> getAllArchivedShifts() {
-//        List<ArchivedShift> archivedShifts = repositoryCollector.getArchivedShifts().findAll();
-//
-//        return archivedShifts.stream()
-//                .map(ArchivedShiftDto::fromEntity)
-//                .toList();
-//    }
-
-//    /**
-//     * Retrieves a specific archived shift PDF by its ID.
-//     *
-//     * @param id the ID of the archived shift to retrieve
-//     * @return ResponseEntity containing the archived shift PDF as InputStreamResource
-//     */
-//    public ResponseEntity<InputStreamResource> getArchivedShift(long id) {
-//        ArchivedShift archivedShift = repositoryCollector.getArchivedShifts().findById(id)
-//                .orElseThrow(() -> new IllegalArgumentException("Archived Shift not found"));
-//
-//        byte[] pdfData = archivedShift.getPdfData();
-//        ByteArrayInputStream bis = new ByteArrayInputStream(pdfData);
-//
-//        return ResponseEntity.ok()
-//                .contentType(MediaType.APPLICATION_PDF)
-//                .body(new InputStreamResource(bis));
-//    }
-
-//    /**
-//     * Archives the shifts from the previous week by generating a PDF and saving it to the database.
-//     */
-//    @Transactional
-//    public void archivePreviousWeekShifts() {
-//        LocalDate today = LocalDate.now();
-//        LocalDate startOfPreviousWeek = today.minusWeeks(1).with(DayOfWeek.MONDAY);
-//        LocalDate endOfPreviousWeek = startOfPreviousWeek.plusDays(6);
-//
-//        List<Shift> shifts = repositoryCollector.getShifts()
-//                .findAllByDateRange(startOfPreviousWeek.atStartOfDay(), endOfPreviousWeek.atTime(23, 59, 59));
-//
-//        if (!shifts.isEmpty()) {
-//            String fileTitle = startOfPreviousWeek + " - " + endOfPreviousWeek;
-//            byte[] pdfData = generatePdf(shifts, fileTitle);
-//
-//            ArchivedShift archivedShift = new ArchivedShift();
-//            archivedShift.setFileTitle(fileTitle);
-//            archivedShift.setPdfData(pdfData);
-//
-//            repositoryCollector.getArchivedShifts().save(archivedShift);
-//        }
-//    }
-
     /**
      * Generates a PDF report based on the provided list of shifts and date range.
      *
@@ -106,7 +51,7 @@ public class PdfService {
             document.open();
 
             Font dateFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, Color.BLACK);
-            Paragraph datePara = new Paragraph("Date Range: " + dateRange, dateFont);
+            Paragraph datePara = new Paragraph("Data: " + dateRange, dateFont);
             datePara.setAlignment(Element.ALIGN_CENTER);
             document.add(datePara);
             document.add(Chunk.NEWLINE);
@@ -119,7 +64,7 @@ public class PdfService {
 
             PdfPTable table = new PdfPTable(8);
 
-            Stream.of("EMPLOYEE ID", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday").forEach(headerTitle -> {
+            Stream.of("ID Pracownika", "Poniedzialek", "Wtorek", "Sroda", "Czwartek", "Piatek", "Sobota", "Niedziela").forEach(headerTitle -> {
                 PdfPCell header = new PdfPCell();
                 Font headFont = FontFactory.getFont(FontFactory.HELVETICA);
                 header.setBackgroundColor(Color.ORANGE);
@@ -167,14 +112,6 @@ public class PdfService {
         return out.toByteArray();
     }
 
-//    /**
-//     * Schedules the archiving of shifts from the previous week to occur every Monday at midnight.
-//     */
-//    @Scheduled(cron = "0 0 0 * * MON")
-//    public void scheduleWeeklyShiftArchival() {
-//        archivePreviousWeekShifts();
-//    }
-
     /**
      * Generates a PDF report for shifts in a specific week based on the provided start date.
      *
@@ -212,15 +149,15 @@ public class PdfService {
             document.open();
 
             Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, Color.BLACK);
-            Paragraph title = new Paragraph("Employees: ", titleFont);
+            Paragraph title = new Paragraph("Pracownicy: ", titleFont);
             title.setAlignment(Element.ALIGN_CENTER);
             document.add(title);
             document.add(Chunk.NEWLINE);
 
-            String[] headersCell = {"Employee ID", "First Name", "Surname", "Email", "Phone number", "City", "Street",
-                    "Apartment", "Zip code", "Building number", "Roles", "Languages",
-                    "Contract type", "Contract signature", "Contract expiration",
-                    "Supervisor employee ID", "Department name"};
+            String[] headersCell = {"ID Pracownika", "Imie", "Nazwisko", "Mail", "Numer telefonu", "Miasto", "Ulica",
+                    "Numer mieszkania", "Kod pocztowy", "Numer budynku", "Role", "Jezyki",
+                    "Typ umowy", "Podpisanie umowy", "Wygasniecie umowy",
+                    "ID Przelozonego", "Oddzial"};
             PdfPTable table = new PdfPTable(headersCell.length);
             table.setWidthPercentage(100);
 
@@ -256,10 +193,13 @@ public class PdfService {
                 table.addCell(new PdfPCell(new Phrase(user.getContractType().getName())));
                 table.addCell(new PdfPCell(new Phrase(user.getContractSignature().toString())));
                 table.addCell(new PdfPCell(new Phrase(user.getContractExpiration().toString())));
-                String supervisorEmployeeId = repositoryCollector.getUsers()
-                        .findById(user.getSupervisor().getId())
-                        .map(User::getEmployeeId)
-                        .orElse("");
+                String supervisorEmployeeId = "";
+                if (user.getSupervisor() != null) {
+                    supervisorEmployeeId = repositoryCollector.getUsers()
+                            .findById(user.getSupervisor().getId())
+                            .map(User::getEmployeeId)
+                            .orElse("");
+                }
                 table.addCell(new PdfPCell(new Phrase(supervisorEmployeeId)));
                 table.addCell(new PdfPCell(new Phrase(user.getWorkAddress().getDepartmentName())));
             }

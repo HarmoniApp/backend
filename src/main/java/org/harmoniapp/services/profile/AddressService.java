@@ -18,6 +18,7 @@ public interface AddressService extends CrudService<AddressDto> {
      * @return a list of DepartmentDto objects.
      */
     List<DepartmentDto> getAllDepartments();
+    List<AddressDto> getAllDepartmentsAddress();
 
     /**
      * Saves a new address entity.

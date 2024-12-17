@@ -7,11 +7,10 @@ import org.harmoniapp.contracts.PageDto;
 import org.harmoniapp.entities.absence.Absence;
 import org.harmoniapp.entities.absence.AbsenceType;
 import org.harmoniapp.entities.absence.Status;
-import org.harmoniapp.entities.notification.NotificationType;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.harmoniapp.services.notification.NotificationServiceImpl;
+import org.harmoniapp.services.notification.NotificationService;
 import org.harmoniapp.utils.HolidayCalculator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AbsenceService {
     private final RepositoryCollector repositoryCollector;
-    private final NotificationServiceImpl notificationService;
+    private final NotificationService notificationService;
 
     /**
      * Retrieves a paginated list of absences for a specific user.
@@ -147,7 +146,7 @@ public class AbsenceService {
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("updated").descending());
 
-        var absence = repositoryCollector.getAbsences().findAll(pageable);
+        var absence = repositoryCollector.getAbsences().findAllWithActiveUsers(pageable);
         return new PageDto<>(absence.stream().map(AbsenceDto::fromEntity).toList(),
                 absence.getSize(),
                 absence.getNumber()+1,
@@ -178,10 +177,10 @@ public class AbsenceService {
                 .orElseThrow(IllegalArgumentException::new);
 
         if (absenceDto.start().isBefore(LocalDate.now()) || absenceDto.end().isBefore(LocalDate.now())) {
-            throw new RuntimeException("An error occurred: You can't start or end the absence in the past.");
+            throw new RuntimeException("Błąd: Nie można rozpocząć ani zakończyć urlopu w przeszłości.");
         }
         if (absenceDto.end().isBefore(absenceDto.start())) {
-            throw new RuntimeException("An error occurred: You can't end the absence before it starts.");
+            throw new RuntimeException("Błąd: Nie można zakończyć urlopu przed jego rozpoczęciem");
         }
 
         Absence absence = absenceDto.toEntity(user, absenceType, status);
@@ -193,7 +192,7 @@ public class AbsenceService {
         int availableDays = user.getAvailableAbsenceDays() + user.getUnusedAbsenceDays();
 
         if (requestedDays > availableDays) {
-            throw new RuntimeException("An error occurred: You can't take more days than available.");
+            throw new RuntimeException("Błąd: Nie można wziąć więcej dni niż jest dostępnych");
         }
 
         if (requestedDays <= user.getUnusedAbsenceDays()) {
@@ -358,13 +357,13 @@ public class AbsenceService {
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
                 savedAbsence.getUser().getSupervisor().getId(),
-                "New Absence Awaiting",
-                "New absence awaiting. Employee " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " requested for absence.",
+                "Nowy wniosek o urlop",
+                "Nowy wniosek o urlop. Pracownik " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " złożył wniosek o urlop. Zapoznaj się ze zmianami",
                 false,
                 LocalDateTime.now()
         );
 
-        notificationService.createNotification(notificationDto);
+        notificationService.create(notificationDto);
     }
 
     /**
@@ -373,19 +372,16 @@ public class AbsenceService {
      * @param savedAbsence the saved absence
      */
     private void employeeUpdatedAbsenceNotification(Absence savedAbsence) {
-        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(5L) //5 is Absence Updated
-                .orElseThrow(() -> new RuntimeException("Notification type not found"));
-
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
                 savedAbsence.getUser().getSupervisor().getId(),
-                "Absence is updated",
-                "Absence is updated. Employee " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " has changed their absence. Please review the changes.",
+                "Urlop zaaktualizowany",
+                "Urlop zaaktualizowany. Pracownik " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " zmienił swoją nieobecność. Zapoznaj się ze zmianami.",
                 false,
                 LocalDateTime.now()
         );
 
-        notificationService.createNotification(notificationDto);
+        notificationService.create(notificationDto);
     }
 
     /**
@@ -394,22 +390,19 @@ public class AbsenceService {
      * @param savedAbsence the saved absence
      */
     private void employerChangeAbsenceStatusNotification(Absence savedAbsence) {
-        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(3L) //3 is Absence Status Updated
-                .orElseThrow(() -> new RuntimeException("Notification type not found"));
-
         NotificationDto notificationDto = new NotificationDto(
                 0L, // id is set automatically by the database
                 savedAbsence.getUser().getId(),
-                "Absence Status is updated",
-                "Absence status is updated. Status for absence " +
+                "Status urlopu zaaktualizowany",
+                "Status urlopu zaaktualizowany. Status urlopu " +
                         savedAbsence.getStart() + "-" + savedAbsence.getEnd() +
-                        " is " + savedAbsence.getStatus().getName() +
-                        " Please review the changes.",
+                        " to " + savedAbsence.getStatus().getName() +
+                        " Zapoznaj się ze zmianami.",
                 false,
                 LocalDateTime.now()
         );
 
-        notificationService.createNotification(notificationDto);
+        notificationService.create(notificationDto);
     }
 
     /**
@@ -444,9 +437,6 @@ public class AbsenceService {
      * @throws RuntimeException if the absence or notification type is not found
      */
     private void deleteAbsenceNotification(long absenceId, long statusId) {
-        NotificationType notificationType = repositoryCollector.getNotificationTypes().findById(5L) //5 is Absence Updated
-                        .orElseThrow(() -> new RuntimeException("Notification type not found"));
-
         Absence absence = repositoryCollector.getAbsences().findById(absenceId)
                 .orElseThrow(() -> new RuntimeException("Absence not found"));
 
@@ -454,11 +444,11 @@ public class AbsenceService {
         User user;
         if(statusId == 3){ // employer gets notification
             user = absence.getUser().getSupervisor();
-            message = "Employee " + absence.getUser().getFirstname() + " "
-                    + absence.getUser().getSurname() + " cancelled absence";
+            message = "Pracownik " + absence.getUser().getFirstname() + " "
+                    + absence.getUser().getSurname() + "anulował urlop";
         } else if (statusId == 4) { // employee gets notification
             user = absence.getUser();
-            message = "Absence " + absence.getStart() + " - " + absence.getEnd() + " is rejected";
+            message = "Urlop " + absence.getStart() + " - " + absence.getEnd() + " odrzucony";
         } else {
             throw new RuntimeException("Invalid status for notification");
         }
@@ -466,12 +456,12 @@ public class AbsenceService {
         NotificationDto notificationDto = new NotificationDto(
                                 0L, // id is set automatically by the database
                                 user.getId(),
-                                "Absence update",
+                                "Urlop zaaktualizowany",
                                 message,
                                 false,
                                 LocalDateTime.now()
                         );
 
-        notificationService.createNotification(notificationDto);
+        notificationService.create(notificationDto);
     }
 }

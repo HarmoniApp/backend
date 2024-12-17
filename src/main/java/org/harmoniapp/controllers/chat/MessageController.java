@@ -2,6 +2,7 @@ package org.harmoniapp.controllers.chat;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.contracts.chat.ChatPartnerDto;
 import org.harmoniapp.contracts.chat.ChatRequestDto;
 import org.harmoniapp.contracts.chat.MessageDto;
 import org.harmoniapp.contracts.chat.TranslationRequestDto;
@@ -23,9 +24,9 @@ public class MessageController {
         return service.getChatHistory(chatRequestDto, translationRequestDto);
     }
 
-    @GetMapping("/chat-partners")
-    public List<Long> getChatPartners(@RequestParam Long userId) {
-        return service.getChatPartnersByUserId(userId);
+    @GetMapping("/all-chat-partners")
+    public List<ChatPartnerDto> getAllChatPartners(@RequestParam Long userId) {
+        return service.getAllChatPartners(userId);
     }
 
     @GetMapping("/last")
@@ -40,7 +41,7 @@ public class MessageController {
     }
 
     @PatchMapping("/mark-all-read")
-    @PreAuthorize("@securityService.canMarkAllMessagesAsRead(#userId1, #groupId, authentication)")
+    @PreAuthorize("@securityService.canMarkAllMessagesAsRead(#userId1, #groupId, authentication)") //TODO
     public List<MessageDto> markAllRead(@ModelAttribute ChatRequestDto chatRequestDto) {
         return service.markAllMessagesAsRead(chatRequestDto);
     }

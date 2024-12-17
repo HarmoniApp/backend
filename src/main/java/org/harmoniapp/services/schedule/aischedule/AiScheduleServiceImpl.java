@@ -8,7 +8,6 @@ import org.harmoniapp.contracts.schedule.aischedule.AiSchedulerResponse;
 import org.harmoniapp.contracts.schedule.aischedule.GeneratingProgressDto;
 import org.harmoniapp.contracts.schedule.aischedule.ScheduleRequirement;
 import org.harmoniapp.entities.notification.Notification;
-import org.harmoniapp.entities.notification.NotificationType;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.geneticalgorithm.*;
@@ -129,12 +128,10 @@ public class AiScheduleServiceImpl implements AiScheduleService {
      * @param user the user to whom the notification will be sent
      */
     private void createAndSendSuccessfulNotification(User user) {
-        NotificationType type = repositoryCollector.getNotificationTypes().findById(8L).orElseThrow();
         Notification notification = Notification.builder()
                 .user(user)
                 .title("Automatyczne układanie grafiku ukończone")
                 .message("Grafik został pomyślnie wygenerowany, zobacz teraz w kalendarzu.")
-                .type(type)
                 .read(false)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -149,12 +146,10 @@ public class AiScheduleServiceImpl implements AiScheduleService {
      * @param user the user to whom the notification will be sent
      */
     private void createAndSendFailedNotification(User user) {
-        NotificationType type = repositoryCollector.getNotificationTypes().findById(7L).orElseThrow();
         Notification notification = Notification.builder()
                 .user(user)
                 .title("Automatyczne układanie grafiku nie powiodło się")
                 .message("Nie udało się wygenerować grafiku, spróbuj ponownie.")
-                .type(type)
                 .read(false)
                 .createdAt(LocalDateTime.now())
                 .build();

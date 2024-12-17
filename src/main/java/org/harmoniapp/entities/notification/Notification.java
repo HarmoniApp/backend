@@ -36,10 +36,6 @@ public class Notification {
     @NotEmpty(message = "Message cannot be null")
     private String message;
 
-    @ManyToOne
-    @JoinColumn(name = "type_id")
-    private NotificationType type;
-
     @ColumnDefault("false")
     @NotNull(message = "Read cannot be null")
     private Boolean read;

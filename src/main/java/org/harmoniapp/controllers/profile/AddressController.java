@@ -35,9 +35,14 @@ public class AddressController {
      *
      * @return A list of all departments.
      */
-    @GetMapping("/departments")
+    @GetMapping("/departments/name")
     public List<DepartmentDto> getAllDepartments(){
         return service.getAllDepartments();
+    }
+
+    @GetMapping("/departments")
+    public List<AddressDto> getAllDepartmentsAddress(){
+        return service.getAllDepartmentsAddress();
     }
 
     /**
