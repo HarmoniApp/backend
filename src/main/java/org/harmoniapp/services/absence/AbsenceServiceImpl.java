@@ -138,15 +138,29 @@ public class AbsenceServiceImpl implements AbsenceService {
     @Override
     @Transactional
     public void deleteAbsence(long id, long statusId) {
-        if (statusId != AbsenceStatus.CANCELLED.getId()) {
-            throw new InvalidAbsenceStatusException("Niprawidłowy status");
-        }
         Absence existingAbsence = getAbsenceById(id);
+        validateDeleteAbsence(existingAbsence, statusId);
         if (isVacation(existingAbsence)) {
             absenceDaysUpdater.updateUserAbsenceDays(existingAbsence);
         }
         sendNotification(existingAbsence, AbsenceNotificationType.EMPLOYEE_DELETED);
         repositoryCollector.getAbsences().delete(existingAbsence);
+    }
+
+    /**
+     * Validates if an absence can be deleted based on its status.
+     *
+     * @param absence  the Absence entity to be validated
+     * @param statusId the status ID to be checked
+     * @throws InvalidAbsenceStatusException if the status is not CANCELLED or the absence status is not AWAITING
+     */
+    private void validateDeleteAbsence(Absence absence, long statusId) {
+        if (statusId != AbsenceStatus.CANCELLED.getId()) {
+            throw new InvalidAbsenceStatusException("Niprawidłowy status");
+        }
+        if (!absence.getStatus().getId().equals(AbsenceStatus.AWAITING.getId())) {
+            throw new InvalidAbsenceStatusException("Nie można usunąć wniosku o urlop");
+        }
     }
 
     private boolean isVacation(Absence absence) {
@@ -225,16 +239,14 @@ public class AbsenceServiceImpl implements AbsenceService {
     /**
      * Validates the data required to update the status of an absence.
      *
-     * @param absence        the Absence entity
-     * @param updateStatusId the new status ID
-     * @throws RuntimeException              if the status ID is invalid
+     * @param absence        the Absence entity to be updated
+     * @param updateStatusId the new status ID to be set
+     * @throws InvalidAbsenceStatusException if the new status ID is invalid or the current status is CANCELLED or REJECTED
      * @throws InvalidDateException          if the absence start date is in the past
-     * @throws InvalidAbsenceStatusException if the absence status is already finalized
      */
     private void validateUpdateStatusData(Absence absence, long updateStatusId) {
-        if (updateStatusId != AbsenceStatus.APPROVED.getId()
-                && updateStatusId != AbsenceStatus.REJECTED.getId()) {
-            throw new RuntimeException("Invalid status ID");
+        if (updateStatusId == AbsenceStatus.AWAITING.getId()) {
+            throw new InvalidAbsenceStatusException("Invalid status ID");
         }
         if (absence.getStart().isBefore(LocalDate.now())) {
             throw new InvalidDateException("Nie można zmienić statusu wniosku o urlop, który rozpoczą się w przeszłości");

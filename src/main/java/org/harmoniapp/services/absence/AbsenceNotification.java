@@ -33,10 +33,10 @@ public class AbsenceNotification {
      */
     private static long getReceiverId(Absence absence, AbsenceNotificationType type) {
         switch (type) {
-            case NEW_ABSENCE, EMPLOYEE_UPDATED, EMPLOYEE_DELETED -> {
+            case NEW_ABSENCE, EMPLOYEE_DELETED -> {
                 return absence.getUser().getSupervisor().getId();
             }
-            case EMPLOYER_UPDATED, EMPLOYER_DELETED -> {
+            case EMPLOYER_UPDATED -> {
                 return absence.getUser().getId();
             }
             default -> throw new IllegalArgumentException("Unknown notification type");
@@ -53,14 +53,11 @@ public class AbsenceNotification {
      */
     private static String getMessage(Absence absence, AbsenceNotificationType type) {
         switch (type) {
-            case NEW_ABSENCE, EMPLOYEE_UPDATED, EMPLOYEE_DELETED -> {
+            case NEW_ABSENCE, EMPLOYEE_DELETED -> {
                 return type.formatMessage(absence.getUser().getFirstname(), absence.getUser().getSurname());
             }
             case EMPLOYER_UPDATED -> {
                 return type.formatMessage(absence.getStart(), absence.getEnd(), absence.getStatus().getName());
-            }
-            case EMPLOYER_DELETED -> {
-                return type.formatMessage(absence.getAbsenceType().getName(), absence.getStart(), absence.getEnd());
             }
             default -> throw new IllegalArgumentException("Unknown notification type");
         }
