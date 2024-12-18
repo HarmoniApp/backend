@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 @SpringBootApplication(exclude = {SessionAutoConfiguration.class})
-@EnableAsync
+@EnableAsync(proxyTargetClass = true)
 @EnableCaching
 @EnableScheduling
 @EnableWebSecurity

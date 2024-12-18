@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import org.harmoniapp.entities.notification.Notification;
 import org.harmoniapp.entities.user.User;
 
@@ -38,6 +39,17 @@ public record NotificationDto(
 
         @JsonProperty("created_at")LocalDateTime createdAt
         ) {
+
+    public static NotificationDto createNotification(long receiverId, String title, String message) {
+        return new NotificationDto(
+                0L, // id is set automatically by the database
+                receiverId,
+                title,
+                message,
+                false,
+                LocalDateTime.now()
+        );
+    }
 
     /**
      * Converts a Notification entity to a NotificationDto.

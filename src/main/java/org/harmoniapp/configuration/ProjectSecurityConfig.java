@@ -108,15 +108,12 @@ public class ProjectSecurityConfig {
                         .requestMatchers("/csrf").authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/absence/{id}/status/{statusId}", "DELETE")).authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/absence", "POST"),
-                                new AntPathRequestMatcher("/absence/{id}", "PUT"),
-                                new AntPathRequestMatcher("/absence/archive/{id}", "PATCH")).hasRole("USER")
+                                new AntPathRequestMatcher("/absence/{id}", "PUT")).hasRole("USER")
                         .requestMatchers("/absence/user/{id}/**").access(adminOrOwnerAuthorizationManager)
-                        .requestMatchers("/absence/range/**").authenticated()
                         .requestMatchers("/absence/**").hasRole("ADMIN")
                         .requestMatchers("/absence-type/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/address/**").hasRole("ADMIN")
                         .requestMatchers("/aiSchedule/**").hasRole("ADMIN")
-                        .requestMatchers("/archived-shifts/**").hasRole("ADMIN")
                         .requestMatchers("/contract-type/**").hasRole("ADMIN")
                         .requestMatchers("/excel/**").hasRole("ADMIN")
                         .requestMatchers("/language/**").hasAnyRole("USER", "ADMIN")

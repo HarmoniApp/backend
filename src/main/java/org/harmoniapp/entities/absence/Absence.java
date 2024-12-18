@@ -17,8 +17,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-@Table(name = "absence", schema = "public",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"start", "end", "user_id", "absence_type_id", "submission"})})
+@Table(name = "absence", schema = "public")
 @Getter
 @Setter
 @NoArgsConstructor

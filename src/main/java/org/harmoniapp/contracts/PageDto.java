@@ -12,10 +12,10 @@ import java.util.function.Function;
  */
 public record PageDto<T>(List<T> content, int pageSize, int pageNumber, int totalPages) {
 
-    public static <T, U> PageDto<T> mapPage(Page<U> surcePage, Function<U, T> mapper) {
-        return new PageDto<>(surcePage.getContent().stream().map(mapper).toList(),
-                surcePage.getSize(),
-                surcePage.getNumber() + 1,
-                surcePage.getTotalPages());
+    public static <T, U> PageDto<T> mapPage(Page<U> sourcePage, Function<U, T> mapper) {
+        return new PageDto<>(sourcePage.getContent().stream().map(mapper).toList(),
+                sourcePage.getSize(),
+                sourcePage.getNumber() + 1,
+                sourcePage.getTotalPages());
     }
 }
