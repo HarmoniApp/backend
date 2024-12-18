@@ -8,13 +8,13 @@ import org.harmoniapp.enums.AbsenceNotificationType;
  * This class is responsible for creating absence notifications.
  */
 //Strategy pattern???
-public class AbsenceNotification{
+public class AbsenceNotification {
 
     /**
      * Creates a notification based on the given absence and notification type.
      *
      * @param savedAbsence the saved absence entity
-     * @param type the type of absence notification
+     * @param type         the type of absence notification
      * @return a NotificationDto object containing the notification details
      */
     public static NotificationDto createNotification(Absence savedAbsence, AbsenceNotificationType type) {
@@ -27,11 +27,11 @@ public class AbsenceNotification{
      * Determines the receiver ID based on the absence and notification type.
      *
      * @param absence the absence entity
-     * @param type the type of absence notification
+     * @param type    the type of absence notification
      * @return the ID of the notification receiver
      * @throws IllegalArgumentException if the notification type is unknown
      */
-    private static long getReceiverId(Absence absence, AbsenceNotificationType type){
+    private static long getReceiverId(Absence absence, AbsenceNotificationType type) {
         switch (type) {
             case NEW_ABSENCE, EMPLOYEE_UPDATED, EMPLOYEE_DELETED -> {
                 return absence.getUser().getSupervisor().getId();
@@ -47,7 +47,7 @@ public class AbsenceNotification{
      * Generates a message for the notification based on the absence and notification type.
      *
      * @param absence the absence entity
-     * @param type the type of absence notification
+     * @param type    the type of absence notification
      * @return the message content of the notification
      * @throws IllegalArgumentException if the notification type is unknown
      */
@@ -70,8 +70,8 @@ public class AbsenceNotification{
      * Helper method to create a NotificationDto object.
      *
      * @param receiverId the ID of the notification receiver
-     * @param title the title of the notification
-     * @param message the message content of the notification
+     * @param title      the title of the notification
+     * @param message    the message content of the notification
      * @return a NotificationDto object containing the notification details
      */
     private static NotificationDto createNotification(long receiverId, String title, String message) {

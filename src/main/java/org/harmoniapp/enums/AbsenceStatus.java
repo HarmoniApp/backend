@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum AbsenceStatusEnum {
+public enum AbsenceStatus {
     AWAITING("Oczekuje", 1L),
     APPROVED("Zatwierdzony", 2L),
     CANCELLED("Anulowany", 3L),

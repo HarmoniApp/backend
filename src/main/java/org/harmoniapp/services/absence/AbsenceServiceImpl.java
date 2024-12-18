@@ -7,11 +7,9 @@ import org.harmoniapp.contracts.notification.NotificationDto;
 import org.harmoniapp.entities.absence.Absence;
 import org.harmoniapp.entities.absence.AbsenceType;
 import org.harmoniapp.entities.absence.Status;
-import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.enums.AbsenceNotificationType;
-import org.harmoniapp.enums.AbsenceStatusEnum;
-import org.harmoniapp.exception.AbsenceDaysExceededException;
+import org.harmoniapp.enums.AbsenceStatus;
 import org.harmoniapp.exception.EntityNotFound;
 import org.harmoniapp.exception.InvalidAbsenceStatusException;
 import org.harmoniapp.exception.InvalidDateException;
@@ -26,9 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
 
 /**
  * Service class for managing absences.
@@ -39,6 +34,8 @@ import java.util.List;
 public class AbsenceServiceImpl implements AbsenceService {
     private final RepositoryCollector repositoryCollector;
     private final NotificationService notificationService;
+    private final AbsenceDaysUpdater absenceDaysUpdater;
+    private final ShiftUpdater shiftUpdater;
 
     /**
      * Retrieves a paginated list of absences for a specific user.
@@ -71,19 +68,6 @@ public class AbsenceServiceImpl implements AbsenceService {
     }
 
     /**
-     * Creates a Pageable object for pagination.
-     *
-     * @param pageNumber the page number to retrieve
-     * @param pageSize   the size of the page to retrieve
-     * @return a Pageable object
-     */
-    private Pageable createPageable(int pageNumber, int pageSize) {
-        pageNumber = (pageNumber < 1) ? 0 : pageNumber - 1;
-        pageSize = (pageSize < 1) ? 10 : pageSize;
-        return PageRequest.of(pageNumber, pageSize, Sort.by("updated").descending());
-    }
-
-    /**
      * Retrieves a paginated list of all absences with active users.
      *
      * @param pageNumber the page number to retrieve
@@ -104,17 +88,65 @@ public class AbsenceServiceImpl implements AbsenceService {
      * @return the created AbsenceDto object
      */
     @Override
+    @Transactional
     public AbsenceDto create(AbsenceDto absenceDto) {
         validateAbsenceDays(absenceDto);
         User user = getUserById(absenceDto.userId());
-        Absence absence = buildAbsence(absenceDto, user, AbsenceStatusEnum.AWAITING);  //Here status MUST be awaiting
+        Absence absence = buildAbsence(absenceDto, user, AbsenceStatus.AWAITING);
         absence.setSubmission(LocalDate.now());
         if (isVacation(absence)) {
-            updateUserAbsenceDays(user, absence.getWorkingDays().intValue());
+            absenceDaysUpdater.updateUserAbsenceDays(user, absence.getWorkingDays().intValue());
         }
         Absence savedAbsence = repositoryCollector.getAbsences().save(absence);
         sendNotification(savedAbsence, AbsenceNotificationType.NEW_ABSENCE);
         return AbsenceDto.fromEntity(savedAbsence);
+    }
+
+    /**
+     * Updates the status of an absence.
+     *
+     * @param id       the absence ID
+     * @param statusId the new status ID
+     * @return the updated AbsenceDto object
+     * @throws EntityNotFound                if the absence is not found
+     * @throws InvalidDateException          if the absence start date is in the past
+     * @throws InvalidAbsenceStatusException if the absence status is already finalized
+     */
+    @Override
+    @Transactional
+    public AbsenceDto updateStatus(long id, long statusId) {
+        Absence existingAbsence = getAbsenceById(id);
+        validateUpdateStatusData(existingAbsence, statusId);
+        Absence updatedAbsence = updateStatus(existingAbsence, statusId);
+        long updatedStatus = updatedAbsence.getStatus().getId();
+        if (updatedStatus == AbsenceStatus.APPROVED.getId()) {
+            shiftUpdater.removeOverlappedShifts(updatedAbsence);
+        } else if (updatedStatus == AbsenceStatus.REJECTED.getId() && isVacation(updatedAbsence)) {
+            absenceDaysUpdater.updateUserAbsenceDays(updatedAbsence);
+        }
+
+        sendNotification(updatedAbsence, AbsenceNotificationType.EMPLOYER_UPDATED);
+        return AbsenceDto.fromEntity(updatedAbsence);
+    }
+
+    /**
+     * Deletes an absence.
+     *
+     * @param id       the absence ID
+     * @param statusId the status ID
+     */
+    @Override
+    @Transactional
+    public void deleteAbsence(long id, long statusId) {
+        if (statusId != AbsenceStatus.CANCELLED.getId()) {
+            throw new InvalidAbsenceStatusException("Niprawidłowy status");
+        }
+        Absence existingAbsence = getAbsenceById(id);
+        if (isVacation(existingAbsence)) {
+            absenceDaysUpdater.updateUserAbsenceDays(existingAbsence);
+        }
+        sendNotification(existingAbsence, AbsenceNotificationType.EMPLOYEE_DELETED);
+        repositoryCollector.getAbsences().delete(existingAbsence);
     }
 
     private boolean isVacation(Absence absence) {
@@ -125,11 +157,11 @@ public class AbsenceServiceImpl implements AbsenceService {
      * Builds an Absence entity from the given AbsenceDto, User, and AbsenceStatusEnum.
      *
      * @param absenceDto the AbsenceDto object containing absence details
-     * @param user the User entity associated with the absence
+     * @param user       the User entity associated with the absence
      * @param statusEnum the AbsenceStatusEnum representing the status of the absence
      * @return the built Absence entity
      */
-    private Absence buildAbsence(AbsenceDto absenceDto, User user, AbsenceStatusEnum statusEnum) {
+    private Absence buildAbsence(AbsenceDto absenceDto, User user, AbsenceStatus statusEnum) {
         AbsenceType absenceType = getAbsenceTypeById(absenceDto.absenceTypeId());
         Status status = getStatusById(statusEnum.getId());
 
@@ -152,30 +184,6 @@ public class AbsenceServiceImpl implements AbsenceService {
         if (absenceDto.end().isBefore(absenceDto.start())) {
             throw new InvalidDateException("Nie można zakończyć urlopu przed jego rozpoczęciem");
         }
-    }
-
-    /**
-     * Updates the user's available and unused absence days.
-     *
-     * @param user          the User entity
-     * @param requestedDays the number of requested days
-     * @throws AbsenceDaysExceededException if the requested days exceed available days
-     */
-    private void updateUserAbsenceDays(User user, int requestedDays) { //TODO: maybe move to User service
-        int availableDays = user.getAvailableAbsenceDays() + user.getUnusedAbsenceDays();
-
-        if (requestedDays > availableDays) {
-            throw new AbsenceDaysExceededException("Nie można wziąć więcej dni niż jest dostępnych");
-        }
-
-        int unusedDays = user.getUnusedAbsenceDays();
-        if (requestedDays <= unusedDays) {
-            user.setUnusedAbsenceDays(unusedDays - requestedDays);
-        } else {
-            user.setUnusedAbsenceDays(0);
-            user.setAvailableAbsenceDays(user.getAvailableAbsenceDays() - (requestedDays - unusedDays));
-        }
-        repositoryCollector.getUsers().save(user);
     }
 
     /**
@@ -215,65 +223,39 @@ public class AbsenceServiceImpl implements AbsenceService {
     }
 
     /**
-     * Updates the status of an absence.
-     *
-     * @param id       the absence ID
-     * @param statusId the new status ID
-     * @return the updated AbsenceDto object
-     * @throws EntityNotFound if the absence is not found
-     * @throws InvalidDateException if the absence start date is in the past
-     * @throws InvalidAbsenceStatusException if the absence status is already finalized
-     */
-    @Transactional
-    public AbsenceDto updateStatus(long id, long statusId) {
-        Absence existingAbsence = getAbsenceById(id);
-        validateUpdateStatusData(existingAbsence, statusId);
-        Absence updatedAbsence = updateStatus(existingAbsence, statusId);
-        long updatedStatus = updatedAbsence.getStatus().getId();
-        if (updatedStatus == AbsenceStatusEnum.APPROVED.getId()) {
-            removeOverlappedShifts(updatedAbsence);
-        } else if (updatedStatus == AbsenceStatusEnum.REJECTED.getId() && isVacation(updatedAbsence)) {
-            updateUserAbsenceDays(updatedAbsence);
-        }
-
-        sendNotification(updatedAbsence, AbsenceNotificationType.EMPLOYER_UPDATED);
-        return AbsenceDto.fromEntity(updatedAbsence);
-    }
-
-    /**
      * Validates the data required to update the status of an absence.
      *
      * @param absence        the Absence entity
      * @param updateStatusId the new status ID
-     * @throws RuntimeException            if the status ID is invalid
-     * @throws InvalidDateException        if the absence start date is in the past
+     * @throws RuntimeException              if the status ID is invalid
+     * @throws InvalidDateException          if the absence start date is in the past
      * @throws InvalidAbsenceStatusException if the absence status is already finalized
      */
     private void validateUpdateStatusData(Absence absence, long updateStatusId) {
-        if (updateStatusId != 2 && updateStatusId != 4) {
+        if (updateStatusId != AbsenceStatus.APPROVED.getId()
+                && updateStatusId != AbsenceStatus.REJECTED.getId()) {
             throw new RuntimeException("Invalid status ID");
         }
         if (absence.getStart().isBefore(LocalDate.now())) {
             throw new InvalidDateException("Nie można zmienić statusu wniosku o urlop, który rozpoczą się w przeszłości");
         }
-        if (absence.getStatus().getId().equals(AbsenceStatusEnum.CANCELLED.getId())
-                || absence.getStatus().getId().equals(AbsenceStatusEnum.REJECTED.getId())) {
+        if (absence.getStatus().getId().equals(AbsenceStatus.CANCELLED.getId())
+                || absence.getStatus().getId().equals(AbsenceStatus.REJECTED.getId())) {
             throw new InvalidAbsenceStatusException("Nie można zaktualizować statusu wniosku o urlop");
         }
     }
 
     /**
-     * Removes shifts that overlap with the absence period.
+     * Creates a Pageable object for pagination.
      *
-     * @param absence the Absence entity
+     * @param pageNumber the page number to retrieve
+     * @param pageSize   the size of the page to retrieve
+     * @return a Pageable object
      */
-    //TODO: move to separate class
-    private void removeOverlappedShifts(Absence absence) {
-        LocalDateTime startDateTime = absence.getStart().atStartOfDay();
-        LocalDateTime endDateTime = absence.getEnd().atTime(LocalTime.MAX);
-        List<Shift> overlappingShifts = repositoryCollector.getShifts()
-                .findAllByDateRangeAndUserId(startDateTime, endDateTime, absence.getUser().getId());
-        repositoryCollector.getShifts().deleteAll(overlappingShifts);
+    private Pageable createPageable(int pageNumber, int pageSize) {
+        pageNumber = (pageNumber < 1) ? 0 : pageNumber - 1;
+        pageSize = (pageSize < 1) ? 10 : pageSize;
+        return PageRequest.of(pageNumber, pageSize, Sort.by("updated").descending());
     }
 
     /**
@@ -311,44 +293,5 @@ public class AbsenceServiceImpl implements AbsenceService {
     private Absence getAbsenceById(long id) {
         return repositoryCollector.getAbsences().findById(id)
                 .orElseThrow(() -> new EntityNotFound("Nie znaleziono wniosku o urlop"));
-    }
-
-    /**
-     * Deletes an absence.
-     *
-     * @param id       the absence ID
-     * @param statusId the status ID
-     */
-    public void deleteAbsence(long id, long statusId) {
-        if (statusId != 3) {
-            throw new InvalidAbsenceStatusException("Niprawidłowy status");
-        }
-        Absence existingAbsence = getAbsenceById(id);
-        if (isVacation(existingAbsence)) {
-            updateUserAbsenceDays(existingAbsence);
-        }
-        sendNotification(existingAbsence, AbsenceNotificationType.EMPLOYEE_DELETED);
-        repositoryCollector.getAbsences().delete(existingAbsence);
-    }
-
-    /**
-     * Updates the user's available and unused absence days based on the absence.
-     *
-     * @param absence the Absence entity
-     */
-    private void updateUserAbsenceDays(Absence absence) {
-        User user = getUserById(absence.getUser().getId());
-
-        int contractAbsenceDays = user.getContractType().getAbsenceDays();
-        int availableDays = user.getAvailableAbsenceDays();
-        int bookedDays = absence.getWorkingDays().intValue();
-
-        if (availableDays < contractAbsenceDays) {
-            int rest = bookedDays - availableDays;
-            user.setAvailableAbsenceDays(availableDays + rest);
-            bookedDays -= rest;
-        }
-        user.setUnusedAbsenceDays(bookedDays);
-        repositoryCollector.getUsers().save(user);
     }
 }

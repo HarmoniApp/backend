@@ -21,6 +21,7 @@ public class StatusServiceImpl implements StatusService {
      *
      * @return a list of StatusDto objects representing all statuses.
      */
+    @Override
     public List<StatusDto> getAllStatuses() {
         return repositoryCollector.getStatuses()
                 .findAll(Sort.by("name"))
