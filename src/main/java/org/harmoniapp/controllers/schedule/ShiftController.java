@@ -33,7 +33,7 @@ public class ShiftController {
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') || @securityService.isShiftOwner(#id, authentication)")
     public ShiftDto getShift(@PathVariable long id) {
-        return shiftService.get(id);
+        return shiftService.getById(id);
     }
 
     /**
@@ -72,7 +72,7 @@ public class ShiftController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public ShiftDto updateShift(@PathVariable long id, @RequestBody ShiftDto shiftDto) {
-        return shiftService.update(id, shiftDto);
+        return shiftService.updateById(id, shiftDto);
     }
 
     /**
@@ -97,6 +97,6 @@ public class ShiftController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteShift(@PathVariable long id) {
-        shiftService.delete(id);
+        shiftService.deleteById(id);
     }
 }
