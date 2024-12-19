@@ -7,17 +7,18 @@ import org.harmoniapp.contracts.schedule.aischedule.AggregatedScheduleData;
 import org.harmoniapp.contracts.schedule.aischedule.AiSchedulerResponse;
 import org.harmoniapp.contracts.schedule.aischedule.GeneratingProgressDto;
 import org.harmoniapp.contracts.schedule.aischedule.ScheduleRequirement;
-import org.harmoniapp.entities.notification.Notification;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
+import org.harmoniapp.enums.AiSchedulerNotificationType;
 import org.harmoniapp.geneticalgorithm.*;
 import org.harmoniapp.repositories.RepositoryCollector;
+import org.harmoniapp.services.notification.NotificationService;
+import org.harmoniapp.services.shared.UserDataService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -28,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AiScheduleServiceImpl implements AiScheduleService {
     private final RepositoryCollector repositoryCollector;
+    private final NotificationService notificationService;
     private final SimpMessagingTemplate messagingTemplate;
     private final ScheduleDataEncoder requirementsEncoder;
     private final AlgorithmEntityMapper algorithmEntityMapper;
@@ -106,7 +108,7 @@ public class AiScheduleServiceImpl implements AiScheduleService {
      * @return an AiSchedulerResponse indicating the failure of schedule generation
      */
     private AiSchedulerResponse failedResponse(User receiver) {
-        createAndSendFailedNotification(receiver);
+        sendNotification(receiver, AiSchedulerNotificationType.FAILURE);
         return new AiSchedulerResponse("Nie udało się wygenerować grafiku, spróbuj ponownie", false);
     }
 
@@ -118,44 +120,20 @@ public class AiScheduleServiceImpl implements AiScheduleService {
      * @return an AiSchedulerResponse indicating the success of schedule generation
      */
     private AiSchedulerResponse successfulResponse(User receiver) {
-        createAndSendSuccessfulNotification(receiver);
+        sendNotification(receiver, AiSchedulerNotificationType.SUCCESS);
         return new AiSchedulerResponse("Układanie grafiku zakończone pomyślnie", true);
     }
 
     /**
-     * Creates and sends a notification indicating that the automatic schedule generation was successful.
+     * Sends a notification to the specified user.
      *
      * @param user the user to whom the notification will be sent
+     * @param type the type of notification to be sent
      */
-    private void createAndSendSuccessfulNotification(User user) {
-        Notification notification = Notification.builder()
-                .user(user)
-                .title("Automatyczne układanie grafiku ukończone")
-                .message("Grafik został pomyślnie wygenerowany, zobacz teraz w kalendarzu.")
-                .read(false)
-                .createdAt(LocalDateTime.now())
-                .build();
-        notification = repositoryCollector.getNotifications().save(notification);
-        messagingTemplate.convertAndSend("/client/notifications/" + user.getId(),
-                NotificationDto.fromEntity(notification));
-    }
-
-    /**
-     * Creates and sends a notification indicating that the automatic schedule generation failed.
-     *
-     * @param user the user to whom the notification will be sent
-     */
-    private void createAndSendFailedNotification(User user) {
-        Notification notification = Notification.builder()
-                .user(user)
-                .title("Automatyczne układanie grafiku nie powiodło się")
-                .message("Nie udało się wygenerować grafiku, spróbuj ponownie.")
-                .read(false)
-                .createdAt(LocalDateTime.now())
-                .build();
-        notification = repositoryCollector.getNotifications().save(notification);
-        messagingTemplate.convertAndSend("/client/notifications/" + user.getId(),
-                NotificationDto.fromEntity(notification));
+    private void sendNotification(User user, AiSchedulerNotificationType type) {
+        NotificationDto notification = NotificationDto.createNotification(user.getId(), type.getTitle(), type.getMessage());
+        notification = notificationService.create(notification);
+        messagingTemplate.convertAndSend("/client/notifications/" + user.getId(), notification);
     }
 
     /**
