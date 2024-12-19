@@ -1,10 +1,13 @@
 package org.harmoniapp.controllers.importexport;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.services.importexport.PdfService;
+import org.harmoniapp.services.importexport.PdfExportService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 
@@ -16,7 +19,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @RequestMapping("/pdf")
 public class PdfController {
-    private final PdfService pdfService;
+    private final PdfExportService pdfExportService;
 
     /**
      * Generates a PDF report for the shifts that occurred in the specified week.
@@ -26,11 +29,11 @@ public class PdfController {
      */
     @GetMapping("/generate-pdf-shift")
     public ResponseEntity<InputStreamResource> generatePdfForWeek(@RequestParam("startOfWeek") LocalDate startOfWeek) {
-        return pdfService.generatePdfForWeek(startOfWeek);
+        return pdfExportService.generatePdfForWeek(startOfWeek);
     }
 
     @GetMapping("/generate-pdf-all-employees")
     public ResponseEntity<InputStreamResource> generatePdfForAllEmployees() {
-        return pdfService.generatePdfForAllEmployees();
+        return pdfExportService.generatePdfForAllEmployees();
     }
 }

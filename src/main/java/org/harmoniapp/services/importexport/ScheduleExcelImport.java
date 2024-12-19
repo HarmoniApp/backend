@@ -1,14 +1,17 @@
 package org.harmoniapp.services.importexport;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.exception.EmptyFileException;
 import org.harmoniapp.exception.InvalidCellException;
+import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -18,11 +21,12 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Service for importing schedules from an Excel file.
+ * Service class for importing schedules from an Excel file.
+ * Extends the ExcelImport class and implements the ImportSchedule interface.
  */
-@Component
+@Service
 @RequiredArgsConstructor
-public class ScheduleExcelImport implements ImportSchedule, ReadWorkbook {
+public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
     private final RepositoryCollector repositoryCollector;
 
     /**

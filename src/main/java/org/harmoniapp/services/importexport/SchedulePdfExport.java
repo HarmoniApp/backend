@@ -7,6 +7,7 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.entities.schedule.Shift;
+import org.harmoniapp.entities.user.User;
 import org.harmoniapp.exception.FileGenerationException;
 import org.harmoniapp.exception.InvalidDateException;
 import org.springframework.core.io.InputStreamResource;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
 
 /**
  * Service for exporting schedule data to a PDF file.
+ * Extends PdfExport and implements ExportSchedule.
  */
-//TODO: export only active users
 @Service
 @RequiredArgsConstructor
-public class SchedulePdfExport implements ExportSchedule, PdfExport {
+public class SchedulePdfExport extends PdfExport implements ExportSchedule {
     private final ScheduleDataService scheduleDataService;
     private final List<String> headersCell = List.of("ID Pracownika", "Poniedzialek", "Wtorek", "Sroda",
             "Czwartek", "Piatek", "Sobota", "Niedziela");
@@ -108,19 +108,21 @@ public class SchedulePdfExport implements ExportSchedule, PdfExport {
     }
 
     /**
-     * Adds a table to the PDF document with shifts data.
+     * Adds a table to the PDF document with shift information for the given date range.
      *
      * @param document  the PDF document to add the table to
      * @param startDate the start date of the range
      * @param endDate   the end date of the range
-     * @throws DocumentException if there is an error adding the table
+     * @throws DocumentException if there is an error adding the table to the document
      */
     private void addTable(Document document, LocalDate startDate, LocalDate endDate) throws DocumentException {
-        List<Shift> shifts = scheduleDataService.getShiftsTmp(startDate, endDate);
-        Map<String, Map<DayOfWeek, Shift>> shiftsByUserAndDay = groupShiftsByUserAndDay(shifts);
         PdfPTable table = new PdfPTable(maxDays + 1);
         addTableHeader(headersCell, table);
-        shiftsByUserAndDay.entrySet().forEach(e -> addTableRow(table, e));
+
+        List<Shift> shifts = scheduleDataService.getShifts(startDate, endDate);
+        Map<Long, Map<LocalDate, String>> shiftsByUserAndDay = groupShiftsByUserAndDay(shifts);
+        List<User> users = getUsers(shifts);
+        createTableRow(table, users, shiftsByUserAndDay, startDate, endDate);
         document.add(table);
     }
 
@@ -130,32 +132,50 @@ public class SchedulePdfExport implements ExportSchedule, PdfExport {
      * @param shifts a list of Shift objects
      * @return a map where the key is the user ID and the value is another map with days of the week and shifts
      */
-    private Map<String, Map<DayOfWeek, Shift>> groupShiftsByUserAndDay(List<Shift> shifts) {
+    private Map<Long, Map<LocalDate, String>> groupShiftsByUserAndDay(List<Shift> shifts) {
         return shifts.stream()
                 .collect(Collectors.groupingBy(
-                        shift -> shift.getUser().getEmployeeId(),
+                        shift -> shift.getUser().getId(),
                         Collectors.toMap(
-                                shift -> shift.getStart().toLocalDate().getDayOfWeek(),
-                                shift -> shift,
+                                shift -> shift.getStart().toLocalDate(),
+                                this::createShiftCellContent,
                                 (existing, replacement) -> existing
                         )
                 ));
     }
 
     /**
-     * Adds a row to the table for each user and their shifts.
+     * Creates a table row for each user and populates it with shift information.
      *
-     * @param table     the table to add the row to
-     * @param userEntry a map entry containing the user ID and their shifts
+     * @param table              the table to add the row to
+     * @param users              the list of users
+     * @param shiftsByUserAndDay a map of user IDs to a map of dates and shift information
+     * @param startDate          the start date of the range
+     * @param endDate            the end date of the range
      */
-    private void addTableRow(PdfPTable table, Map.Entry<String, Map<DayOfWeek, Shift>> userEntry) {
-        addCell(table, userEntry.getKey());
+    private void createTableRow(PdfPTable table, List<User> users, Map<Long, Map<LocalDate, String>> shiftsByUserAndDay,
+                                LocalDate startDate, LocalDate endDate) {
+        for (User user : users) {
+            addCell(table, user.getEmployeeId());
+            populateRow(table, shiftsByUserAndDay.get(user.getId()), startDate, endDate);
+        }
+    }
 
-        Map<DayOfWeek, Shift> shiftsByDay = userEntry.getValue();
-        for (DayOfWeek day : DayOfWeek.values()) {
-            Shift shift = shiftsByDay.get(day);
-            String shiftInfo = (shift != null && shift.getStart().toLocalDate().getDayOfWeek() == day) ? createShiftCellContent(shift) : "";
+    /**
+     * Populates a row in the PDF table with shift information for a user.
+     *
+     * @param table         the table to add the row to
+     * @param shiftsForUser a map of dates to shift information for the user
+     * @param startDate     the start date of the range
+     * @param endDate       the end date of the range
+     */
+    private void populateRow(PdfPTable table, Map<LocalDate, String> shiftsForUser,
+                             LocalDate startDate, LocalDate endDate) {
+        LocalDate current = startDate;
+        while (!current.isAfter(endDate)) {
+            String shiftInfo = shiftsForUser.getOrDefault(current, "");
             addCell(table, shiftInfo);
+            current = current.plusDays(1);
         }
     }
 

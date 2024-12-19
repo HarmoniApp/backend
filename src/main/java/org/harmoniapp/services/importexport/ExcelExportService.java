@@ -8,7 +8,7 @@ import java.time.LocalDate;
 /**
  * Service interface for exporting data to Excel files.
  */
-public interface ExportExcelService {
+public interface ExcelExportService {
 
     /**
      * Exports user data to an Excel file.

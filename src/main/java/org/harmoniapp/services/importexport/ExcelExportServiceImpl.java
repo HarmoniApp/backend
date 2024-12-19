@@ -13,7 +13,7 @@ import java.time.LocalDate;
  */
 @Service
 @RequiredArgsConstructor
-public class ExportExcelServiceImpl implements ExportExcelService {
+public class ExcelExportServiceImpl implements ExcelExportService {
     private final ExportUser userExcelExport;
     private final ExportSchedule scheduleExcelExport;
 

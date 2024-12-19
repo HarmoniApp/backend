@@ -1,6 +1,5 @@
 package org.harmoniapp.services.importexport;
 
-import org.harmoniapp.contracts.schedule.ShiftDto;
 import org.harmoniapp.contracts.user.UserDto;
 
 import java.util.List;
@@ -40,12 +39,4 @@ public interface UserDataService {
      * @return a string containing the employee ID of the supervisor, or an empty string if the supervisor is not found
      */
     String getSupervisorEmployeeId(UserDto user);
-
-    /**
-     * Retrieves a list of active users based on the provided shifts.
-     *
-     * @param shifts a list of ShiftDto objects
-     * @return a list of UserDto objects corresponding to the users in the provided shifts
-     */
-    List<UserDto> getUsers(List<ShiftDto> shifts);
 }

@@ -29,6 +29,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
@@ -40,9 +41,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-@Component
+/**
+ * Service class for importing users from an Excel file.
+ * Extends the ExcelImport class and implements the ImportUser interface.
+ */
+@Service
 @RequiredArgsConstructor
-public class UserExcelImport implements ImportUser, ReadWorkbook {
+public class UserExcelImport extends ExcelImport implements ImportUser {
     private final RepositoryCollector repositoryCollector;
     private final UserServiceImpl userService;
     private final List<String> expectedHeaders = List.of("employee id", "first name", "surname", "email",

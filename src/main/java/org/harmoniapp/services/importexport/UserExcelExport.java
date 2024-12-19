@@ -6,24 +6,20 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.harmoniapp.contracts.user.UserDto;
-import org.harmoniapp.exception.FileGenerationException;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 /**
  * Service for exporting user data to an Excel file.
+ * Extends the ExcelExport class and implements the ExportUser interface.
  */
 @Service
 @RequiredArgsConstructor
-public class UserExcelExport implements ExportUser {
+public class UserExcelExport extends ExcelExport implements ExportUser {
     private final UserDataService userDataService;
     private final List<String> headersCell = List.of("ID Pracownika", "Imie", "Nazwisko", "Mail", "Numer telefonu", "Miasto", "Ulica",
             "Numer mieszkania", "Kod pocztowy", "Numer budynku", "Role", "Jezyki",
@@ -107,38 +103,5 @@ public class UserExcelExport implements ExportUser {
             case 15 -> row.createCell(cellIdx).setCellValue(userDataService.getSupervisorEmployeeId(user));
             case 16 -> row.createCell(cellIdx).setCellValue(user.workAddress().departmentName());
         }
-    }
-
-    /**
-     * Writes the given workbook to a ByteArrayInputStream.
-     *
-     * @param workbook the workbook to be written
-     * @return a ByteArrayInputStream containing the workbook data
-     * @throws FileGenerationException if an I/O error occurs during writing
-     */
-    private ByteArrayInputStream writeFile(Workbook workbook) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            workbook.write(out);
-        } catch (IOException e) {
-            throw new FileGenerationException(e.getMessage());
-        }
-        return new ByteArrayInputStream(out.toByteArray());
-    }
-
-    /**
-     * Creates a ResponseEntity containing the Excel file as an InputStreamResource.
-     *
-     * @param in the ByteArrayInputStream containing the Excel file data
-     * @return ResponseEntity containing the Excel file as an InputStreamResource
-     */
-    private ResponseEntity<InputStreamResource> createResponse(ByteArrayInputStream in) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment; filename=pracownicy.xlsx");
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-                .body(new InputStreamResource(in));
     }
 }

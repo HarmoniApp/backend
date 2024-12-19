@@ -18,10 +18,11 @@ import java.util.List;
 
 /**
  * Service for exporting user data to a PDF file.
+ * Extends PdfExport and implements ExportUser.
  */
 @Service
 @RequiredArgsConstructor
-public class UserPdfExport implements ExportUser, PdfExport {
+public class UserPdfExport extends PdfExport implements ExportUser {
     private final UserDataService userDataService;
     private final List<String> headersCell = List.of("ID Pracownika", "Imie", "Nazwisko", "Mail",
             "Numer telefonu", "Miasto", "Ulica",

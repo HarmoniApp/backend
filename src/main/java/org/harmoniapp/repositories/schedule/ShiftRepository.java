@@ -18,8 +18,8 @@ public interface ShiftRepository extends JpaRepository<Shift, Long> {
 
     @Query("""
             SELECT s FROM Shift s
-                         WHERE s.published = TRUE AND s.start BETWEEN :start AND :end""")
-    List<Shift> findAllByDateRangeAndPublishedIsTrue(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+            WHERE s.published = TRUE and s.user.isActive = TRUE AND s.start BETWEEN :start AND :end""")
+    List<Shift> findPublishedByDataRange(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
     @Query("SELECT s FROM Shift s WHERE (s.start <= :end AND s.end >= :start) AND s.user.id = :userId AND s.published = true")
     List<Shift> findPublishedByDateRangeAndUserId(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("userId") Long userId);

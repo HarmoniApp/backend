@@ -1,13 +1,21 @@
 package org.harmoniapp.services.importexport;
 
-import org.harmoniapp.contracts.schedule.ShiftDto;
 import org.harmoniapp.entities.schedule.Shift;
 
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Service interface for handling schedule data operations.
+ */
 public interface ScheduleDataService {
 
-    List<ShiftDto> getShifts(LocalDate startDate, LocalDate endDate);
-    List<Shift> getShiftsTmp(LocalDate startDate, LocalDate endDate);
+    /**
+     * Retrieves a list of shifts within the specified date range.
+     *
+     * @param startDate the start date of the range
+     * @param endDate the end date of the range
+     * @return a list of shifts within the specified date range
+     */
+    List<Shift> getShifts(LocalDate startDate, LocalDate endDate);
 }

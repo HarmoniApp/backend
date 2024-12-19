@@ -16,9 +16,9 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 /**
- * Interface for exporting data to a PDF file.
+ * Abstract class for exporting data to PDF format.
  */
-public interface PdfExport {
+public abstract class PdfExport {
 
     /**
      * Adds a header row to the PDF table.
@@ -26,7 +26,7 @@ public interface PdfExport {
      * @param headersCell a list of header titles
      * @param table       the table to add the header to
      */
-    default void addTableHeader(List<String> headersCell, PdfPTable table) {
+    protected void addTableHeader(List<String> headersCell, PdfPTable table) {
         headersCell.forEach(columnTitle -> {
             PdfPCell header = new PdfPCell();
             Font headFont = FontFactory.getFont(FontFactory.HELVETICA);
@@ -44,7 +44,7 @@ public interface PdfExport {
      * @param out the ByteArrayOutputStream containing the PDF data
      * @return a ResponseEntity containing the PDF file as an InputStreamResource
      */
-    default ResponseEntity<InputStreamResource> createResponseEntity(ByteArrayOutputStream out) {
+    protected ResponseEntity<InputStreamResource> createResponseEntity(ByteArrayOutputStream out) {
         ByteArrayInputStream bis = new ByteArrayInputStream(out.toByteArray());
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)

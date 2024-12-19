@@ -3,7 +3,6 @@ package org.harmoniapp.services.importexport;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.profile.LanguageDto;
 import org.harmoniapp.contracts.profile.RoleDto;
-import org.harmoniapp.contracts.schedule.ShiftDto;
 import org.harmoniapp.contracts.user.UserDto;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.repositories.RepositoryCollector;
@@ -72,19 +71,5 @@ public class UserDataServiceImpl implements UserDataService {
                     .orElse("");
         }
         return "";
-    }
-
-    /**
-     * Retrieves a list of active users based on the provided shifts.
-     *
-     * @param shifts a list of ShiftDto objects
-     * @return a list of UserDto objects corresponding to the users in the provided shifts
-     */
-    public List<UserDto> getUsers(List<ShiftDto> shifts) {
-        List<Long> usersIds = shifts.stream().map(ShiftDto::userId).distinct().toList();
-        return repositoryCollector.getUsers().findByIdInAndIsActiveTrue(usersIds)
-                .stream()
-                .map(UserDto::fromEntity)
-                .toList();
     }
 }
