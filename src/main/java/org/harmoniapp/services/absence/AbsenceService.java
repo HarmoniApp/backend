@@ -357,7 +357,7 @@ public class AbsenceService {
                 0L, // id is set automatically by the database
                 savedAbsence.getUser().getSupervisor().getId(),
                 "Nowy wniosek o urlop",
-                "Nowy wniosek o urlop. Pracownik " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " złożył wniosek o urlop. Zapoznaj się ze zmianami",
+                "Pracownik " + savedAbsence.getUser().getFirstname() + " " + savedAbsence.getUser().getSurname() + " złożył wniosek o urlop. Zapoznaj się ze zmianami",
                 false,
                 LocalDateTime.now()
         );
