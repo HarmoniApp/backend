@@ -145,7 +145,7 @@ public class GroupServiceImpl implements GroupService {
      */
     private User getUserById(long userId, boolean isActive) {
         if (isActive) {
-            return repositoryCollector.getUsers().findByIdAndIsActive(userId, true)
+            return repositoryCollector.getUsers().findByIdAndIsActiveTrue(userId)
                     .orElseThrow(() -> new EntityNotFound("User not found"));
         } else {
             return repositoryCollector.getUsers().findById(userId)

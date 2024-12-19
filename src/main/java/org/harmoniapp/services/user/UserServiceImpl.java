@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     public void delete(long id) {
-        var user = repositoryCollector.getUsers().findByIdAndIsActive(id, true)
+        var user = repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new EntityNotFound("Nie znaleziono użytkownika o ID %d".formatted(id)));
 
         user.setIsActive(false);
@@ -136,7 +136,7 @@ public class UserServiceImpl implements UserService {
      * @throws IllegalArgumentException if the user with the specified ID is not found.
      */
     private User getUserById(long id) {
-        return repositoryCollector.getUsers().findByIdAndIsActive(id, true)
+        return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 

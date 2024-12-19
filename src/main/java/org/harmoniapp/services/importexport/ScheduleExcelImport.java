@@ -39,7 +39,7 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
      */
     public ResponseEntity<String> importSchedule(MultipartFile file) {
         Sheet sheet = readSheet(file);
-        List<User> users = repositoryCollector.getUsers().findAllByIsActive(true);
+        List<User> users = repositoryCollector.getUsers().findAllByIsActiveTrue();
 
         Iterator<Row> rows = sheet.rowIterator();
         if (!rows.hasNext()) {

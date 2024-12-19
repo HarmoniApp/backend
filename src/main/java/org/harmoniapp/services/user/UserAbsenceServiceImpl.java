@@ -26,7 +26,7 @@ public class UserAbsenceServiceImpl implements UserAbsenceService {
      */
     @Override
     public int getUserAvailableAbsenceDays(long id) {
-        User user = repositoryCollector.getUsers().findByIdAndIsActive(id, true)
+        User user = repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return user.getAvailableAbsenceDays() + user.getUnusedAbsenceDays();
     }
@@ -90,7 +90,7 @@ public class UserAbsenceServiceImpl implements UserAbsenceService {
      */
     @Scheduled(cron = "0 0 0 1 1 ?")
     public void scheduledCarryOverPreviousYearAbsenceDays() {
-        List<User> users = repositoryCollector.getUsers().findAllByIsActive(true);
+        List<User> users = repositoryCollector.getUsers().findAllByIsActiveTrue();
         for (User user : users) {
             carryOverPreviousYearAbsenceDays(user);
         }
@@ -102,7 +102,7 @@ public class UserAbsenceServiceImpl implements UserAbsenceService {
      */
     @Scheduled(cron = "0 0 0 1 10 ?")
     public void scheduledExpireUnusedAbsenceDays() {
-        List<User> users = repositoryCollector.getUsers().findAllByIsActive(true);
+        List<User> users = repositoryCollector.getUsers().findAllByIsActiveTrue();
         for (User user : users) {
             expireUnusedAbsenceDays(user);
         }

@@ -113,7 +113,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      * @throws IllegalArgumentException if the user is not found.
      */
     private User getUserById(long id) {
-        return repositoryCollector.getUsers().findByIdAndIsActive(id, true)
+        return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 

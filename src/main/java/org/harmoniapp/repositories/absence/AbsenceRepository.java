@@ -11,9 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface AbsenceRepository extends JpaRepository<Absence, Long> {
-    Page<Absence> findByUserId(long userId, Pageable pageable);
 
-//    Page<Absence> findByUserIdAndArchived(long userId, boolean archived, Pageable pageable);
     @Query("SELECT a FROM Absence a WHERE a.user.isActive = true")
     Page<Absence> findAllWithActiveUsers(Pageable pageable);
 
@@ -22,9 +20,6 @@ public interface AbsenceRepository extends JpaRepository<Absence, Long> {
 
     @Query("SELECT a FROM Absence a WHERE a.status.id = :statusId")
     Page<Absence> findAbsenceByStatusId(@Param("statusId") long statusId, Pageable pageable);
-
-    @Query("SELECT a FROM Absence a WHERE a.user.id = :userId AND (a.start <= :endDate AND a.end >= :startDate)")
-    List<Absence> findAbsenceByDateRangeAndUserId(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, @Param("userId") long userId);
 
     @Query("SELECT a FROM Absence a WHERE a.user.id = :userId AND (a.start <= :endDate AND a.end >= :startDate) AND a.status.name = 'zatwierdzony'")
     List<Absence> findApprovedAbsenceByDateRangeAndUserId(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, @Param("userId") long userId);

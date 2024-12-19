@@ -168,7 +168,7 @@ public class ShiftServiceImpl implements ShiftService {
      * @throws IllegalArgumentException if the user with the specified ID does not exist
      */
     private User getUserById(long id, RepositoryCollector repositoryCollector) {
-        return repositoryCollector.getUsers().findByIdAndIsActive(id, true)
+        return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 

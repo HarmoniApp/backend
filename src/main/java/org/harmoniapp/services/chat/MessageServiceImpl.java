@@ -213,7 +213,7 @@ public class MessageServiceImpl implements MessageService {
      * @throws EntityNotFound if no active user is found with the given ID
      */
     private User getUserById(long id) {
-        return repositoryCollector.getUsers().findByIdAndIsActive(id, true)
+        return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new EntityNotFound("Nie znaleziono użytkownika o ID: " + id));
     }
 
