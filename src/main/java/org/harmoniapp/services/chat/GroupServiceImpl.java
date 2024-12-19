@@ -92,7 +92,7 @@ public class GroupServiceImpl implements GroupService {
      *
      * @param groupId the ID of the group from which the member is to be removed
      * @param userId  the ID of the user to be removed as a member
-     * @return the updated GroupDto after removing the member
+     * @return the updated GroupDto after removing the member, or null if the group is deleted
      * @throws EntityNotFound if no group or user is found with the specified IDs
      */
     @Override
@@ -101,6 +101,10 @@ public class GroupServiceImpl implements GroupService {
         Group group = getGroupById(groupId);
         User user = getUserById(userId, false);
         group.getMembers().remove(user);
+        if (group.getMembers().isEmpty()) {
+            delete(groupId);
+            return null;
+        }
         return saveGroup(group);
     }
 

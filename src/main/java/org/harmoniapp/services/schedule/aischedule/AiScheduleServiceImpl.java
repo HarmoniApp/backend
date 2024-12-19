@@ -13,7 +13,6 @@ import org.harmoniapp.enums.AiSchedulerNotificationType;
 import org.harmoniapp.geneticalgorithm.*;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.services.notification.NotificationService;
-import org.harmoniapp.services.shared.UserDataService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
