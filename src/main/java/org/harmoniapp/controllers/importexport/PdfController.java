@@ -33,26 +33,4 @@ public class PdfController {
     public ResponseEntity<InputStreamResource> generatePdfForAllEmployees() {
         return pdfService.generatePdfForAllEmployees();
     }
-
-
-//    /**
-//     * Retrieves a list of all archived shifts.
-//     *
-//     * @return a list of ArchivedShiftDto containing
-//     */
-//    @GetMapping
-//    public List<ArchivedShiftDto> getAllArchivedShifts() {
-//        return archivedShiftService.getAllArchivedShifts();
-//    }
-
-//    /**
-//     * Retrieves a specific archived shift by its ID and returns the PDF file.
-//     *
-//     * @param id the ID of the archived shift to retrieve
-//     * @return ResponseEntity containing the archived shift PDF as InputStreamResource
-//     */
-//    @GetMapping("/{id}")
-//    public ResponseEntity<InputStreamResource> getArchivedShift(@PathVariable long id) {
-//        return archivedShiftService.getArchivedShift(id);
-//    }
 }
