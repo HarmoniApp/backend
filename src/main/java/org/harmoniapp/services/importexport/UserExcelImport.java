@@ -23,7 +23,7 @@ import org.harmoniapp.contracts.profile.LanguageDto;
 import org.harmoniapp.contracts.user.UserDto;
 import org.harmoniapp.exception.EmptyFileException;
 import org.harmoniapp.exception.InvalidCellException;
-import org.harmoniapp.exception.PdfGenerationException;
+import org.harmoniapp.exception.FileGenerationException;
 import org.harmoniapp.services.user.UserServiceImpl;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
@@ -184,7 +184,7 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
      *
      * @param response the list of UserDto objects to include in the PDF
      * @return a byte array representing the generated PDF
-     * @throws PdfGenerationException if an error occurs while generating the PDF
+     * @throws FileGenerationException if an error occurs while generating the PDF
      */
     private byte[] generatePdf(List<UserDto> response) {
         Document document = new Document(PageSize.A4.rotate());
@@ -198,7 +198,7 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
             document.add(table);
             document.close();
         } catch (DocumentException e) {
-            throw new PdfGenerationException("Error while generating PDF");
+            throw new FileGenerationException("Error while generating PDF");
         }
 
         return out.toByteArray();

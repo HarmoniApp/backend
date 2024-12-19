@@ -1,7 +1,8 @@
 package org.harmoniapp.controllers.importexport;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.services.importexport.ExcelService;
+import org.harmoniapp.services.importexport.ExportExcelService;
+import org.harmoniapp.services.importexport.ExportExcelServiceImpl;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,19 +14,17 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @RequestMapping("/excel")
 public class ExcelController {
-    private final ExcelService excelService;
+    private final ExportExcelService exportExcelService;
 
     @GetMapping("users/export-excel")
     public ResponseEntity<InputStreamResource> exportUsersToExcel() {
-        return excelService.exportUsersToExcel();
+        return exportExcelService.exportUsers();
     }
 
     @GetMapping("shifts/export-excel")
     public ResponseEntity<InputStreamResource> exportShiftsToExcel(@RequestParam("start") String start, @RequestParam("end") String end) {
         LocalDate startDate = LocalDate.parse(start);
         LocalDate endDate = LocalDate.parse(end);
-        return excelService.exportShiftsToExcel(startDate, endDate);
+        return exportExcelService.exportShifts(startDate, endDate);
     }
-
-
 }

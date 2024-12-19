@@ -4,6 +4,7 @@ import org.harmoniapp.entities.user.User;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -22,6 +23,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Optional<User> findByIdAndIsActive(Long id, boolean active);
 
     Page<User> findAllByIsActive(boolean active, Pageable pageable);
+
+    List<User> findByIsActiveTrue(Sort sort);
 
     List<User> findAllByIsActive(boolean isActive);
 
