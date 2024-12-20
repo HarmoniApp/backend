@@ -3,6 +3,8 @@ package org.harmoniapp.services.user;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.user.UserDto;
 import org.harmoniapp.entities.user.User;
+import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.UnsupportedFileTypeException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
@@ -60,8 +62,8 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      * @param id   The ID of the user to associate the photo with.
      * @param file The photo file to be uploaded (must be in JPG or PNG format).
      * @return The updated UserDto object after saving the photo information.
-     * @throws IllegalArgumentException if the user is not found or the file format is not supported.
-     * @throws RuntimeException         if there is an error saving the file.
+     * @throws EntityNotFound   if the user is not found or the file format is not supported.
+     * @throws RuntimeException if there is an error saving the file.
      */
     public UserDto uploadPhoto(long id, MultipartFile file) {
         validateFileFormat(file);
@@ -86,8 +88,8 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      *
      * @param id The ID of the user whose photo is to be set to default.
      * @return The updated UserDto object with the default photo.
-     * @throws IllegalArgumentException if the user with the specified ID is not found.
-     * @throws RuntimeException         if there is an error deleting the old photo file.
+     * @throws EntityNotFound   if the user with the specified ID is not found.
+     * @throws RuntimeException if there is an error deleting the old photo file.
      */
     public UserDto setDefaultPhoto(long id) {
         User user = getUserById(id);
@@ -110,11 +112,11 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      *
      * @param id The ID of the user to retrieve.
      * @return The user entity with the specified ID if it is active.
-     * @throws IllegalArgumentException if the user is not found.
+     * @throws EntityNotFound if the user is not found.
      */
     private User getUserById(long id) {
         return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new EntityNotFound("User not found"));
     }
 
     /**
@@ -142,13 +144,13 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      * Validates the format of the uploaded file.
      *
      * @param file The MultipartFile to be validated.
-     * @throws IllegalArgumentException if the file format is not JPG or PNG.
+     * @throws UnsupportedFileTypeException if the file format is not JPG or PNG.
      */
     private void validateFileFormat(MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null ||
                 !(originalFilename.endsWith(".jpg") || originalFilename.endsWith(".png") || originalFilename.endsWith(".jpeg"))) {
-            throw new IllegalArgumentException("File must be a JPG or PNG image");
+            throw new UnsupportedFileTypeException("File must be a JPG or PNG image");
         }
     }
 

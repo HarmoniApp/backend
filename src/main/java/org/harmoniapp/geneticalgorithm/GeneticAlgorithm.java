@@ -82,11 +82,25 @@ public class GeneticAlgorithm implements Algorithm {
         return bestChromosome;
     }
 
+    /**
+     * Retrieves the best chromosome from the given population based on fitness.
+     *
+     * @param population the list of chromosomes to evaluate
+     * @return the chromosome with the highest fitness
+     * @throws NoSuchElementException if the population is empty
+     */
     private Chromosome getBestChromosome(List<Chromosome> population) {
         assert !population.isEmpty();
         return population.stream().max(Comparator.comparing(Chromosome::getFitness)).get();
     }
 
+    /**
+     * Updates the best chromosome found so far.
+     *
+     * @param population     the current population of chromosomes
+     * @param bestChromosome the best chromosome found so far
+     * @return the updated best chromosome
+     */
     private Chromosome updateBestChromosome(List<Chromosome> population, Chromosome bestChromosome) {
         Chromosome newBestChromosome = getBestChromosome(population);
         if (newBestChromosome.getFitness() > bestChromosome.getFitness()) {
@@ -225,7 +239,6 @@ public class GeneticAlgorithm implements Algorithm {
      * @param employees  the list of employees to mutate the chromosome from
      * @return the mutated chromosome
      */
-    //TODO: sometimes is throwing an exception
     private Chromosome mutate(Chromosome chromosome, Map<String, List<Employee>> employees) {
         List<Gen> gens = chromosome.getGens();
         for (int i = 0; i < gens.size(); i++) {

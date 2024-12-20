@@ -37,6 +37,7 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      */
     @Override
     public AggregatedScheduleData prepareData(List<ScheduleRequirement> requirementsDto) {
+        //TODO: check if one day appears more than once
         requirementsDto.sort(Comparator.comparing(ScheduleRequirement::date));
         List<User> users = findActiveUsersWithoutAbsence(requirementsDto);
         Map<String, List<Employee>> employees = prepareEmployees(requirementsDto, users);

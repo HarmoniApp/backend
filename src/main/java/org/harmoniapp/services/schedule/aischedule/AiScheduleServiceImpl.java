@@ -13,6 +13,8 @@ import org.harmoniapp.enums.AiSchedulerNotificationType;
 import org.harmoniapp.geneticalgorithm.*;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.services.notification.NotificationService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -35,13 +37,13 @@ public class AiScheduleServiceImpl implements AiScheduleService {
     private List<Long> lastGeneratedShiftIds;
 
     /**
-     * Generates a schedule based on the specified requirements.
+     * Generates a schedule based on the provided requirements.
      *
-     * @param requirementsDto the list of schedule requirements to generate the schedule from
-     * @param authentication  the authentication object containing the user's credentials
-     * @return an AiSchedulerResponse containing the generated schedule
+     * @param requirementsDto the list of schedule requirements
+     * @param authentication  the authentication information of the user
+     * @return the response entity containing the AI scheduler response
      */
-    public AiSchedulerResponse generateSchedule(List<ScheduleRequirement> requirementsDto, Authentication authentication) {
+    public ResponseEntity<AiSchedulerResponse> generateSchedule(List<ScheduleRequirement> requirementsDto, Authentication authentication) {
         AggregatedScheduleData data = requirementsEncoder.prepareData(requirementsDto);
         User receiver = getReceiver(authentication);
 
@@ -71,7 +73,7 @@ public class AiScheduleServiceImpl implements AiScheduleService {
     /**
      * Retrieves a user by their ID if they are active.
      *
-     * @param id                  the ID of the user to retrieve
+     * @param id the ID of the user to retrieve
      * @return the user with the specified ID if they are active
      * @throws IllegalArgumentException if the user is not found
      */
@@ -104,11 +106,14 @@ public class AiScheduleServiceImpl implements AiScheduleService {
      * Sends a notification to the user about the failure.
      *
      * @param receiver the user to whom the notification will be sent
-     * @return an AiSchedulerResponse indicating the failure of schedule generation
+     * @return a ResponseEntity containing the failure message and HTTP status
      */
-    private AiSchedulerResponse failedResponse(User receiver) {
+    private ResponseEntity<AiSchedulerResponse> failedResponse(User receiver) {
         sendNotification(receiver, AiSchedulerNotificationType.FAILURE);
-        return new AiSchedulerResponse("Nie udało się wygenerować grafiku, spróbuj ponownie", false);
+        AiSchedulerResponse response = new AiSchedulerResponse("Nie udało się wygenerować grafiku, spróbuj ponownie", false);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .header("Retry-After", "10")
+                .body(response);
     }
 
     /**
@@ -116,11 +121,12 @@ public class AiScheduleServiceImpl implements AiScheduleService {
      * Sends a notification to the user about the success.
      *
      * @param receiver the user to whom the notification will be sent
-     * @return an AiSchedulerResponse indicating the success of schedule generation
+     * @return a ResponseEntity containing the success message and HTTP status
      */
-    private AiSchedulerResponse successfulResponse(User receiver) {
+    private ResponseEntity<AiSchedulerResponse> successfulResponse(User receiver) {
         sendNotification(receiver, AiSchedulerNotificationType.SUCCESS);
-        return new AiSchedulerResponse("Układanie grafiku zakończone pomyślnie", true);
+        AiSchedulerResponse response = new AiSchedulerResponse("Układanie grafiku zakończone pomyślnie", true);
+        return ResponseEntity.ok(response);
     }
 
     /**
