@@ -5,12 +5,14 @@ import org.harmoniapp.configuration.Principle;
 import org.harmoniapp.contracts.notification.NotificationDto;
 import org.harmoniapp.contracts.schedule.aischedule.AggregatedScheduleData;
 import org.harmoniapp.contracts.schedule.aischedule.AiSchedulerResponse;
-import org.harmoniapp.contracts.schedule.aischedule.GeneratingProgressDto;
 import org.harmoniapp.contracts.schedule.aischedule.ScheduleRequirement;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.enums.AiSchedulerNotificationType;
-import org.harmoniapp.geneticalgorithm.*;
+import org.harmoniapp.geneticalgorithm.Algorithm;
+import org.harmoniapp.geneticalgorithm.Chromosome;
+import org.harmoniapp.geneticalgorithm.Gen;
+import org.harmoniapp.geneticalgorithm.GeneticAlgorithm;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.services.notification.NotificationService;
 import org.springframework.http.HttpStatus;
@@ -91,8 +93,9 @@ public class AiScheduleServiceImpl implements AiScheduleService {
      * @throws RuntimeException if the generated schedule's fitness is below the acceptable threshold
      */
     private List<Gen> runAlgorithm(AggregatedScheduleData data, User receiver) {
-        GenerationListener listener = new AiGenerationListener(messagingTemplate, receiver.getId());
-        Algorithm geneticAlgorithm = new GeneticAlgorithm(1000, listener);
+        Algorithm geneticAlgorithm = new GeneticAlgorithm(1000);
+        geneticAlgorithm.addObserver(new WsGenerationObserver(messagingTemplate, receiver.getId()));
+        geneticAlgorithm.addObserver(new LogGenerationObserver()); // Observer for logging
         Chromosome chromosome = geneticAlgorithm.run(data.shifts(), data.employees());
 
         if (chromosome.getFitness() < 0.9) {
@@ -191,19 +194,5 @@ public class AiScheduleServiceImpl implements AiScheduleService {
     private void removeUnpublishedShifts(List<Shift> shifts) {
         shifts.removeIf(Shift::getPublished);
         repositoryCollector.getShifts().deleteAll(shifts);
-    }
-
-    /**
-     * Listener for generation updates in the genetic algorithm.
-     * Sends progress updates to the client via WebSocket.
-     */
-    private record AiGenerationListener(SimpMessagingTemplate messagingTemplate,
-                                        long receiverId) implements GenerationListener {
-        @Override
-        public void onGenerationUpdate(double generation, double fitness) {
-            System.out.println("Generation: " + generation + ", Fitness: " + fitness);
-            GeneratingProgressDto response = new GeneratingProgressDto(generation, fitness);
-            messagingTemplate.convertAndSend("/client/fitness/" + receiverId, response);
-        }
     }
 }

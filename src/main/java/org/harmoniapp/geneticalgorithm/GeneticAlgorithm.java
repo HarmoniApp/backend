@@ -18,7 +18,7 @@ public class GeneticAlgorithm implements Algorithm {
     private final CheckConstraint constraintChecker;
     private final Random random;
     private final int reportInterval;
-    private final GenerationListener listener;
+    private List<GenerationObserver> observers;
 
     /**
      * Creates a new GeneticAlgorithm instance with default parameters.
@@ -32,25 +32,25 @@ public class GeneticAlgorithm implements Algorithm {
         this.constraintChecker = new ConstraintChecker();
         this.random = new Random();
         this.reportInterval = 100;
-        this.listener = null;
+        this.observers = new ArrayList<>();
+        addObserver(new DefaultGenerationObserver());
     }
 
     /**
      * Creates a new GeneticAlgorithm instance with specified parameters.
      *
      * @param reportInterval the interval at which progress is reported
-     * @param listener       the listener for generation updates
      */
-    public GeneticAlgorithm(int reportInterval, GenerationListener listener) {
+    public GeneticAlgorithm(int reportInterval) {
         this.populationSize = 50;
         this.tournamentSize = 10;
         this.maxGenerations = 100000;
-        this.mutationRate = 0.2;
+        this.mutationRate = 0.02;
         this.crossoverRate = 0.6;
         this.constraintChecker = new ConstraintChecker();
         this.random = new Random();
         this.reportInterval = reportInterval;
-        this.listener = listener;
+        this.observers = new ArrayList<>();
     }
 
     /**
@@ -69,17 +69,36 @@ public class GeneticAlgorithm implements Algorithm {
             population = evolvePopulation(population, employees);
             bestChromosome = updateBestChromosome(population, bestChromosome);
 
-            //TODO: Modify this to observation
-            if ((i % reportInterval == 0 || bestChromosome.getFitness() == 1) && listener != null) {
-                listener.onGenerationUpdate((double) i / this.maxGenerations, bestChromosome.getFitness());
-            }
-
+            notifyObservers(i, bestChromosome);
             if (bestChromosome.getFitness() == 1) {
                 break;
             }
         }
 
         return bestChromosome;
+    }
+
+    /**
+     * Adds an observer to the genetic algorithm.
+     *
+     * @param observer the observer to add
+     */
+    @Override
+    public void addObserver(GenerationObserver observer) {
+        this.observers.add(observer);
+    }
+
+    /**
+     * Notifies all observers of a generation update.
+     *
+     * @param generation     the generation number
+     * @param bestChromosome the chromosome of the current generation
+     */
+    public void notifyObservers(int generation, Chromosome bestChromosome) {
+        if ((generation % reportInterval == 0 || bestChromosome.getFitness() == 1)) {
+            double progress = (double) generation / this.maxGenerations * 100;
+            observers.forEach(observer -> observer.onGenerationUpdate(progress, bestChromosome.getFitness()));
+        }
     }
 
     /**

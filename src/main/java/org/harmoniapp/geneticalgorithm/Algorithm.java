@@ -16,4 +16,19 @@ public interface Algorithm {
      * @return the resulting Chromosome after running the algorithm
      */
     Chromosome run(List<Gen> shifts, Map<String, List<Employee>> employees);
+
+    /**
+     * Adds an observer to the genetic algorithm.
+     *
+     * @param observer the listener to add
+     */
+    void addObserver(GenerationObserver observer);
+
+    /**
+     * Notifies all observers of a generation update.
+     *
+     * @param generation the generation number
+     * @param chromosome the chromosome of the current generation
+     */
+    void notifyObservers(int generation, Chromosome chromosome);
 }
