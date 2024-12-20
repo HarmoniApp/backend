@@ -38,7 +38,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      */
     public ResponseEntity<InputStreamResource> getUserPhoto(long id) {
         User user = getUserById(id);
-        String photo = user.getPhoto();
+        String photo = (user.getPhoto() != null) ? user.getPhoto() : "default.jpg";
         MediaType contentType = determineContentType(photo);
 
         Path photoPath = getPhotoPath(photo);

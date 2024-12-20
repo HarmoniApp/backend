@@ -194,7 +194,8 @@ public class AiScheduleServiceImpl implements AiScheduleService {
     private record AiGenerationListener(SimpMessagingTemplate messagingTemplate,
                                         long receiverId) implements GenerationListener {
         @Override
-        public void onGenerationUpdate(int generation, double fitness) {
+        public void onGenerationUpdate(double generation, double fitness) {
+            System.out.println("Generation: " + generation + ", Fitness: " + fitness);
             GeneratingProgressDto response = new GeneratingProgressDto(generation, fitness);
             messagingTemplate.convertAndSend("/client/fitness/" + receiverId, response);
         }
