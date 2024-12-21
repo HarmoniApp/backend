@@ -54,5 +54,4 @@ public class PartialUserController {
     public List<PartialUserDto> getUsersSearch(@RequestParam String q) {
         return service.getUsersSearch(q);
     }
-
 }

@@ -23,7 +23,6 @@ public class UserPhotoController {
      * @return The updated UserDto object with the new photo path.
      */
     @PatchMapping("/{id}/uploadPhoto")
-    @ResponseStatus(HttpStatus.CREATED)
     public UserDto uploadPhoto(@PathVariable long id, @RequestParam("file") MultipartFile file) {
         return service.uploadPhoto(id, file);
     }
@@ -48,7 +47,6 @@ public class UserPhotoController {
      * @return A ResponseEntity containing the InputStreamResource of the user's photo.
      */
     @GetMapping("/{id}/photo")
-    @ResponseBody
     public ResponseEntity<InputStreamResource> getUserPhoto(@PathVariable long id) {
         return service.getUserPhoto(id);
     }

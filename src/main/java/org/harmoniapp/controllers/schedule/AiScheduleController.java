@@ -28,7 +28,7 @@ public class AiScheduleController {
     /**
      * Generates a schedule based on the provided requirements.
      *
-     * @param requirements the list of schedule requirements
+     * @param requirements   the list of schedule requirements
      * @param authentication the authentication information of the user
      * @return a ResponseEntity containing the generated schedule
      */

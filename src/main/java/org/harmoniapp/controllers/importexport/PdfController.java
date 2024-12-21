@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 
 /**
- * REST controller for managing archived shifts.
- * Provides endpoints to generate PDFs for shifts and retrieve archived shifts data.
+ * Controller for handling PDF export requests.
  */
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +31,11 @@ public class PdfController {
         return pdfExportService.generatePdfForWeek(startOfWeek);
     }
 
+    /**
+     * Generates a PDF report for all employees.
+     *
+     * @return ResponseEntity containing the generated PDF as InputStreamResource
+     */
     @GetMapping("/generate-pdf-all-employees")
     public ResponseEntity<InputStreamResource> generatePdfForAllEmployees() {
         return pdfExportService.generatePdfForAllEmployees();

@@ -83,7 +83,6 @@ public class ShiftController {
      * @return a list of ShiftDto with the 'published' status set to true
      */
     @PatchMapping("/{start}/{end}")
-    @ResponseStatus(HttpStatus.CREATED)
     public List<ShiftDto> publishShifts(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
                                         @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
         return shiftService.publish(start, end);
