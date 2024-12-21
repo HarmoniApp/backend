@@ -7,10 +7,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.harmoniapp.contracts.user.UserDto;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.util.List;
 
 /**
@@ -30,10 +28,10 @@ public class UserExcelExport extends ExcelExport implements ExportUser {
     /**
      * Exports the list of active users to an Excel file.
      *
-     * @return ResponseEntity containing the Excel file as an InputStreamResource
+     * @return an InputStreamResource containing the exported data
      */
     @Override
-    public ResponseEntity<InputStreamResource> exportUsers() {
+    public InputStreamResource exportUsers() {
         List<UserDto> users = userDataService.getAllUsers();
 
         Workbook workbook = new XSSFWorkbook();
@@ -46,8 +44,7 @@ public class UserExcelExport extends ExcelExport implements ExportUser {
             sheet.autoSizeColumn(i);
         }
 
-        ByteArrayInputStream in = writeFile(workbook);
-        return createResponse(in);
+        return writeFile(workbook);
     }
 
     /**

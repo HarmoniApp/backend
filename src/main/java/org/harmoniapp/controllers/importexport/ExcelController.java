@@ -3,13 +3,12 @@ package org.harmoniapp.controllers.importexport;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.services.importexport.ExcelExportService;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.LocalDate;
 
 /**
  * REST controller for handling Excel import/export operations.
@@ -19,6 +18,7 @@ import java.time.LocalDate;
 @RequestMapping("/excel")
 public class ExcelController {
     private final ExcelExportService excelExportService;
+    private final MediaType mediaType = MediaType.parseMediaType("application/vnd.ms-excel");
 
     /**
      * Exports user data to an Excel file.
@@ -27,7 +27,10 @@ public class ExcelController {
      */
     @GetMapping("users/export-excel")
     public ResponseEntity<InputStreamResource> exportUsersToExcel() {
-        return excelExportService.exportUsers();
+        InputStreamResource resource = excelExportService.exportUsers();
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .body(resource);
     }
 
     /**
@@ -39,8 +42,9 @@ public class ExcelController {
      */
     @GetMapping("shifts/export-excel")
     public ResponseEntity<InputStreamResource> exportShiftsToExcel(@RequestParam("start") String start, @RequestParam("end") String end) {
-        LocalDate startDate = LocalDate.parse(start);
-        LocalDate endDate = LocalDate.parse(end);
-        return excelExportService.exportShifts(startDate, endDate);
+        InputStreamResource resource = excelExportService.exportShifts(start, end);
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .body(resource);
     }
 }

@@ -11,24 +11,21 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.harmoniapp.contracts.profile.RoleDto;
-import org.harmoniapp.entities.profile.Address;
-import org.harmoniapp.entities.profile.Language;
-import org.harmoniapp.entities.profile.Role;
-import org.harmoniapp.entities.profile.ContractType;
-import org.harmoniapp.entities.user.User;
-import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.contracts.profile.AddressDto;
 import org.harmoniapp.contracts.profile.LanguageDto;
+import org.harmoniapp.contracts.profile.RoleDto;
 import org.harmoniapp.contracts.user.UserDto;
+import org.harmoniapp.entities.profile.Address;
+import org.harmoniapp.entities.profile.ContractType;
+import org.harmoniapp.entities.profile.Language;
+import org.harmoniapp.entities.profile.Role;
+import org.harmoniapp.entities.user.User;
 import org.harmoniapp.exception.EmptyFileException;
-import org.harmoniapp.exception.InvalidCellException;
 import org.harmoniapp.exception.FileGenerationException;
+import org.harmoniapp.exception.InvalidCellException;
+import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.services.user.UserServiceImpl;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -58,12 +55,12 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * Imports users from an Excel file.
      *
      * @param file the Excel file containing user data.
-     * @return a ResponseEntity containing a list of UserDto with the result of the import operation.
+     * @return an InputStreamResource containing the result of the import operation.
      * @throws EmptyFileException   if the file is empty.
      * @throws InvalidCellException if the headers are invalid or an error occurs during import.
      */
     @Transactional
-    public ResponseEntity<InputStreamResource> importUsers(MultipartFile file) {
+    public InputStreamResource importUsers(MultipartFile file) {
         Sheet sheet = readSheet(file);
         Iterator<Row> rows = sheet.rowIterator();
         if (!rows.hasNext()) {
@@ -150,18 +147,15 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * Generates a response indicating the result of the import operation.
      *
      * @param savedUsers the list of saved user DTOs.
-     * @return a ResponseEntity containing the list of successfully saved users.
+     * @return an InputStreamResource containing the response data.
      */
-    private ResponseEntity<InputStreamResource> generateResponse(List<UserDto> savedUsers) {
+    private InputStreamResource generateResponse(List<UserDto> savedUsers) {
         List<UserDto> response = createResponseList(savedUsers);
 
-        //TODO: extract PDF generation to a separate class
         byte[] pdfData = generatePdf(response);
         ByteArrayInputStream bis = new ByteArrayInputStream(pdfData);
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(new InputStreamResource(bis));
+        return new InputStreamResource(bis);
     }
 
     /**

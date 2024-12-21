@@ -10,7 +10,6 @@ import org.harmoniapp.entities.user.User;
 import org.harmoniapp.exception.EmptyFileException;
 import org.harmoniapp.exception.InvalidCellException;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,12 +31,12 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
     /**
      * Imports a schedule from an Excel file.
      *
-     * @param file the Excel file containing the schedule.
-     * @return a ResponseEntity with a success message.
-     * @throws EmptyFileException if no rows are found in the Excel file.
-     * @throws InvalidCellException if an invalid employee ID is found in the Excel file.
+     * @param file the Excel file containing the schedule
+     * @return a status message
+     * @throws EmptyFileException if no rows are found in the Excel file
+     * @throws InvalidCellException if an invalid employee ID is found in the Excel file
      */
-    public ResponseEntity<String> importSchedule(MultipartFile file) {
+    public String importSchedule(MultipartFile file) {
         Sheet sheet = readSheet(file);
         List<User> users = repositoryCollector.getUsers().findAllByIsActiveTrue();
 
@@ -61,8 +60,7 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
             processRow(row, dateHeaders, user, shiftList);
         }
         repositoryCollector.getShifts().saveAll(shiftList);
-        return ResponseEntity.ok("Schedule imported successfully");
-
+        return "Schedule imported successfully";
     }
 
     /**
@@ -143,10 +141,10 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
     /**
      * Extracts headers from the given header row.
      *
-     * @param headerRow the row containing the headers.
-     * @return a list of headers extracted from the row.
-     * @throws EmptyFileException if no headers are found in the Excel file.
-     * @throws InvalidCellException if the "employee id" column is not found or if a date cell has an invalid format.
+     * @param headerRow the row containing the headers
+     * @return a list of headers extracted from the row
+     * @throws EmptyFileException if no headers are found in the Excel file
+     * @throws InvalidCellException if the "employee id" column is not found or if a date cell has an invalid format
      */
     private List<LocalDateTime> extractHeaders(Row headerRow) {
         List<LocalDateTime> headers = new ArrayList<>();

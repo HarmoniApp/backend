@@ -8,10 +8,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -31,10 +29,10 @@ public class ScheduleExcelExport extends ExcelExport implements ExportSchedule {
      *
      * @param startDate the start date of the range
      * @param endDate   the end date of the range
-     * @return a ResponseEntity containing the Excel file as an InputStreamResource
+     * @return an InputStreamResource containing the exported data
      */
     @Override
-    public ResponseEntity<InputStreamResource> exportShifts(LocalDate startDate, LocalDate endDate) {
+    public InputStreamResource exportShifts(LocalDate startDate, LocalDate endDate) {
         List<Shift> shifts = scheduleDataService.getShifts(startDate, endDate);
         List<User> users = getUsers(shifts);
         Map<Long, Map<LocalDate, String>> userShiftMap = createUserShiftMap(shifts);
@@ -43,8 +41,7 @@ public class ScheduleExcelExport extends ExcelExport implements ExportSchedule {
         Sheet sheet = createSheetWithHeader(workbook, startDate, endDate);
         populateSheetWithData(sheet, users, userShiftMap, startDate, endDate);
 
-        ByteArrayInputStream in = writeFile(workbook);
-        return createResponse(in);
+        return writeFile(workbook);
     }
 
     /**

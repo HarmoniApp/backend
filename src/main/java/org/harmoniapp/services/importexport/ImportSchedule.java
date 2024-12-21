@@ -1,6 +1,5 @@
 package org.harmoniapp.services.importexport;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -12,7 +11,7 @@ public interface ImportSchedule {
      * Imports a schedule from a given file.
      *
      * @param file the file containing the schedule to import
-     * @return a ResponseEntity with a message indicating the result of the import
+     * @return a status message
      */
-    ResponseEntity<String> importSchedule(MultipartFile file);
+    String importSchedule(MultipartFile file);
 }

@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.user.UserDto;
 import org.harmoniapp.exception.FileGenerationException;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -33,15 +32,15 @@ public class UserPdfExport extends PdfExport implements ExportUser {
     /**
      * Exports user data to a PDF file.
      *
-     * @return a ResponseEntity containing the PDF file as an InputStreamResource
+     * @return an InputStreamResource containing the exported data
      */
     @Override
-    public ResponseEntity<InputStreamResource> exportUsers() {
+    public InputStreamResource exportUsers() {
         List<UserDto> users = userDataService.getAllUsers();
         Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         writeDocument(document, out, users);
-        return createResponseEntity(out);
+        return convertToInputStreamResource(out);
     }
 
     /**

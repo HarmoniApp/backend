@@ -1,6 +1,7 @@
 package org.harmoniapp.services.user;
 
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.contracts.user.PhotoDto;
 import org.harmoniapp.contracts.user.UserDto;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.exception.EntityNotFoundException;
@@ -8,7 +9,6 @@ import org.harmoniapp.exception.UnsupportedFileTypeException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,14 +34,13 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      * Retrieves the photo of a specific user by their ID.
      *
      * @param id The ID of the user whose photo is to be retrieved.
-     * @return A ResponseEntity containing the InputStreamResource of the user's photo.
+     * @return The user's photo as a PhotoDto object.
      * @throws IllegalArgumentException if the user with the specified ID is not found.
      * @throws RuntimeException         if there is an error reading the photo file.
      */
-    public ResponseEntity<InputStreamResource> getUserPhoto(long id) {
+    public PhotoDto getUserPhoto(long id) {
         User user = getUserById(id);
         String photo = (user.getPhoto() != null) ? user.getPhoto() : "default.jpg";
-        MediaType contentType = determineContentType(photo);
 
         Path photoPath = getPhotoPath(photo);
         if (!Files.exists(photoPath)) {
@@ -50,7 +49,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
 
         try {
             InputStream in = new FileInputStream(photoPath.toString());
-            return ResponseEntity.ok().contentType(contentType).body(new InputStreamResource(in));
+            return new PhotoDto(new InputStreamResource(in), determineContentType(photo));
         } catch (IOException e) {
             throw new RuntimeException("Failed to read photo file", e);
         }
@@ -62,8 +61,8 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      * @param id   The ID of the user to associate the photo with.
      * @param file The photo file to be uploaded (must be in JPG or PNG format).
      * @return The updated UserDto object after saving the photo information.
-     * @throws EntityNotFoundException   if the user is not found or the file format is not supported.
-     * @throws RuntimeException if there is an error saving the file.
+     * @throws EntityNotFoundException if the user is not found or the file format is not supported.
+     * @throws RuntimeException        if there is an error saving the file.
      */
     public UserDto uploadPhoto(long id, MultipartFile file) {
         validateFileFormat(file);
@@ -88,8 +87,8 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      *
      * @param id The ID of the user whose photo is to be set to default.
      * @return The updated UserDto object with the default photo.
-     * @throws EntityNotFoundException   if the user with the specified ID is not found.
-     * @throws RuntimeException if there is an error deleting the old photo file.
+     * @throws EntityNotFoundException if the user with the specified ID is not found.
+     * @throws RuntimeException        if there is an error deleting the old photo file.
      */
     public UserDto setDefaultPhoto(long id) {
         User user = getUserById(id);

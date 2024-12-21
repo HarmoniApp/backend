@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.configuration.Principle;
 import org.harmoniapp.contracts.notification.NotificationDto;
 import org.harmoniapp.contracts.schedule.aischedule.AggregatedScheduleData;
-import org.harmoniapp.contracts.schedule.aischedule.AiSchedulerResponse;
+import org.harmoniapp.contracts.schedule.aischedule.AiSchedulerResponseDto;
 import org.harmoniapp.contracts.schedule.aischedule.ScheduleRequirement;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
@@ -15,8 +15,6 @@ import org.harmoniapp.geneticalgorithm.Gen;
 import org.harmoniapp.geneticalgorithm.GeneticAlgorithm;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.services.notification.NotificationService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -43,9 +41,9 @@ public class AiScheduleServiceImpl implements AiScheduleService {
      *
      * @param requirementsDto the list of schedule requirements
      * @param authentication  the authentication information of the user
-     * @return the response entity containing the AI scheduler response
+     * @return the generated schedule response
      */
-    public ResponseEntity<AiSchedulerResponse> generateSchedule(List<ScheduleRequirement> requirementsDto, Authentication authentication) {
+    public AiSchedulerResponseDto generateSchedule(List<ScheduleRequirement> requirementsDto, Authentication authentication) {
         AggregatedScheduleData data = requirementsEncoder.prepareData(requirementsDto);
         User receiver = getReceiver(authentication);
 
@@ -109,14 +107,11 @@ public class AiScheduleServiceImpl implements AiScheduleService {
      * Sends a notification to the user about the failure.
      *
      * @param receiver the user to whom the notification will be sent
-     * @return a ResponseEntity containing the failure message and HTTP status
+     * @return a response containing the failure message and status
      */
-    private ResponseEntity<AiSchedulerResponse> failedResponse(User receiver) {
+    private AiSchedulerResponseDto failedResponse(User receiver) {
         sendNotification(receiver, AiSchedulerNotificationType.FAILURE);
-        AiSchedulerResponse response = new AiSchedulerResponse("Nie udało się wygenerować grafiku, spróbuj ponownie", false);
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                .header("Retry-After", "10")
-                .body(response);
+        return new AiSchedulerResponseDto("Nie udało się wygenerować grafiku, spróbuj ponownie", false);
     }
 
     /**
@@ -126,10 +121,9 @@ public class AiScheduleServiceImpl implements AiScheduleService {
      * @param receiver the user to whom the notification will be sent
      * @return a ResponseEntity containing the success message and HTTP status
      */
-    private ResponseEntity<AiSchedulerResponse> successfulResponse(User receiver) {
+    private AiSchedulerResponseDto successfulResponse(User receiver) {
         sendNotification(receiver, AiSchedulerNotificationType.SUCCESS);
-        AiSchedulerResponse response = new AiSchedulerResponse("Układanie grafiku zakończone pomyślnie", true);
-        return ResponseEntity.ok(response);
+        return new AiSchedulerResponseDto("Układanie grafiku zakończone pomyślnie", true);
     }
 
     /**
@@ -163,9 +157,9 @@ public class AiScheduleServiceImpl implements AiScheduleService {
      * @return an AiSchedulerResponse containing the result of the revocation
      */
     @Transactional
-    public AiSchedulerResponse revokeSchedule() {
+    public AiSchedulerResponseDto revokeSchedule() {
         if (isLastGeneratedShiftIdsEmpty()) {
-            return new AiSchedulerResponse(
+            return new AiSchedulerResponseDto(
                     "Nie ma żadnego grafiku do usunięcia", null
             );
         }
@@ -174,7 +168,7 @@ public class AiScheduleServiceImpl implements AiScheduleService {
         removeUnpublishedShifts(shifts);
         lastGeneratedShiftIds = null;
 
-        return new AiSchedulerResponse("Usunięto ostatnio wygenerowany grafik", null);
+        return new AiSchedulerResponseDto("Usunięto ostatnio wygenerowany grafik", null);
     }
 
     /**

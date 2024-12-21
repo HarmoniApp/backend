@@ -7,8 +7,6 @@ import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 
 import java.awt.*;
 import java.io.ByteArrayInputStream;
@@ -39,15 +37,13 @@ public abstract class PdfExport {
     }
 
     /**
-     * Creates a ResponseEntity containing the PDF file.
+     * Converts a ByteArrayOutputStream to an InputStreamResource.
      *
-     * @param out the ByteArrayOutputStream containing the PDF data
-     * @return a ResponseEntity containing the PDF file as an InputStreamResource
+     * @param outputStream the ByteArrayOutputStream containing the PDF data
+     * @return an InputStreamResource containing the PDF data
      */
-    protected ResponseEntity<InputStreamResource> createResponseEntity(ByteArrayOutputStream out) {
-        ByteArrayInputStream bis = new ByteArrayInputStream(out.toByteArray());
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(new InputStreamResource(bis));
+    public InputStreamResource convertToInputStreamResource(ByteArrayOutputStream outputStream) {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+        return new InputStreamResource(inputStream);
     }
 }

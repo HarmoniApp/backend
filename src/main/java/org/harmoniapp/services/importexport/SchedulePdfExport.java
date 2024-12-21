@@ -11,7 +11,6 @@ import org.harmoniapp.entities.user.User;
 import org.harmoniapp.exception.FileGenerationException;
 import org.harmoniapp.exception.InvalidDateException;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -39,14 +38,14 @@ public class SchedulePdfExport extends PdfExport implements ExportSchedule {
      *
      * @param startDate the start date of the range
      * @param endDate   the end date of the range
-     * @return a ResponseEntity containing the PDF file as an InputStreamResource
+     * @return an InputStreamResource containing the PDF file
      */
-    public ResponseEntity<InputStreamResource> exportShifts(LocalDate startDate, LocalDate endDate) {
+    public InputStreamResource exportShifts(LocalDate startDate, LocalDate endDate) {
         validateDate(startDate, endDate);
         Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         writeDocument(document, out, startDate, endDate);
-        return createResponseEntity(out);
+        return convertToInputStreamResource(out);
     }
 
     /**

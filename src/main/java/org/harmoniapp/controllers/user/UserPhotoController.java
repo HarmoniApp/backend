@@ -1,10 +1,10 @@
 package org.harmoniapp.controllers.user;
 
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.contracts.user.PhotoDto;
 import org.harmoniapp.contracts.user.UserDto;
 import org.harmoniapp.services.user.UserPhotoService;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,6 +48,9 @@ public class UserPhotoController {
      */
     @GetMapping("/{id}/photo")
     public ResponseEntity<InputStreamResource> getUserPhoto(@PathVariable long id) {
-        return service.getUserPhoto(id);
+        PhotoDto photoDto = service.getUserPhoto(id);
+        return ResponseEntity.ok()
+                .contentType(photoDto.contentType())
+                .body(photoDto.photo());
     }
 }

@@ -3,7 +3,6 @@ package org.harmoniapp.services.importexport;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,10 +16,10 @@ public interface ExportSchedule {
      * Exports shifts within the specified date range.
      *
      * @param startDate the start date of the range
-     * @param endDate the end date of the range
-     * @return a ResponseEntity containing an InputStreamResource of the exported shifts
+     * @param endDate   the end date of the range
+     * @return an InputStreamResource containing the exported data
      */
-    ResponseEntity<InputStreamResource> exportShifts(LocalDate startDate, LocalDate endDate);
+    InputStreamResource exportShifts(LocalDate startDate, LocalDate endDate);
 
 
     /**

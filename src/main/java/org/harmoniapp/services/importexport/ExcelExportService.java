@@ -1,9 +1,6 @@
 package org.harmoniapp.services.importexport;
 
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.ResponseEntity;
-
-import java.time.LocalDate;
 
 /**
  * Service interface for exporting data to Excel files.
@@ -13,16 +10,16 @@ public interface ExcelExportService {
     /**
      * Exports user data to an Excel file.
      *
-     * @return a ResponseEntity containing the InputStreamResource of the Excel file.
+     * @return an InputStreamResource containing the Excel file
      */
-    ResponseEntity<InputStreamResource> exportUsers();
+    InputStreamResource exportUsers();
 
     /**
      * Exports shift data to an Excel file within the specified date range.
      *
-     * @param startDate the start date of the date range.
-     * @param endDate the end date of the date range.
-     * @return a ResponseEntity containing the InputStreamResource of the Excel file.
+     * @param start the start date of the range
+     * @param end   the end date of the range
+     * @return an InputStreamResource containing the Excel file
      */
-    ResponseEntity<InputStreamResource> exportShifts(LocalDate startDate, LocalDate endDate);
+    InputStreamResource exportShifts(String start, String end);
 }
