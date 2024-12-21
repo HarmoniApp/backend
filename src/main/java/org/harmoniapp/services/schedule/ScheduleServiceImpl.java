@@ -7,7 +7,7 @@ import org.harmoniapp.contracts.schedule.ShiftDto;
 import org.harmoniapp.contracts.schedule.UserScheduleDto;
 import org.harmoniapp.entities.absence.Absence;
 import org.harmoniapp.entities.schedule.Shift;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +29,7 @@ public class ScheduleServiceImpl implements ScheduleService {
      * @param userId             the ID of the user
      * @param scheduleRequestDto the schedule request data transfer object containing the date range and publication status
      * @return a UserScheduleDto containing the user's shifts and absences
-     * @throws EntityNotFound if the user ID is invalid
+     * @throws EntityNotFoundException if the user ID is invalid
      */
     public UserScheduleDto getUserWeeklySchedule(Long userId, ScheduleRequestDto scheduleRequestDto) {
         validateUserId(userId);
@@ -47,11 +47,11 @@ public class ScheduleServiceImpl implements ScheduleService {
      * Validates the user ID.
      *
      * @param userId the ID of the user to validate
-     * @throws EntityNotFound if the user ID is null or does not exist
+     * @throws EntityNotFoundException if the user ID is null or does not exist
      */
     private void validateUserId(Long userId) {
         if (userId == null || !repositoryCollector.getUsers().existsById(userId)) {
-            throw new EntityNotFound("Nie znaleziono użytkownika o ID %d".formatted(userId));
+            throw new EntityNotFoundException("Nie znaleziono użytkownika o ID %d".formatted(userId));
         }
     }
 

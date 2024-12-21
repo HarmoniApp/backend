@@ -10,7 +10,7 @@ import org.harmoniapp.entities.absence.Status;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.enums.AbsenceNotificationType;
 import org.harmoniapp.enums.AbsenceStatus;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.exception.InvalidAbsenceStatusException;
 import org.harmoniapp.exception.InvalidDateException;
 import org.harmoniapp.repositories.RepositoryCollector;
@@ -108,7 +108,7 @@ public class AbsenceServiceImpl implements AbsenceService {
      * @param id       the absence ID
      * @param statusId the new status ID
      * @return the updated AbsenceDto object
-     * @throws EntityNotFound                if the absence is not found
+     * @throws EntityNotFoundException                if the absence is not found
      * @throws InvalidDateException          if the absence start date is in the past
      * @throws InvalidAbsenceStatusException if the absence status is already finalized
      */
@@ -205,11 +205,11 @@ public class AbsenceServiceImpl implements AbsenceService {
      *
      * @param userId the user ID
      * @return the User entity
-     * @throws EntityNotFound if the user is not found
+     * @throws EntityNotFoundException if the user is not found
      */
     private User getUserById(long userId) {
         return repositoryCollector.getUsers().findById(userId)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono użytkownika"));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono użytkownika"));
     }
 
     /**
@@ -217,11 +217,11 @@ public class AbsenceServiceImpl implements AbsenceService {
      *
      * @param typeId the type ID
      * @return the AbsenceType entity
-     * @throws EntityNotFound if the absence type is not found
+     * @throws EntityNotFoundException if the absence type is not found
      */
     private AbsenceType getAbsenceTypeById(long typeId) {
         return repositoryCollector.getAbsenceTypes().findById(typeId)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono typu urlopu"));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono typu urlopu"));
     }
 
     /**
@@ -229,11 +229,11 @@ public class AbsenceServiceImpl implements AbsenceService {
      *
      * @param statusId the status ID
      * @return the Status entity
-     * @throws EntityNotFound if the status is not found
+     * @throws EntityNotFoundException if the status is not found
      */
     private Status getStatusById(long statusId) {
         return repositoryCollector.getStatuses().findById(statusId)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono statusu"));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono statusu"));
     }
 
     /**
@@ -300,10 +300,10 @@ public class AbsenceServiceImpl implements AbsenceService {
      *
      * @param id the absence ID
      * @return the Absence entity
-     * @throws EntityNotFound if the absence is not found
+     * @throws EntityNotFoundException if the absence is not found
      */
     private Absence getAbsenceById(long id) {
         return repositoryCollector.getAbsences().findById(id)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono wniosku o urlop"));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono wniosku o urlop"));
     }
 }

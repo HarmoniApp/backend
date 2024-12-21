@@ -8,7 +8,7 @@ import org.harmoniapp.contracts.schedule.aischedule.ScheduleRequirement;
 import org.harmoniapp.entities.profile.Role;
 import org.harmoniapp.entities.schedule.PredefineShift;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.exception.InvalidAiScheduleRequirementsException;
 import org.harmoniapp.geneticalgorithm.Employee;
 import org.harmoniapp.geneticalgorithm.Gen;
@@ -165,13 +165,13 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param roles  the list of roles
      * @param roleId the ID of the role to find
      * @return the name of the role
-     * @throws EntityNotFound if no role with the given ID is found
+     * @throws EntityNotFoundException if no role with the given ID is found
      */
     private String findRoleNameById(List<Role> roles, Long roleId) {
         return roles.stream()
                 .filter(r -> r.getId().equals(roleId))
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono roli o id: " + roleId))
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono roli o id: " + roleId))
                 .getName();
     }
 

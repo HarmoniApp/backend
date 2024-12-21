@@ -6,7 +6,7 @@ import org.harmoniapp.entities.profile.Role;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.enums.ShiftNotificationType;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.exception.InvalidDateException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.stereotype.Service;
@@ -32,12 +32,12 @@ public class ShiftServiceImpl implements ShiftService {
      *
      * @param id the ID of the shift to retrieve
      * @return a ShiftDto containing the details of the shift
-     * @throws EntityNotFound if the shift with the specified ID does not exist
+     * @throws EntityNotFoundException if the shift with the specified ID does not exist
      */
     @Override
-    public ShiftDto getById(long id) throws EntityNotFound {
+    public ShiftDto getById(long id) throws EntityNotFoundException {
         Shift shift = repositoryCollector.getShifts().findById(id)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono zmiany o id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono zmiany o id: " + id));
 
         return ShiftDto.fromEntity(shift);
     }
@@ -61,7 +61,7 @@ public class ShiftServiceImpl implements ShiftService {
      * @param endStr   the end date and time of the range as a string
      * @param userId   the ID of the user whose shifts are to be retrieved
      * @return a list of ShiftDto containing the details of shifts within the date range for the specified user
-     * @throws EntityNotFound       if the user with the specified ID does not exist
+     * @throws EntityNotFoundException       if the user with the specified ID does not exist
      * @throws InvalidDateException if the start date is after the end date
      */
     @Override
@@ -80,11 +80,11 @@ public class ShiftServiceImpl implements ShiftService {
      * Validates the user ID.
      *
      * @param userId the ID of the user to validate
-     * @throws EntityNotFound if the user ID is null or does not exist
+     * @throws EntityNotFoundException if the user ID is null or does not exist
      */
     private void validateUserId(Long userId) {
         if (userId == null || !repositoryCollector.getUsers().existsById(userId)) {
-            throw new EntityNotFound("Nie znaleziono użytkownika o id: " + userId);
+            throw new EntityNotFoundException("Nie znaleziono użytkownika o id: " + userId);
         }
     }
 
@@ -121,7 +121,7 @@ public class ShiftServiceImpl implements ShiftService {
      *
      * @param shiftDto the ShiftDto containing the details of the shift to create
      * @return the created ShiftDto
-     * @throws EntityNotFound   if the user or role ID provided does not exist
+     * @throws EntityNotFoundException   if the user or role ID provided does not exist
      * @throws RuntimeException if an error occurs during the creation process
      */
     @Override
@@ -140,7 +140,7 @@ public class ShiftServiceImpl implements ShiftService {
      * @param id       the ID of the shift to update or create
      * @param shiftDto the ShiftDto containing the details of the shift
      * @return the updated or newly created ShiftDto
-     * @throws EntityNotFound   if the user or role ID provided does not exist
+     * @throws EntityNotFoundException   if the user or role ID provided does not exist
      * @throws RuntimeException if an error occurs during the update or creation process
      */
     @Override
@@ -260,13 +260,13 @@ public class ShiftServiceImpl implements ShiftService {
      * Deletes a Shift by its ID.
      *
      * @param id the ID of the Shift to be deleted
-     * @throws EntityNotFound if the shift with the specified ID does not exist
+     * @throws EntityNotFoundException if the shift with the specified ID does not exist
      */
     @Override
-    public void deleteById(long id) throws EntityNotFound {
+    public void deleteById(long id) throws EntityNotFoundException {
         Shift shift = findExistingShift(id);
         if (shift == null) {
-            throw new EntityNotFound("Nie znaleziono zmiany o id: " + id);
+            throw new EntityNotFoundException("Nie znaleziono zmiany o id: " + id);
         }
         if (shift.getPublished()) {
             shiftNotificationSender.send(shift, ShiftNotificationType.DELETED_SHIFT);

@@ -3,7 +3,7 @@ package org.harmoniapp.services.schedule;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.schedule.PredefineShiftDto;
 import org.harmoniapp.entities.schedule.PredefineShift;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -26,12 +26,12 @@ public class PredefineShiftServiceImpl implements PredefineShiftService {
      *
      * @param id the ID of the predefined shift to retrieve
      * @return a PredefineShiftDto containing the details of the predefined shift
-     * @throws EntityNotFound if the predefined shift with the specified ID does not exist
+     * @throws EntityNotFoundException if the predefined shift with the specified ID does not exist
      */
     public PredefineShiftDto getById(long id) {
         return repositoryCollector.getPredefineShifts().findById(id)
                 .map(PredefineShiftDto::fromEntity)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono predefiniowanej zmiany o podanym id: %d".formatted(id)));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono predefiniowanej zmiany o podanym id: %d".formatted(id)));
     }
 
     /**

@@ -9,9 +9,9 @@ import org.harmoniapp.contracts.chat.TranslationRequestDto;
 import org.harmoniapp.entities.chat.Group;
 import org.harmoniapp.entities.chat.Message;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.exception.InvalidConversationException;
-import org.harmoniapp.exception.TranslationException;
+import org.harmoniapp.exception.TranslationFailsException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.stereotype.Service;
 
@@ -48,12 +48,12 @@ public class MessageServiceImpl implements MessageService {
      *
      * @param userId the ID of the user
      * @return a list of ChatPartnerDto objects representing the chat partners
-     * @throws EntityNotFound if the user is not found
+     * @throws EntityNotFoundException if the user is not found
      */
     @Override
     public List<ChatPartnerDto> getAllChatPartners(long userId) {
         if (!repositoryCollector.getUsers().existsById(userId)) {
-            throw new EntityNotFound("Nie znaleziono użytkownika o ID: " + userId);
+            throw new EntityNotFoundException("Nie znaleziono użytkownika o ID: " + userId);
         }
         List<Object[]> results = repositoryCollector.getMessages().findAllChatPartners(userId);
         return results.stream()
@@ -176,7 +176,7 @@ public class MessageServiceImpl implements MessageService {
             try {
                 String content = translationService.translate(message.getContent(), translationRequestDto.targetLanguage());
                 return MessageDto.fromEntity(message, content);
-            } catch (TranslationException ignored) {
+            } catch (TranslationFailsException ignored) {
             }
         }
         return MessageDto.fromEntity(message);
@@ -210,11 +210,11 @@ public class MessageServiceImpl implements MessageService {
      *
      * @param id the ID of the user to retrieve
      * @return the User entity if found and active
-     * @throws EntityNotFound if no active user is found with the given ID
+     * @throws EntityNotFoundException if no active user is found with the given ID
      */
     private User getUserById(long id) {
         return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono użytkownika o ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono użytkownika o ID: " + id));
     }
 
     /**
@@ -223,7 +223,7 @@ public class MessageServiceImpl implements MessageService {
      * @param message    the message entity to be sent
      * @param receiverId the ID of the receiver
      * @return the created MessageDto object
-     * @throws EntityNotFound if the receiver is not found
+     * @throws EntityNotFoundException if the receiver is not found
      */
     private MessageDto createDirectMessage(Message message, long receiverId) {
         User receiver = getUserById(receiverId);
@@ -239,7 +239,7 @@ public class MessageServiceImpl implements MessageService {
      * @param message the message entity to be sent
      * @param groupId the ID of the group
      * @return the created MessageDto object
-     * @throws EntityNotFound if the group is not found
+     * @throws EntityNotFoundException if the group is not found
      */
     private MessageDto createGroupMessage(Message message, long groupId) {
         Group group = getGroupById(groupId);
@@ -265,11 +265,11 @@ public class MessageServiceImpl implements MessageService {
      *
      * @param id the ID of the group to retrieve
      * @return the Group entity if found
-     * @throws EntityNotFound if no group is found with the given ID
+     * @throws EntityNotFoundException if no group is found with the given ID
      */
     private Group getGroupById(long id) {
         return repositoryCollector.getGroups().findById(id)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono grupy o ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono grupy o ID: " + id));
     }
 
     /**

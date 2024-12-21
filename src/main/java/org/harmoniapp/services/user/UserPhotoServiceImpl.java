@@ -3,7 +3,7 @@ package org.harmoniapp.services.user;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.user.UserDto;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.exception.UnsupportedFileTypeException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.core.io.InputStreamResource;
@@ -62,7 +62,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      * @param id   The ID of the user to associate the photo with.
      * @param file The photo file to be uploaded (must be in JPG or PNG format).
      * @return The updated UserDto object after saving the photo information.
-     * @throws EntityNotFound   if the user is not found or the file format is not supported.
+     * @throws EntityNotFoundException   if the user is not found or the file format is not supported.
      * @throws RuntimeException if there is an error saving the file.
      */
     public UserDto uploadPhoto(long id, MultipartFile file) {
@@ -88,7 +88,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      *
      * @param id The ID of the user whose photo is to be set to default.
      * @return The updated UserDto object with the default photo.
-     * @throws EntityNotFound   if the user with the specified ID is not found.
+     * @throws EntityNotFoundException   if the user with the specified ID is not found.
      * @throws RuntimeException if there is an error deleting the old photo file.
      */
     public UserDto setDefaultPhoto(long id) {
@@ -112,11 +112,11 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      *
      * @param id The ID of the user to retrieve.
      * @return The user entity with the specified ID if it is active.
-     * @throws EntityNotFound if the user is not found.
+     * @throws EntityNotFoundException if the user is not found.
      */
     private User getUserById(long id) {
         return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new EntityNotFound("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 
     /**

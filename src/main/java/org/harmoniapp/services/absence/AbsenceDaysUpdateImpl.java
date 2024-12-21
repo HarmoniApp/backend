@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.entities.absence.Absence;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.exception.AbsenceDaysExceededException;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,13 +47,13 @@ public class AbsenceDaysUpdateImpl implements AbsenceDaysUpdater {
      * Updates the user's available and unused absence days based on the given Absence entity.
      *
      * @param absence the Absence entity containing the absence details
-     * @throws EntityNotFound if the user associated with the absence is not found
+     * @throws EntityNotFoundException if the user associated with the absence is not found
      */
     @Override
     @Transactional
     public void updateUserAbsenceDays(Absence absence) {
         User user = repositoryCollector.getUsers().findById(absence.getUser().getId())
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono użytkownika"));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono użytkownika"));
 
         int contractAbsenceDays = user.getContractType().getAbsenceDays();
         int availableDays = user.getAvailableAbsenceDays();

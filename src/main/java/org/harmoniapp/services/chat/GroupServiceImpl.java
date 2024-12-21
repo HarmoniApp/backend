@@ -6,7 +6,7 @@ import org.harmoniapp.contracts.chat.GroupDto;
 import org.harmoniapp.contracts.user.PartialUserDto;
 import org.harmoniapp.entities.chat.Group;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public class GroupServiceImpl implements GroupService {
      *
      * @param groupId the ID of the group to retrieve
      * @return the GroupDto corresponding to the specified ID
-     * @throws EntityNotFound if no group is found with the specified ID
+     * @throws EntityNotFoundException if no group is found with the specified ID
      */
     @Override
     public GroupDto getById(long groupId) {
@@ -39,7 +39,7 @@ public class GroupServiceImpl implements GroupService {
      *
      * @param groupId the ID of the group whose members are to be retrieved
      * @return a list of PartialUserDto representing the members of the group
-     * @throws EntityNotFound if no group is found with the specified ID
+     * @throws EntityNotFoundException if no group is found with the specified ID
      */
     @Override
     public List<PartialUserDto> getMembersById(long groupId) {
@@ -76,7 +76,7 @@ public class GroupServiceImpl implements GroupService {
      * @param groupId the ID of the group to which the member is to be added
      * @param userId  the ID of the user to be added as a member
      * @return the updated GroupDto after adding the member
-     * @throws EntityNotFound if no group or user is found with the specified IDs
+     * @throws EntityNotFoundException if no group or user is found with the specified IDs
      */
     @Override
     @Transactional
@@ -93,7 +93,7 @@ public class GroupServiceImpl implements GroupService {
      * @param groupId the ID of the group from which the member is to be removed
      * @param userId  the ID of the user to be removed as a member
      * @return the updated GroupDto after removing the member, or null if the group is deleted
-     * @throws EntityNotFound if no group or user is found with the specified IDs
+     * @throws EntityNotFoundException if no group or user is found with the specified IDs
      */
     @Override
     @Transactional
@@ -112,13 +112,13 @@ public class GroupServiceImpl implements GroupService {
      * Deletes a group by its ID.
      *
      * @param groupId the ID of the group to delete
-     * @throws EntityNotFound if no group is found with the specified ID
+     * @throws EntityNotFoundException if no group is found with the specified ID
      */
     @Override
     @Transactional
     public void delete(long groupId) {
         if (!repositoryCollector.getGroups().existsById(groupId)) {
-            throw new EntityNotFound("Group not found with ID: " + groupId);
+            throw new EntityNotFoundException("Group not found with ID: " + groupId);
         }
         repositoryCollector.getMessages().deleteByGroupId(groupId);
         repositoryCollector.getGroups().deleteById(groupId);
@@ -141,15 +141,15 @@ public class GroupServiceImpl implements GroupService {
      * @param userId   the ID of the user to retrieve
      * @param isActive whether the user should be active
      * @return the User entity corresponding to the specified ID and active status
-     * @throws EntityNotFound if no user is found with the specified ID and active status
+     * @throws EntityNotFoundException if no user is found with the specified ID and active status
      */
     private User getUserById(long userId, boolean isActive) {
         if (isActive) {
             return repositoryCollector.getUsers().findByIdAndIsActiveTrue(userId)
-                    .orElseThrow(() -> new EntityNotFound("User not found"));
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
         } else {
             return repositoryCollector.getUsers().findById(userId)
-                    .orElseThrow(() -> new EntityNotFound("User not found"));
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
         }
     }
 
@@ -158,10 +158,10 @@ public class GroupServiceImpl implements GroupService {
      *
      * @param groupId the ID of the group to retrieve
      * @return the Group entity corresponding to the specified ID
-     * @throws EntityNotFound if no group is found with the specified ID
+     * @throws EntityNotFoundException if no group is found with the specified ID
      */
     private Group getGroupById(long groupId) {
         return repositoryCollector.getGroups().findById(groupId)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono grupy o ID: " + groupId));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono grupy o ID: " + groupId));
     }
 }
