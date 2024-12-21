@@ -1,6 +1,7 @@
 package org.harmoniapp.contracts.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import org.harmoniapp.contracts.profile.RoleDto;
 import org.harmoniapp.entities.user.User;
 
@@ -16,6 +17,7 @@ import java.util.List;
  * @param role       The list of roles associated with the supervisor.
  * @param employeeId The employee ID of the supervisor.
  */
+@Builder
 public record SupervisorDto(long id,
                             String firstname,
                             String surname,
@@ -30,16 +32,18 @@ public record SupervisorDto(long id,
      * @return a {@link SupervisorDto} representing the user entity.
      */
     public static SupervisorDto fromEntity(User user) {
-        List<RoleDto> roles = user.getRoles().stream()
-                .filter(r -> r.getName().equalsIgnoreCase("admin"))
+        return SupervisorDto.builder()
+                .id(user.getId())
+                .firstname(user.getFirstname())
+                .surname(user.getSurname())
+                .role(getRoles(user))
+                .employeeId(user.getEmployeeId())
+                .build();
+    }
+
+    private static List<RoleDto> getRoles(User user) {
+        return user.getRoles().stream()
                 .map(RoleDto::fromEntity)
                 .toList();
-
-        return new SupervisorDto(
-                user.getId(),
-                user.getFirstname(),
-                user.getSurname(),
-                roles,
-                user.getEmployeeId());
     }
 }

@@ -5,9 +5,11 @@ import jakarta.validation.constraints.Pattern;
 import org.harmoniapp.entities.profile.Language;
 
 /**
- * Data Transfer Object (DTO) for Language.
- * This record represents a language with an ID and a name.
- * It provides methods to convert between {@link Language} entities and {@link LanguageDto}.
+ * A Data Transfer Object for Language.
+ *
+ * @param id   the unique identifier of the language
+ * @param name the name of the language
+ * @param code the code of the language
  */
 public record LanguageDto(
         Long id,

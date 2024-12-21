@@ -41,7 +41,7 @@ public class PartialUserServiceImpl implements PartialUserService {
      * @return the user entity
      */
     private User getUserById(long id) {
-        return repositoryCollector.getUsers().findByIdAndIsActive(id, true)
+        return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 

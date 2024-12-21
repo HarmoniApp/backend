@@ -5,10 +5,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Builder;
 import org.harmoniapp.entities.chat.Message;
 
 import java.time.LocalDateTime;
 
+/**
+ * Data Transfer Object for messages.
+ *
+ * @param id         the unique identifier of the message
+ * @param senderId   the ID of the sender
+ * @param receiverId the ID of the receiver
+ * @param groupId    the ID of the group
+ * @param content    the content of the message
+ * @param sentAt     the date and time when the message was sent
+ * @param isRead     whether the message has been read
+ */
+@Builder
 public record MessageDto(
         Long id,
 
@@ -33,24 +46,42 @@ public record MessageDto(
         LocalDateTime sentAt,
 
         @JsonProperty("is_read")
-        boolean isRead
-) {
+        boolean isRead) {
+
+    /**
+     * Converts a Message entity to a MessageDto.
+     *
+     * @param message           the Message entity
+     * @param translatedContent the translated content of the message
+     * @return the corresponding MessageDto
+     */
     public static MessageDto fromEntity(Message message, String translatedContent) {
-        return new MessageDto(
-                message.getId(),
-                message.getSender().getId(),
-                message.getReceiver() != null ? message.getReceiver().getId() : null,
-                message.getGroup() != null ? message.getGroup().getId() : null,
-                translatedContent != null ? translatedContent : message.getContent(),
-                message.getSentAt(),
-                message.isRead()
-        );
+        return MessageDto.builder()
+                .id(message.getId())
+                .senderId(message.getSender().getId())
+                .receiverId(message.getReceiver() != null ? message.getReceiver().getId() : null)
+                .groupId(message.getGroup() != null ? message.getGroup().getId() : null)
+                .content(translatedContent != null ? translatedContent : message.getContent())
+                .sentAt(message.getSentAt())
+                .isRead(message.isRead())
+                .build();
     }
 
+    /**
+     * Converts a Message entity to a MessageDto.
+     *
+     * @param message the Message entity
+     * @return the corresponding MessageDto
+     */
     public static MessageDto fromEntity(Message message) {
         return fromEntity(message, null);
     }
 
+    /**
+     * Converts this MessageDto to a Message entity.
+     *
+     * @return the corresponding Message entity
+     */
     public Message toEntity() {
         return new Message(
                 this.id,

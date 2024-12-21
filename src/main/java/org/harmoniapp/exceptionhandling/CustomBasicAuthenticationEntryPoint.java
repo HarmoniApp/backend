@@ -21,35 +21,60 @@ import java.time.LocalDateTime;
 public class CustomBasicAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     /**
-     * Handles authentication failures by returning a custom JSON response.
-     * <p>
-     * This method is invoked when a user attempts to authenticate but fails.
-     * It sends a 401 Unauthorized status along with a JSON response containing
-     * the timestamp, status, error, message, and request path.
-     * </p>
+     * Handles an authentication failure and sends a custom JSON response.
      *
-     * @param request the {@link HttpServletRequest} that resulted in the exception.
-     * @param response the {@link HttpServletResponse} used to send the response.
+     * @param request       the {@link HttpServletRequest} that resulted in an {@link AuthenticationException}.
+     * @param response      the {@link HttpServletResponse} to send the error response.
      * @param authException the exception that caused the authentication to fail.
-     * @throws IOException if an input or output error occurs while writing the response.
-     * @throws ServletException if a servlet-specific error occurs.
+     * @throws IOException      if an input or output error occurs while handling the error response.
+     * @throws ServletException if the request could not be handled.
      */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException, ServletException {
-        // Populate dynamic values
-        LocalDateTime currentTimeStamp = LocalDateTime.now();
-        String message = (authException != null && authException.getMessage() != null) ? authException.getMessage()
-                : "Unauthorized";
+        String message = getMessage(authException);
         String path = request.getRequestURI();
+        String jsonResponse = constructJsonResponse(message, path);
+
+        setResponseHeaders(response);
+        response.getWriter().write(jsonResponse);
+    }
+
+    /**
+     * Retrieves the message from the given AuthenticationException.
+     *
+     * @param authException the exception that caused the authentication to fail.
+     * @return the message from the exception, or "Unauthorized" if the exception or its message is null.
+     */
+    private String getMessage(AuthenticationException authException) {
+        return (authException != null && authException.getMessage() != null) ? authException.getMessage() : "Unauthorized";
+    }
+
+    /**
+     * Sets the response headers for an authentication failure response.
+     * <p>
+     * This method sets the HTTP status to 401 Unauthorized, the content type to JSON,
+     * and adds a custom header indicating the reason for the failure.
+     * </p>
+     *
+     * @param response the {@link HttpServletResponse} used to send the response.
+     */
+    private void setResponseHeaders(HttpServletResponse response) {
         response.setHeader("harmoni-error-reason", "Authentication failed");
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json;charset=UTF-8");
-        // Construct the JSON response
-        String jsonResponse =
-                String.format("{\"timestamp\": \"%s\", \"status\": %d, \"error\": \"%s\", \"message\": \"%s\", \"path\": \"%s\"}",
-                        currentTimeStamp, HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase(),
-                        message, path);
-        response.getWriter().write(jsonResponse);
+    }
+
+    /**
+     * Constructs a JSON response string for an authentication failure.
+     *
+     * @param message the message describing the authentication failure.
+     * @param path    the request path where the authentication failure occurred.
+     * @return a JSON string containing the timestamp, status, error, message, and request path.
+     */
+    private String constructJsonResponse(String message, String path) {
+        return String.format("{\"timestamp\": \"%s\", \"status\": %d, \"error\": \"%s\", \"message\": \"%s\", \"path\": \"%s\"}",
+                LocalDateTime.now(), HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                message, path);
     }
 }

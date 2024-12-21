@@ -2,6 +2,7 @@ package org.harmoniapp.geneticalgorithm;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +22,15 @@ public class Chromosome {
     public Chromosome(List<Gen> gens, CheckConstraint checker) {
         this.gens = gens;
         evaluateFitness(checker);
+    }
+
+    /**
+     * Returns a copy of the list of genes.
+     *
+     * @return a new list containing the genes
+     */
+    public List<Gen> getGens() {
+        return new ArrayList<>(gens);
     }
 
     /**

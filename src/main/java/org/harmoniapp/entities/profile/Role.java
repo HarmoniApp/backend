@@ -25,6 +25,7 @@ public class Role {
 
     @Column(unique = true)
     @NotEmpty(message = "Name is required")
+    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Name must contain only letters, spaces, hyphens and apostrophes")
     private String name;
 
     @NotEmpty(message = "Color is required")

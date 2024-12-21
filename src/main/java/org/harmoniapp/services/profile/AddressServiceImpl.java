@@ -5,7 +5,7 @@ import org.harmoniapp.contracts.profile.AddressDto;
 import org.harmoniapp.contracts.profile.DepartmentDto;
 import org.harmoniapp.entities.profile.Address;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class AddressServiceImpl implements AddressService {
      *
      * @param id the ID of the address to retrieve
      * @return the AddressDto corresponding to the given ID
-     * @throws EntityNotFound if no address is found with the given ID
+     * @throws EntityNotFoundException if no address is found with the given ID
      */
     @Override
     public AddressDto getById(long id) {
@@ -39,11 +39,11 @@ public class AddressServiceImpl implements AddressService {
      *
      * @param id the ID of the address to retrieve
      * @return the Address entity corresponding to the given ID
-     * @throws EntityNotFound if no address is found with the given ID
+     * @throws EntityNotFoundException if no address is found with the given ID
      */
     private Address getAddressById(long id) {
         return repositoryCollector.getAddresses().findById(id)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono adresu o id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono adresu o id: " + id));
     }
 
     /**
@@ -121,7 +121,7 @@ public class AddressServiceImpl implements AddressService {
         Address existingAddress = null;
         try {
             existingAddress = getAddressById(id);
-        } catch (EntityNotFound ignored) {
+        } catch (EntityNotFoundException ignored) {
         }
         Address updatedAddress = update(existingAddress, addressDto);
         return AddressDto.fromEntity(repositoryCollector.getAddresses().save(updatedAddress));
@@ -147,7 +147,7 @@ public class AddressServiceImpl implements AddressService {
      * Deletes an Address entity by its ID.
      *
      * @param id the ID of the address to delete
-     * @throws EntityNotFound if no address is found with the given ID
+     * @throws EntityNotFoundException if no address is found with the given ID
      */
     @Override
     @Transactional
@@ -161,11 +161,11 @@ public class AddressServiceImpl implements AddressService {
      * Checks if an address exists by its ID.
      *
      * @param id the ID of the address to check
-     * @throws EntityNotFound if no address is found with the given ID
+     * @throws EntityNotFoundException if no address is found with the given ID
      */
     private void addressExists(long id) {
         if (!repositoryCollector.getAddresses().existsById(id)) {
-            throw new EntityNotFound("Nie znaleziono adresu o id: " + id);
+            throw new EntityNotFoundException("Nie znaleziono adresu o id: " + id);
         }
     }
 

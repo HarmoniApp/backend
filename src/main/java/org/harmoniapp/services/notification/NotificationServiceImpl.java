@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.notification.NotificationDto;
 import org.harmoniapp.entities.notification.Notification;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class NotificationServiceImpl implements NotificationService {
      *
      * @param userId the ID of the user whose notifications are to be retrieved
      * @return a list of NotificationDto objects representing the user's notifications
-     * @throws EntityNotFound if the user with the specified ID does not exist
+     * @throws EntityNotFoundException if the user with the specified ID does not exist
      */
     @Override
     public List<NotificationDto> getAllByUserId(long userId) {
@@ -42,11 +42,11 @@ public class NotificationServiceImpl implements NotificationService {
      * Verifies if a user with the given ID exists.
      *
      * @param userId the ID of the user to verify
-     * @throws EntityNotFound if the user with the specified ID does not exist
+     * @throws EntityNotFoundException if the user with the specified ID does not exist
      */
     private void verifyUserExist(long userId) {
         if (!repositoryCollector.getUsers().existsById(userId)) {
-            throw new EntityNotFound("Nie znaleziono użytkownika o podanym ID: " + userId);
+            throw new EntityNotFoundException("Nie znaleziono użytkownika o podanym ID: " + userId);
         }
     }
 
@@ -55,7 +55,7 @@ public class NotificationServiceImpl implements NotificationService {
      *
      * @param userId the ID of the user whose unread notifications are to be retrieved
      * @return a list of NotificationDto objects representing the user's unread notifications
-     * @throws EntityNotFound if the user with the specified ID does not exist
+     * @throws EntityNotFoundException if the user with the specified ID does not exist
      */
     @Override
     public List<NotificationDto> getAllUnreadByUserId(long userId) {
@@ -99,11 +99,11 @@ public class NotificationServiceImpl implements NotificationService {
      *
      * @param userId the ID of the user to retrieve
      * @return the User entity with the specified ID
-     * @throws EntityNotFound if the user with the specified ID does not exist
+     * @throws EntityNotFoundException if the user with the specified ID does not exist
      */
     private User getUserById(long userId) {
         return repositoryCollector.getUsers().findById(userId)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono użytkownika o podanym ID: " + userId));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono użytkownika o podanym ID: " + userId));
     }
 
     /**
@@ -111,13 +111,13 @@ public class NotificationServiceImpl implements NotificationService {
      *
      * @param notificationId the ID of the notification to mark as read
      * @return a NotificationDto object representing the marked notification
-     * @throws EntityNotFound if the notification with the specified ID does not exist
+     * @throws EntityNotFoundException if the notification with the specified ID does not exist
      */
     @Override
     @Transactional
     public NotificationDto markAsReadById(long notificationId) {
         Notification notification = repositoryCollector.getNotifications().findById(notificationId)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono powiadomienia o podanym ID: " + notificationId));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono powiadomienia o podanym ID: " + notificationId));
         return markAsRead(notification);
     }
 
@@ -126,7 +126,7 @@ public class NotificationServiceImpl implements NotificationService {
      *
      * @param userId the ID of the user whose unread notifications are to be marked as read
      * @return a list of NotificationDto objects representing the marked notifications
-     * @throws EntityNotFound if the user with the specified ID does not exist
+     * @throws EntityNotFoundException if the user with the specified ID does not exist
      */
     @Transactional
     public List<NotificationDto> markAllAsReadByUserId(long userId) {

@@ -5,7 +5,7 @@ import org.harmoniapp.contracts.user.UserNewPassword;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.exception.EasyPasswordException;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.harmoniapp.utils.PasswordManager;
+import org.harmoniapp.utils.PasswordGenerator;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
      */
     @Override
     public String setPassword(User user) {
-        String rawPwd = PasswordManager.generateCommonTextPassword();
+        String rawPwd = PasswordGenerator.generateCommonTextPassword();
         setPassword(user, rawPwd, true);
         return rawPwd;
     }
@@ -82,7 +82,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     private User getUserById(long id) {
-        return repositoryCollector.getUsers().findByIdAndIsActive(id, true)
+        return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 

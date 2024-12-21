@@ -1,22 +1,26 @@
 package org.harmoniapp.controllers.importexport;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.services.importexport.PdfService;
+import org.harmoniapp.services.importexport.PdfExportService;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 
 /**
- * REST controller for managing archived shifts.
- * Provides endpoints to generate PDFs for shifts and retrieve archived shifts data.
+ * Controller for handling PDF export requests.
  */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/pdf")
 public class PdfController {
-    private final PdfService pdfService;
+    private final PdfExportService pdfExportService;
+    private final MediaType mediaType = MediaType.APPLICATION_PDF;
 
     /**
      * Generates a PDF report for the shifts that occurred in the specified week.
@@ -26,33 +30,22 @@ public class PdfController {
      */
     @GetMapping("/generate-pdf-shift")
     public ResponseEntity<InputStreamResource> generatePdfForWeek(@RequestParam("startOfWeek") LocalDate startOfWeek) {
-        return pdfService.generatePdfForWeek(startOfWeek);
+        InputStreamResource resource = pdfExportService.generatePdfForWeek(startOfWeek);
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .body(resource);
     }
 
+    /**
+     * Generates a PDF report for all employees.
+     *
+     * @return ResponseEntity containing the generated PDF as InputStreamResource
+     */
     @GetMapping("/generate-pdf-all-employees")
     public ResponseEntity<InputStreamResource> generatePdfForAllEmployees() {
-        return pdfService.generatePdfForAllEmployees();
+        InputStreamResource resource = pdfExportService.generatePdfForAllEmployees();
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .body(resource);
     }
-
-
-//    /**
-//     * Retrieves a list of all archived shifts.
-//     *
-//     * @return a list of ArchivedShiftDto containing
-//     */
-//    @GetMapping
-//    public List<ArchivedShiftDto> getAllArchivedShifts() {
-//        return archivedShiftService.getAllArchivedShifts();
-//    }
-
-//    /**
-//     * Retrieves a specific archived shift by its ID and returns the PDF file.
-//     *
-//     * @param id the ID of the archived shift to retrieve
-//     * @return ResponseEntity containing the archived shift PDF as InputStreamResource
-//     */
-//    @GetMapping("/{id}")
-//    public ResponseEntity<InputStreamResource> getArchivedShift(@PathVariable long id) {
-//        return archivedShiftService.getArchivedShift(id);
-//    }
 }

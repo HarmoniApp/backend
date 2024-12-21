@@ -12,7 +12,6 @@ import java.util.List;
 /**
  * Controller class for managing language-related endpoints.
  * This controller provides RESTful endpoints for CRUD operations on languages.
- * It uses {@link LanguageService} to handle the business logic.
  */
 @RestController
 @RequiredArgsConstructor
@@ -56,7 +55,7 @@ public class LanguageController {
     /**
      * Updates an existing language by its ID.
      *
-     * @param id the ID of the language to update.
+     * @param id  the ID of the language to update.
      * @param dto the {@link LanguageDto} containing the updated details of the language.
      * @return the updated {@link LanguageDto}.
      */
@@ -76,5 +75,4 @@ public class LanguageController {
     public void deleteLanguage(@PathVariable long id) {
         service.deleteById(id);
     }
-
 }

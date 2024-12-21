@@ -40,10 +40,6 @@ public record ContractTypeDto(
      * @return the resulting ContractType entity
      */
     public ContractType toEntity() {
-        return new ContractType(
-                this.id,
-                this.name,
-                this.absenceDays
-        );
+        return new ContractType(this.id, this.name, this.absenceDays);
     }
 }

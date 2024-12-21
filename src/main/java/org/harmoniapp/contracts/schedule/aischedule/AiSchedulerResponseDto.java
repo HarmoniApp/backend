@@ -6,5 +6,5 @@ package org.harmoniapp.contracts.schedule.aischedule;
  * @param message  the message of the response
  * @param success  the success of the response
  */
-public record AiSchedulerResponse(String message, Boolean success) {
+public record AiSchedulerResponseDto(String message, Boolean success) {
 }

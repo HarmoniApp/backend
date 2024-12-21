@@ -17,10 +17,7 @@ public record StatusDto(long id, String name) {
      * @return a StatusDto representing the provided Status entity
      */
     public static StatusDto fromEntity(Status status) {
-        return new StatusDto(
-                status.getId(),
-                status.getName()
-        );
+        return new StatusDto(status.getId(), status.getName());
     }
 
     /**
@@ -29,8 +26,6 @@ public record StatusDto(long id, String name) {
      * @return the resulting Status entity
      */
     public Status toEntity() {
-        return new Status(
-                this.id,
-                this.name);
+        return new Status(this.id, this.name);
     }
 }

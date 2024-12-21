@@ -22,6 +22,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Message {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,7 +47,7 @@ public class Message {
     @CreationTimestamp
     private LocalDateTime sentAt;
 
-    @Column(name ="is_read")
+    @Column(name = "is_read")
     @ColumnDefault("false")
     @NotNull
     private boolean isRead;

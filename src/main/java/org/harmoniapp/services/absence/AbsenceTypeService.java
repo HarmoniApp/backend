@@ -1,55 +1,26 @@
 package org.harmoniapp.services.absence;
 
-import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.absence.AbsenceTypeDto;
-import org.harmoniapp.entities.absence.AbsenceType;
-import org.harmoniapp.repositories.RepositoryCollector;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
- * Service class for managing absenceType.
- * Provides methods to retrieve absenceType information.
+ * Service interface for managing absence types.
  */
-@Service
-@RequiredArgsConstructor
-public class AbsenceTypeService {
-    private final RepositoryCollector repositoryCollector;
+public interface AbsenceTypeService {
 
     /**
-     * Retrieves a AbsenceTypeDto for the absenceType with the specified ID.
+     * Retrieves an absence type by its ID.
      *
-     * @param id the ID of the absenceType to retrieve
-     * @return a AbsenceTypeDto containing the details of the absenceType
-     * @throws IllegalArgumentException if the absenceType with the specified ID does not exist
+     * @param id the ID of the absence type
+     * @return the absence type DTO
      */
-    public AbsenceTypeDto getAbsenceType(long id) {
-        try {
-            AbsenceType absenceType = repositoryCollector.getAbsenceTypes().findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("AbsenceType with ID " + id + " not found"));
-
-            return AbsenceTypeDto.fromEntity(absenceType);
-        } catch (Exception e) {
-            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
-        }
-    }
+    AbsenceTypeDto getAbsenceType(long id);
 
     /**
-     * Retrieves a list of all AbsenceTypeDto.
+     * Retrieves all absence types.
      *
-     * @return a list of AbsenceTypeDto containing the details of all absenceType
-     * @throws RuntimeException if there is an error
+     * @return a list of absence type DTOs
      */
-    public List<AbsenceTypeDto> getAllAbsenceTypes() {
-        try {
-            var absenceType = repositoryCollector.getAbsenceTypes().findAll();
-            return absenceType.stream()
-                    .map(AbsenceTypeDto::fromEntity)
-                    .toList();
-        } catch (Exception e) {
-            throw new RuntimeException("An error occurred: " + e.getMessage(), e);
-        }
-    }
-
+    List<AbsenceTypeDto> getAllAbsenceTypes();
 }

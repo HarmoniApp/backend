@@ -2,8 +2,8 @@ package org.harmoniapp.configuration;
 
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.entities.user.User;
+import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,14 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Custom implementation of {@link UserDetailsService} for loading user details from the database.
- * This service retrieves user information using the {@link RepositoryCollector} and assigns roles
- * based on user roles within the system.
- *
- * <p>If the user has a "sup" role, they are assigned the "ROLE_ADMIN", otherwise they are assigned the "ROLE_USER".</p>
- *
- * @see UserDetailsService
- * @see RepositoryCollector
+ * Service class for loading user-specific data.
+ * Implements the UserDetailsService interface to provide user details for authentication.
  */
 @Service
 @RequiredArgsConstructor
@@ -29,42 +23,61 @@ public class HarmoniUserDetailsService implements UserDetailsService {
     private final RepositoryCollector repositoryCollector;
 
     /**
-     * Loads user-specific data by username (which is the user's email in this case).
+     * Loads the user details by username.
      *
-     * <p>This method fetches the user from the database, verifies if the user exists, and assigns roles based on
-     * the user's roles in the system. If the user has a "sup" role, they are granted "ROLE_ADMIN", otherwise "ROLE_USER".</p>
-     *
-     * <p>If the user is inactive or has failed login attempts greater than or equal to 3, an exception is thrown.</p>
-     *
-     * @param username the username identifying the user whose data is required (email in this case).
-     * @return a fully populated {@link UserDetails} object.
-     * @throws UsernameNotFoundException if no user is found with the given username, if the user is inactive,
-     *                                   or if the user account is locked due to multiple failed login attempts.
+     * @param username the username identifying the user whose data is required
+     * @return a fully populated UserDetails object
+     * @throws UsernameNotFoundException if the user could not be found or the user is inactive
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = repositoryCollector.getUsers().findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User details not found for the user: " + username));
+        User user = fetchUserByUsername(username);
+        validateUser(user);
+        List<GrantedAuthority> authorities = getUserAuthorities(user);
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+    }
 
+    /**
+     * Fetches the user by username.
+     *
+     * @param username the username identifying the user whose data is required
+     * @return the User object
+     * @throws UsernameNotFoundException if the user could not be found
+     */
+    private User fetchUserByUsername(String username) {
+        return repositoryCollector.getUsers().findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User details not found for the user: " + username));
+    }
+
+    /**
+     * Validates the user.
+     *
+     * @param user the User object to validate
+     * @throws UsernameNotFoundException if the user is inactive, has no password, or is locked due to multiple failed login attempts
+     */
+    private void validateUser(User user) {
         if (!user.getIsActive()) {
             throw new UsernameNotFoundException("User account is inactive.");
         }
-
         if (user.getPassword() == null) {
             throw new UsernameNotFoundException("Invalid credentials.");
         }
-
         if (user.getFailedLoginAttempts() >= 3) {
             throw new UsernameNotFoundException("User account is locked due to multiple failed login attempts.");
         }
+    }
 
-        List<GrantedAuthority> authorities;
+    /**
+     * Gets the authorities granted to the user.
+     *
+     * @param user the User object
+     * @return a list of granted authorities
+     */
+    private List<GrantedAuthority> getUserAuthorities(User user) {
         if (user.getRoles().stream().anyMatch(r -> r.getName().equalsIgnoreCase("ADMIN"))) {
-            authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
         } else {
-            authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
         }
-
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
     }
 }

@@ -6,7 +6,7 @@ import org.harmoniapp.entities.profile.Role;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.exception.AdminRoleModificationException;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Sort;
@@ -30,7 +30,7 @@ public class RoleServiceImpl implements RoleService {
      *
      * @param id the ID of the role to retrieve
      * @return the RoleDto representing the role
-     * @throws EntityNotFound if the role with the specified ID is not found
+     * @throws EntityNotFoundException if the role with the specified ID is not found
      */
     @Override
     public RoleDto getById(long id) {
@@ -43,7 +43,7 @@ public class RoleServiceImpl implements RoleService {
      *
      * @param id the ID of the user whose roles are to be retrieved
      * @return a list of RoleDto representing the user's roles
-     * @throws EntityNotFound if the user with the specified ID is not found
+     * @throws EntityNotFoundException if the user with the specified ID is not found
      */
     @Override
     public List<RoleDto> getUserRoles(long id) {
@@ -104,7 +104,7 @@ public class RoleServiceImpl implements RoleService {
             checkRoleIsAdmin(role);
             role = updateRole(role, roleDto);
             return RoleDto.fromEntity(role);
-        } catch (EntityNotFound e) {
+        } catch (EntityNotFoundException e) {
             return create(roleDto);
         }
     }
@@ -114,7 +114,7 @@ public class RoleServiceImpl implements RoleService {
      * Evicts all entries from the cacheName cache.
      *
      * @param id the ID of the role to delete
-     * @throws EntityNotFound                 if the role with the specified ID is not found
+     * @throws EntityNotFoundException                 if the role with the specified ID is not found
      * @throws AdminRoleModificationException if the role is the admin role
      */
     @Override
@@ -133,11 +133,11 @@ public class RoleServiceImpl implements RoleService {
      *
      * @param id the ID of the role to retrieve
      * @return the Role entity
-     * @throws EntityNotFound if the role with the specified ID is not found
+     * @throws EntityNotFoundException if the role with the specified ID is not found
      */
     private Role getRoleById(long id) {
         return repositoryCollector.getRoles().findById(id)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono roli o ID: %d".formatted(id)));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono roli o ID: %d".formatted(id)));
     }
 
     /**
@@ -145,13 +145,13 @@ public class RoleServiceImpl implements RoleService {
      *
      * @param id the ID of the user whose roles are to be retrieved
      * @return a set of Role entities representing the user's roles
-     * @throws EntityNotFound if the user with the specified ID is not found
+     * @throws EntityNotFoundException if the user with the specified ID is not found
      */
     private Set<Role> getUserRoleSet(long id) {
         return repositoryCollector.getUsers()
                 .findById(id)
                 .map(User::getRoles)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono użytkownika o ID: %d".formatted(id)));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono użytkownika o ID: %d".formatted(id)));
     }
 
     /**

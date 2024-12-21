@@ -3,6 +3,7 @@ package org.harmoniapp.controllers.profile;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.profile.ContractTypeDto;
 import org.harmoniapp.services.profile.ContractTypeServiceImpl;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,19 +39,39 @@ public class ContractTypeController {
         return contractTypeService.getAll();
     }
 
+    /**
+     * Creates a new contractType.
+     *
+     * @param contractTypeDto the contractType data to create
+     * @return the created ContractTypeDto
+     */
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ContractTypeDto createContractType(@RequestBody ContractTypeDto contractTypeDto) {
         return contractTypeService.create(contractTypeDto);
     }
 
+    /**
+     * Updates an existing contractType by ID.
+     *
+     * @param id              the ID of the contractType to update
+     * @param contractTypeDto the contractType data to update
+     * @return the updated ContractTypeDto
+     */
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
     public ContractTypeDto updateContractType(@PathVariable long id, @RequestBody ContractTypeDto contractTypeDto) {
         return contractTypeService.updateById(id, contractTypeDto);
     }
 
+    /**
+     * Deletes a contractType by ID.
+     *
+     * @param id the ID of the contractType to delete
+     */
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteContractType(@PathVariable long id) {
         contractTypeService.deleteById(id);
     }
-
 }

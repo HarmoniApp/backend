@@ -10,7 +10,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -24,12 +23,11 @@ public class OwnerAuthorizationManager implements AuthorizationManager<RequestAu
      * Checks whether the authenticated user is the owner of the resource based on the user ID in the request context.
      *
      * @param authenticationSupplier supplier for the current authentication object
-     * @param ctx the context containing request variables like the user ID
+     * @param ctx                    the context containing request variables like the user ID
      * @return an {@link AuthorizationDecision} indicating whether access is granted or denied
      */
     @Override
     public AuthorizationDecision check(Supplier authenticationSupplier, RequestAuthorizationContext ctx) {
-
         try {
             Long userId = Long.parseLong(ctx.getVariables().get("id"));
             Authentication authentication = (Authentication) authenticationSupplier.get();
@@ -43,12 +41,12 @@ public class OwnerAuthorizationManager implements AuthorizationManager<RequestAu
      * Determines whether the authenticated user matches the provided user ID.
      *
      * @param authentication the current authentication object
-     * @param id the ID of the user to check ownership against
+     * @param id             the ID of the user to check ownership against
      * @return {@code true} if the user is authenticated and their ID matches, {@code false} otherwise
      */
     private boolean hasUserId(Authentication authentication, Long id) throws AccessDeniedException {
-        List<GrantedAuthority> authorities = (List<GrantedAuthority>) authentication.getAuthorities();
-        if (authorities.getFirst().getAuthority().equals("ROLE_ANONYMOUS")) {
+        GrantedAuthority authority = authentication.getAuthorities().iterator().next();
+        if (authority.getAuthority().equals("ROLE_ANONYMOUS")) {
             return false;
         }
 

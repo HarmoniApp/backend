@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.profile.LanguageDto;
 import org.harmoniapp.entities.profile.Language;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.exception.LanguageExistsException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.cache.annotation.CacheEvict;
@@ -41,7 +41,7 @@ public class LanguageServiceImpl implements LanguageService {
      *
      * @param id the ID of the language to retrieve
      * @return a LanguageDto object representing the language
-     * @throws EntityNotFound if no language is found with the given ID
+     * @throws EntityNotFoundException if no language is found with the given ID
      */
     @Override
     public LanguageDto getById(long id) {
@@ -54,12 +54,12 @@ public class LanguageServiceImpl implements LanguageService {
      *
      * @param id the ID of the language to retrieve
      * @return the Language entity
-     * @throws EntityNotFound if no language is found with the given ID
+     * @throws EntityNotFoundException if no language is found with the given ID
      */
     private Language getLanguageById(long id) {
         return repositoryCollector.getLanguages()
                 .findById(id)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono języka o podanym ID: %d".formatted(id)));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono języka o podanym ID: %d".formatted(id)));
     }
 
     /**
@@ -106,7 +106,7 @@ public class LanguageServiceImpl implements LanguageService {
             languageExists(languageDto.name());
             language = updateLanguage(language, languageDto);
             return LanguageDto.fromEntity(language);
-        } catch (EntityNotFound e) {
+        } catch (EntityNotFoundException e) {
             return create(languageDto);
         }
     }

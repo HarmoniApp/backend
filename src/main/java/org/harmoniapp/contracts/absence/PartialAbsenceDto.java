@@ -19,11 +19,7 @@ public record PartialAbsenceDto(Long id, LocalDate start, LocalDate end) {
      * @param absence the Absence entity to convert
      * @return the resulting PartialAbsenceDto
      */
-    public static PartialAbsenceDto fromEntity(Absence absence){
-        return new PartialAbsenceDto(
-                absence.getId(),
-                absence.getStart(),
-                absence.getEnd()
-        );
+    public static PartialAbsenceDto fromEntity(Absence absence) {
+        return new PartialAbsenceDto(absence.getId(), absence.getStart(), absence.getEnd());
     }
 }

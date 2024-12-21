@@ -1,17 +1,14 @@
 package org.harmoniapp.services.schedule;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.contracts.notification.NotificationDto;
 import org.harmoniapp.contracts.schedule.ShiftDto;
 import org.harmoniapp.entities.profile.Role;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.enums.ShiftNotificationType;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.exception.InvalidDateException;
 import org.harmoniapp.repositories.RepositoryCollector;
-import org.harmoniapp.services.notification.NotificationService;
-import org.harmoniapp.utils.ShiftNotificationManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,20 +25,33 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ShiftServiceImpl implements ShiftService {
     private final RepositoryCollector repositoryCollector;
-    private final NotificationService notificationService;
+    private final ShiftNotificationSender shiftNotificationSender;
 
     /**
      * Retrieves a ShiftDto for the shift with the specified ID.
      *
      * @param id the ID of the shift to retrieve
      * @return a ShiftDto containing the details of the shift
-     * @throws EntityNotFound if the shift with the specified ID does not exist
+     * @throws EntityNotFoundException if the shift with the specified ID does not exist
      */
-    public ShiftDto get(long id) throws EntityNotFound {
+    @Override
+    public ShiftDto getById(long id) throws EntityNotFoundException {
         Shift shift = repositoryCollector.getShifts().findById(id)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono zmiany o id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono zmiany o id: " + id));
 
         return ShiftDto.fromEntity(shift);
+    }
+
+    /**
+     * Retrieves all shifts.
+     *
+     * @return a list of ShiftDto containing the details of all shifts
+     */
+    @Override
+    public List<ShiftDto> getAll() {
+        return repositoryCollector.getShifts().findAll().stream()
+                .map(ShiftDto::fromEntity)
+                .toList();
     }
 
     /**
@@ -51,9 +61,10 @@ public class ShiftServiceImpl implements ShiftService {
      * @param endStr   the end date and time of the range as a string
      * @param userId   the ID of the user whose shifts are to be retrieved
      * @return a list of ShiftDto containing the details of shifts within the date range for the specified user
-     * @throws EntityNotFound       if the user with the specified ID does not exist
+     * @throws EntityNotFoundException       if the user with the specified ID does not exist
      * @throws InvalidDateException if the start date is after the end date
      */
+    @Override
     public List<ShiftDto> getShiftsByDateRangeAndUserId(String startStr, String endStr, Long userId) {
         validateUserId(userId);
         LocalDateTime start = parseDateTime(startStr);
@@ -69,11 +80,11 @@ public class ShiftServiceImpl implements ShiftService {
      * Validates the user ID.
      *
      * @param userId the ID of the user to validate
-     * @throws EntityNotFound if the user ID is null or does not exist
+     * @throws EntityNotFoundException if the user ID is null or does not exist
      */
     private void validateUserId(Long userId) {
         if (userId == null || !repositoryCollector.getUsers().existsById(userId)) {
-            throw new EntityNotFound("Nie znaleziono użytkownika o id: " + userId);
+            throw new EntityNotFoundException("Nie znaleziono użytkownika o id: " + userId);
         }
     }
 
@@ -110,9 +121,10 @@ public class ShiftServiceImpl implements ShiftService {
      *
      * @param shiftDto the ShiftDto containing the details of the shift to create
      * @return the created ShiftDto
-     * @throws EntityNotFound   if the user or role ID provided does not exist
+     * @throws EntityNotFoundException   if the user or role ID provided does not exist
      * @throws RuntimeException if an error occurs during the creation process
      */
+    @Override
     @Transactional
     public ShiftDto create(ShiftDto shiftDto) {
         validateUserId(shiftDto.userId());
@@ -128,11 +140,12 @@ public class ShiftServiceImpl implements ShiftService {
      * @param id       the ID of the shift to update or create
      * @param shiftDto the ShiftDto containing the details of the shift
      * @return the updated or newly created ShiftDto
-     * @throws EntityNotFound   if the user or role ID provided does not exist
+     * @throws EntityNotFoundException   if the user or role ID provided does not exist
      * @throws RuntimeException if an error occurs during the update or creation process
      */
+    @Override
     @Transactional
-    public ShiftDto update(long id, ShiftDto shiftDto) {
+    public ShiftDto updateById(long id, ShiftDto shiftDto) {
         validateUserId(shiftDto.userId());
         Shift existingShift = findExistingShift(id);
         User user = getUserById(shiftDto.userId(), repositoryCollector);
@@ -155,7 +168,7 @@ public class ShiftServiceImpl implements ShiftService {
      * @throws IllegalArgumentException if the user with the specified ID does not exist
      */
     private User getUserById(long id, RepositoryCollector repositoryCollector) {
-        return repositoryCollector.getUsers().findByIdAndIsActive(id, true)
+        return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
@@ -207,12 +220,12 @@ public class ShiftServiceImpl implements ShiftService {
      * @param end   the end date of the range
      * @return a list of ShiftDto containing the details of the published shifts
      */
+    @Override
     @Transactional
     public List<ShiftDto> publish(LocalDate start, LocalDate end) {
         List<Shift> shifts = findShiftsByDateRange(start, end);
-        publishShifts(shifts);
-        List<Shift> updatedShifts = saveShifts(shifts);
-        notifyPublishedShifts(updatedShifts);
+        List<Shift> updatedShifts = publishShiftsAndSave(shifts);
+        shiftNotificationSender.send(updatedShifts, ShiftNotificationType.PUBLISHED_SHIFT);
 
         return updatedShifts.stream()
                 .map(ShiftDto::fromEntity)
@@ -232,48 +245,33 @@ public class ShiftServiceImpl implements ShiftService {
     }
 
     /**
-     * Marks all shifts in the provided list as published.
+     * Publishes the provided list of shifts by setting their published status to true
+     * and saving them to the repository.
      *
-     * @param shifts the list of shifts to be marked as published
+     * @param shifts the list of shifts to be published
+     * @return the list of published shifts after being saved
      */
-    private void publishShifts(List<Shift> shifts) {
+    private List<Shift> publishShiftsAndSave(List<Shift> shifts) {
         shifts.forEach(shift -> shift.setPublished(true));
-    }
-
-    /**
-     * Saves the provided list of shifts and flushes the changes immediately.
-     *
-     * @param shifts the list of Shift objects to be saved
-     * @return the list of saved Shift objects
-     */
-    private List<Shift> saveShifts(List<Shift> shifts) {
         return repositoryCollector.getShifts().saveAllAndFlush(shifts);
-    }
-
-    /**
-     * Sends notifications for all published shifts in the provided list.
-     *
-     * @param shifts the list of shifts that have been published
-     */
-    private void notifyPublishedShifts(List<Shift> shifts) {
-        shifts.forEach(this::publishedShiftNotification);
     }
 
     /**
      * Deletes a Shift by its ID.
      *
      * @param id the ID of the Shift to be deleted
-     * @throws EntityNotFound if the shift with the specified ID does not exist
+     * @throws EntityNotFoundException if the shift with the specified ID does not exist
      */
-    public void delete(long id) throws EntityNotFound {
+    @Override
+    public void deleteById(long id) throws EntityNotFoundException {
         Shift shift = findExistingShift(id);
         if (shift == null) {
-            throw new EntityNotFound("Nie znaleziono zmiany o id: " + id);
+            throw new EntityNotFoundException("Nie znaleziono zmiany o id: " + id);
         }
         if (shift.getPublished()) {
-            deletedShiftNotification(shift);
+            shiftNotificationSender.send(shift, ShiftNotificationType.DELETED_SHIFT);
         }
-        repositoryCollector.getShifts().deleteById(id);
+        repositoryCollector.getShifts().delete(shift);
     }
 
     /**
@@ -296,27 +294,5 @@ public class ShiftServiceImpl implements ShiftService {
      */
     private Role getRoleByName(String roleName) {
         return repositoryCollector.getRoles().findByName(roleName);
-    }
-
-    //TODO: Maybe move this to a separate class
-
-    /**
-     * Sends a notification to the user when a shift is published.
-     *
-     * @param publishedShift the Shift object that was published
-     */
-    private void publishedShiftNotification(@NotNull Shift publishedShift) {
-        NotificationDto notificationDto = ShiftNotificationManager.createPublishNotificationDto(publishedShift);
-        notificationService.create(notificationDto);
-    }
-
-    /**
-     * Sends a notification to the user when a shift is deleted.
-     *
-     * @param shift the Shift object that was deleted
-     */
-    private void deletedShiftNotification(@NotNull Shift shift) {
-        NotificationDto notificationDto = ShiftNotificationManager.createDeletedNotificationDto(shift);
-        notificationService.create(notificationDto);
     }
 }

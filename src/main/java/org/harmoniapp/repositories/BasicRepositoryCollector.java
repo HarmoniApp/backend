@@ -16,7 +16,9 @@ import org.harmoniapp.repositories.schedule.ShiftRepository;
 import org.harmoniapp.repositories.user.UserRepository;
 import org.springframework.stereotype.Repository;
 
-
+/**
+ * BasicRepositoryCollector is a repository collector that aggregates various repository interfaces.
+ */
 @Repository
 @Data
 public class BasicRepositoryCollector implements RepositoryCollector {

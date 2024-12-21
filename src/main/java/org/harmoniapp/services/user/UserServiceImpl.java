@@ -10,7 +10,7 @@ import org.harmoniapp.entities.profile.ContractType;
 import org.harmoniapp.entities.profile.Language;
 import org.harmoniapp.entities.profile.Role;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.services.profile.AddressService;
 import org.springframework.data.domain.Page;
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
      *
      * @param id The ID of the user to retrieve.
      * @return The UserDto object corresponding to the specified ID.
-     * @throws EntityNotFound if the user with the specified ID is not found.
+     * @throws EntityNotFoundException if the user with the specified ID is not found.
      */
     public UserDto get(long id) {
         User user = getUserById(id);
@@ -98,8 +98,8 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     public void delete(long id) {
-        var user = repositoryCollector.getUsers().findByIdAndIsActive(id, true)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono użytkownika o ID %d".formatted(id)));
+        var user = repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono użytkownika o ID %d".formatted(id)));
 
         user.setIsActive(false);
         repositoryCollector.getUsers().save(user);
@@ -136,7 +136,7 @@ public class UserServiceImpl implements UserService {
      * @throws IllegalArgumentException if the user with the specified ID is not found.
      */
     private User getUserById(long id) {
-        return repositoryCollector.getUsers().findByIdAndIsActive(id, true)
+        return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
@@ -305,10 +305,10 @@ public class UserServiceImpl implements UserService {
      *
      * @param departmentId The ID of the department to retrieve.
      * @return The Address entity corresponding to the specified department ID.
-     * @throws EntityNotFound if the department with the specified ID is not found.
+     * @throws EntityNotFoundException if the department with the specified ID is not found.
      */
     private Address getDepartment(Long departmentId) {
         return repositoryCollector.getAddresses().findById(departmentId)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono oddziału o ID %d".formatted(departmentId)));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono oddziału o ID %d".formatted(departmentId)));
     }
 }

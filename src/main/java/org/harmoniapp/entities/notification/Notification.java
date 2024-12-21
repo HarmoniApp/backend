@@ -1,9 +1,9 @@
 package org.harmoniapp.entities.notification;
 
 import jakarta.persistence.*;
-import lombok.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import org.harmoniapp.entities.user.User;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;

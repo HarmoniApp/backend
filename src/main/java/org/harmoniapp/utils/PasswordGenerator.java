@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * This component provides methods to generate random passwords with a mix of special characters, numbers, and alphabets.
  * </p>
  */
-public class PasswordManager {
+public class PasswordGenerator {
 
     /**
      * Generates a common text password with a mix of special characters, numbers, and alphabets.
@@ -21,18 +21,38 @@ public class PasswordManager {
      * @return a randomly generated password as a {@link String}.
      */
     public static String generateCommonTextPassword() {
-        String pwString = generateRandomSpecialCharacters(2)
-                .concat(generateRandomNumbers(2))
-                .concat(generateRandomAlphabet(2, true))
-                .concat(generateRandomAlphabet(2, false))
-                .concat(generateRandomCharacters(4));
-        List<Character> pwChars = pwString.chars()
-                .mapToObj(data -> (char) data)
-                .collect(Collectors.toList());
+        String pwString = generateRandomPassword();
+        List<Character> pwChars = convertStringToList(pwString);
         Collections.shuffle(pwChars);
         return pwChars.stream()
                 .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
                 .toString();
+    }
+
+    /**
+     * Generates a random password consisting of a mix of special characters, numbers,
+     * uppercase and lowercase alphabets, and additional random characters.
+     *
+     * @return a randomly generated password as a {@link String}.
+     */
+    private static String generateRandomPassword() {
+        return generateRandomSpecialCharacters(2)
+                .concat(generateRandomNumbers(2))
+                .concat(generateRandomAlphabet(2, true))
+                .concat(generateRandomAlphabet(2, false))
+                .concat(generateRandomCharacters(4));
+    }
+
+    /**
+     * Converts a given string to a list of characters.
+     *
+     * @param pwString the string to convert.
+     * @return a list of characters representing the input string.
+     */
+    private static List<Character> convertStringToList(String pwString) {
+        return pwString.chars()
+                .mapToObj(data -> (char) data)
+                .collect(Collectors.toList());
     }
 
     /**

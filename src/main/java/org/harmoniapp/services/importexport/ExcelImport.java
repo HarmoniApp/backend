@@ -11,7 +11,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public interface ReadWorkbook {
+/**
+ * Abstract class for importing data from Excel files.
+ */
+public abstract class ExcelImport {
+
     /**
      * Reads the first sheet from the provided Excel file.
      *
@@ -21,7 +25,7 @@ public interface ReadWorkbook {
      * @throws EmptyFileException           if the file is empty.
      * @throws UnsupportedFileTypeException if the file is not an Excel file.
      */
-    default Sheet readSheet(@NotNull MultipartFile file) {
+    protected Sheet readSheet(@NotNull MultipartFile file) {
         Sheet sheet;
         assert file.getOriginalFilename() != null;
         if (!(file.getOriginalFilename().toLowerCase().endsWith(".xlsx") || file.getOriginalFilename().toLowerCase().endsWith(".xls"))) {

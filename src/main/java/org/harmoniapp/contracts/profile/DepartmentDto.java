@@ -5,7 +5,7 @@ import org.harmoniapp.entities.profile.Address;
 /**
  * A Data Transfer Object for Department.
  *
- * @param id the unique identifier of the department
+ * @param id             the unique identifier of the department
  * @param departmentName the name of the department
  */
 public record DepartmentDto(long id, String departmentName) {
@@ -17,9 +17,6 @@ public record DepartmentDto(long id, String departmentName) {
      * @return a new DepartmentDto with values from the Address entity
      */
     public static DepartmentDto fromEntity(Address address) {
-        return new DepartmentDto(
-                address.getId(),
-                address.getDepartmentName()
-        );
+        return new DepartmentDto(address.getId(), address.getDepartmentName());
     }
 }

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.profile.ContractTypeDto;
 import org.harmoniapp.entities.profile.ContractType;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class ContractTypeServiceImpl implements ContractTypeService {
      *
      * @param id the ID of the contract type
      * @return the ContractTypeDto corresponding to the given ID
-     * @throws EntityNotFound if no contract type is found with the given ID
+     * @throws EntityNotFoundException if no contract type is found with the given ID
      */
     @Override
     public ContractTypeDto getById(long id) {
@@ -40,11 +40,11 @@ public class ContractTypeServiceImpl implements ContractTypeService {
      *
      * @param id the ID of the contract type
      * @return the ContractType entity corresponding to the given ID
-     * @throws EntityNotFound if no contract type is found with the given ID
+     * @throws EntityNotFoundException if no contract type is found with the given ID
      */
     private ContractType getContractTypeById(long id) {
         return repositoryCollector.getContractTypes().findById(id)
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono typu umowy o id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono typu umowy o id: " + id));
     }
 
     /**
@@ -121,7 +121,7 @@ public class ContractTypeServiceImpl implements ContractTypeService {
      * Deletes a ContractType by its ID.
      *
      * @param id the ID of the contract type to be deleted
-     * @throws EntityNotFound if no contract type is found with the given ID
+     * @throws EntityNotFoundException if no contract type is found with the given ID
      */
     @Override
     @Transactional
@@ -136,11 +136,11 @@ public class ContractTypeServiceImpl implements ContractTypeService {
      * Checks if a ContractType exists by its ID.
      *
      * @param id the ID of the contract type
-     * @throws EntityNotFound if no contract type is found with the given ID
+     * @throws EntityNotFoundException if no contract type is found with the given ID
      */
     private void contractTypeExists(long id) {
         if (!repositoryCollector.getContractTypes().existsById(id)) {
-            throw new EntityNotFound("Nie znaleziono typu umowy o id: " + id);
+            throw new EntityNotFoundException("Nie znaleziono typu umowy o id: " + id);
         }
     }
 

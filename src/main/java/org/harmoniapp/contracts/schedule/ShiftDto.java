@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Builder;
 import org.harmoniapp.entities.profile.Role;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
@@ -18,7 +19,9 @@ import java.time.LocalDateTime;
  * @param end       the end time of the shift
  * @param userId    the userId associated with the shift
  * @param roleName  the roleName of the user during the shift
+ * @param published the published status of the shift
  */
+@Builder
 public record ShiftDto(
         Long id,
 
@@ -45,14 +48,14 @@ public record ShiftDto(
      * @return the resulting ShiftDto
      */
     public static ShiftDto fromEntity(Shift shift) {
-        return new ShiftDto(
-                shift.getId(),
-                shift.getStart(),
-                shift.getEnd(),
-                shift.getUser().getId(),
-                (shift.getRole() != null) ? shift.getRole().getName() : null,
-                shift.getPublished()
-        );
+        return ShiftDto.builder()
+                .id(shift.getId())
+                .start(shift.getStart())
+                .end(shift.getEnd())
+                .userId(shift.getUser().getId())
+                .roleName((shift.getRole() != null) ? shift.getRole().getName() : null)
+                .published(shift.getPublished())
+                .build();
     }
 
     /**
@@ -62,13 +65,13 @@ public record ShiftDto(
      * @return the resulting Shift entity
      */
     public Shift toEntity(User user, Role role) {
-        return new Shift(
-                this.id,
-                this.start,
-                this.end,
-                user,
-                role,
-                this.published
-        );
+        return Shift.builder()
+                .id(this.id)
+                .start(this.start)
+                .end(this.end)
+                .user(user)
+                .role(role)
+                .published(this.published)
+                .build();
     }
 }

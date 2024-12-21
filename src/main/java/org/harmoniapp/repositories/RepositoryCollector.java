@@ -15,6 +15,9 @@ import org.harmoniapp.repositories.schedule.PredefineShiftRepository;
 import org.harmoniapp.repositories.schedule.ShiftRepository;
 import org.harmoniapp.repositories.user.UserRepository;
 
+/**
+ * Interface for collecting various repositories.
+ */
 public interface RepositoryCollector {
     AbsenceRepository getAbsences();
 

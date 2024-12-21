@@ -67,9 +67,9 @@ public class UserSearchServiceImpl implements UserSearchService {
      */
     private List<User> searchUsersInDb(List<String> qSplit) {
         if (qSplit.size() > 1) {
-            return repositoryCollector.getUsers().findAllBySearchName(qSplit, true);
+            return repositoryCollector.getUsers().findAllActiveBySearchName(qSplit);
         } else {
-            return repositoryCollector.getUsers().FindAllBySearch(qSplit.getFirst(), true);
+            return repositoryCollector.getUsers().findAllActiveBySearch(qSplit.getFirst());
         }
     }
 
@@ -131,7 +131,7 @@ public class UserSearchServiceImpl implements UserSearchService {
                 ((searchParamsDto.roles() == null || searchParamsDto.roles().isEmpty())
                         && (searchParamsDto.contracts() == null || searchParamsDto.contracts().isEmpty())
                         && (searchParamsDto.language() == null || searchParamsDto.language().isEmpty()))) {
-            return repositoryCollector.getUsers().findAllByIsActive(true, pageable);
+            return repositoryCollector.getUsers().findAllByIsActiveTrue(pageable);
         } else {
             return repositoryCollector.getUsers().findAllByContractAndRoleAndLanguageAndIsActive(
                     searchParamsDto.contracts(), searchParamsDto.roles(), searchParamsDto.language(), pageable);

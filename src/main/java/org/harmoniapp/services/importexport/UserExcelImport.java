@@ -11,24 +11,22 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.harmoniapp.contracts.profile.RoleDto;
-import org.harmoniapp.entities.profile.Address;
-import org.harmoniapp.entities.profile.Language;
-import org.harmoniapp.entities.profile.Role;
-import org.harmoniapp.entities.profile.ContractType;
-import org.harmoniapp.entities.user.User;
-import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.contracts.profile.AddressDto;
 import org.harmoniapp.contracts.profile.LanguageDto;
+import org.harmoniapp.contracts.profile.RoleDto;
 import org.harmoniapp.contracts.user.UserDto;
+import org.harmoniapp.entities.profile.Address;
+import org.harmoniapp.entities.profile.ContractType;
+import org.harmoniapp.entities.profile.Language;
+import org.harmoniapp.entities.profile.Role;
+import org.harmoniapp.entities.user.User;
 import org.harmoniapp.exception.EmptyFileException;
+import org.harmoniapp.exception.FileGenerationException;
 import org.harmoniapp.exception.InvalidCellException;
-import org.harmoniapp.exception.PdfGenerationException;
+import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.services.user.UserServiceImpl;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
@@ -40,9 +38,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-@Component
+/**
+ * Service class for importing users from an Excel file.
+ * Extends the ExcelImport class and implements the ImportUser interface.
+ */
+@Service
 @RequiredArgsConstructor
-public class UserExcelImport implements ImportUser, ReadWorkbook {
+public class UserExcelImport extends ExcelImport implements ImportUser {
     private final RepositoryCollector repositoryCollector;
     private final UserServiceImpl userService;
     private final List<String> expectedHeaders = List.of("employee id", "first name", "surname", "email",
@@ -53,12 +55,12 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
      * Imports users from an Excel file.
      *
      * @param file the Excel file containing user data.
-     * @return a ResponseEntity containing a list of UserDto with the result of the import operation.
+     * @return an InputStreamResource containing the result of the import operation.
      * @throws EmptyFileException   if the file is empty.
      * @throws InvalidCellException if the headers are invalid or an error occurs during import.
      */
     @Transactional
-    public ResponseEntity<InputStreamResource> importUsers(MultipartFile file) {
+    public InputStreamResource importUsers(MultipartFile file) {
         Sheet sheet = readSheet(file);
         Iterator<Row> rows = sheet.rowIterator();
         if (!rows.hasNext()) {
@@ -145,18 +147,15 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
      * Generates a response indicating the result of the import operation.
      *
      * @param savedUsers the list of saved user DTOs.
-     * @return a ResponseEntity containing the list of successfully saved users.
+     * @return an InputStreamResource containing the response data.
      */
-    private ResponseEntity<InputStreamResource> generateResponse(List<UserDto> savedUsers) {
+    private InputStreamResource generateResponse(List<UserDto> savedUsers) {
         List<UserDto> response = createResponseList(savedUsers);
 
-        //TODO: extract PDF generation to a separate class
         byte[] pdfData = generatePdf(response);
         ByteArrayInputStream bis = new ByteArrayInputStream(pdfData);
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(new InputStreamResource(bis));
+        return new InputStreamResource(bis);
     }
 
     /**
@@ -184,7 +183,7 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
      *
      * @param response the list of UserDto objects to include in the PDF
      * @return a byte array representing the generated PDF
-     * @throws PdfGenerationException if an error occurs while generating the PDF
+     * @throws FileGenerationException if an error occurs while generating the PDF
      */
     private byte[] generatePdf(List<UserDto> response) {
         Document document = new Document(PageSize.A4.rotate());
@@ -198,7 +197,7 @@ public class UserExcelImport implements ImportUser, ReadWorkbook {
             document.add(table);
             document.close();
         } catch (DocumentException e) {
-            throw new PdfGenerationException("Error while generating PDF");
+            throw new FileGenerationException("Error while generating PDF");
         }
 
         return out.toByteArray();

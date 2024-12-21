@@ -1,10 +1,10 @@
 package org.harmoniapp.controllers.user;
 
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.contracts.user.PhotoDto;
 import org.harmoniapp.contracts.user.UserDto;
 import org.harmoniapp.services.user.UserPhotoService;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +23,6 @@ public class UserPhotoController {
      * @return The updated UserDto object with the new photo path.
      */
     @PatchMapping("/{id}/uploadPhoto")
-    @ResponseStatus(HttpStatus.CREATED)
     public UserDto uploadPhoto(@PathVariable long id, @RequestParam("file") MultipartFile file) {
         return service.uploadPhoto(id, file);
     }
@@ -48,8 +47,10 @@ public class UserPhotoController {
      * @return A ResponseEntity containing the InputStreamResource of the user's photo.
      */
     @GetMapping("/{id}/photo")
-    @ResponseBody
     public ResponseEntity<InputStreamResource> getUserPhoto(@PathVariable long id) {
-        return service.getUserPhoto(id);
+        PhotoDto photoDto = service.getUserPhoto(id);
+        return ResponseEntity.ok()
+                .contentType(photoDto.contentType())
+                .body(photoDto.photo());
     }
 }

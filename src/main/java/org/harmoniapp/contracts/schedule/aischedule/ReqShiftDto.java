@@ -20,6 +20,5 @@ public record ReqShiftDto(
 
         @NotEmpty(message = "Roles cannot be empty")
         @Valid
-        List<ReqRoleDto> roles
-) {
+        List<ReqRoleDto> roles) {
 }

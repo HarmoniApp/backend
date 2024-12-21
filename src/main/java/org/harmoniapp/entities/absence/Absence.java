@@ -4,12 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.PositiveOrZero;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.harmoniapp.entities.user.User;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -17,12 +13,12 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-@Table(name = "absence", schema = "public",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"start", "end", "user_id", "absence_type_id", "submission"})})
+@Table(name = "absence", schema = "public")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Absence {
 
     @Id
