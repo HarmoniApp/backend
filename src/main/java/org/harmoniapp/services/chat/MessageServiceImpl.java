@@ -52,7 +52,7 @@ public class MessageServiceImpl implements MessageService {
      */
     @Override
     public List<ChatPartnerDto> getAllChatPartners(long userId) {
-        if (repositoryCollector.getUsers().existsById(userId)) {
+        if (!repositoryCollector.getUsers().existsById(userId)) {
             throw new EntityNotFound("Nie znaleziono użytkownika o ID: " + userId);
         }
         List<Object[]> results = repositoryCollector.getMessages().findAllChatPartners(userId);
