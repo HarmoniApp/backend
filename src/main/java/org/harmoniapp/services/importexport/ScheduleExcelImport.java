@@ -33,7 +33,7 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
      *
      * @param file the Excel file containing the schedule
      * @return a status message
-     * @throws EmptyFileException if no rows are found in the Excel file
+     * @throws EmptyFileException   if no rows are found in the Excel file
      * @throws InvalidCellException if an invalid employee ID is found in the Excel file
      */
     public String importSchedule(MultipartFile file) {
@@ -45,22 +45,45 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
             throw new EmptyFileException("No rows found in the Excel file");
         }
         List<LocalDateTime> dateHeaders = extractHeaders(rows.next());
+        List<Shift> shiftList = processShiftRows(rows, users, dateHeaders);
+        repositoryCollector.getShifts().saveAll(shiftList);
+        return "Schedule imported successfully";
+    }
+
+    /**
+     * Processes the rows from the Excel sheet and creates shifts.
+     *
+     * @param rows        the iterator of rows to process
+     * @param users       the list of active users
+     * @param dateHeaders the list of date headers
+     * @return a list of created shifts
+     */
+    private List<Shift> processShiftRows(Iterator<Row> rows, List<User> users, List<LocalDateTime> dateHeaders) {
         List<Shift> shiftList = new ArrayList<>();
         while (rows.hasNext()) {
             Row row = rows.next();
-
             Cell empCell = row.getCell(0);
-            String empId = getCellValueAsString(empCell);
-            User user = users.stream()
-                    .filter(u -> u.getEmployeeId().equals(empId))
-                    .findFirst()
-                    .orElseThrow(() -> new InvalidCellException("Invalid cell: "
-                            + empCell.getAddress().formatAsString() + " - invalid employee ID"));
-
+            User user = getUser(users, empCell);
             processRow(row, dateHeaders, user, shiftList);
         }
-        repositoryCollector.getShifts().saveAll(shiftList);
-        return "Schedule imported successfully";
+        return shiftList;
+    }
+
+    /**
+     * Retrieves a User object based on the employee ID found in the given cell.
+     *
+     * @param users the list of active users
+     * @param cell  the cell containing the employee ID
+     * @return the User object corresponding to the employee ID
+     * @throws InvalidCellException if the employee ID is not found in the list of users
+     */
+    private User getUser(List<User> users, Cell cell) {
+        String empId = getCellValueAsString(cell);
+        return users.stream()
+                .filter(u -> u.getEmployeeId().equals(empId))
+                .findFirst()
+                .orElseThrow(() -> new InvalidCellException("Invalid cell: "
+                        + cell.getAddress().formatAsString() + " - invalid employee ID"));
     }
 
     /**
@@ -80,16 +103,29 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
             }
 
             LocalDateTime day = header.get(i);
-            List<String> workHours = List.of(cellValue.split("-", 2));
-            LocalDateTime start = parseTime(workHours.get(0), day, cell);
-            LocalDateTime end = parseTime(workHours.get(1), day, cell);
-            if (start.isAfter(end)) {
-                end = end.plusDays(1);
-            }
-
-            Shift shift = createShift(user, start, end);
+            LocalDateTime[] workHours = parseWorkHours(cellValue, day, cell);
+            Shift shift = createShift(user, workHours[0], workHours[1]);
             shiftList.add(shift);
         }
+    }
+
+    /**
+     * Parses the work hours from a cell value and combines them with a given day.
+     *
+     * @param cellValue the cell value containing the work hours in the format HH:mm-HH:mm
+     * @param day       the day to combine with the parsed work hours
+     * @param cell      the cell containing the work hours, used for error reporting
+     * @return an array containing the start and end times as LocalDateTime objects
+     * @throws InvalidCellException if the work hours format is invalid
+     */
+    private LocalDateTime[] parseWorkHours(String cellValue, LocalDateTime day, Cell cell) {
+        List<String> workHours = List.of(cellValue.split("-", 2));
+        LocalDateTime start = parseTime(workHours.get(0), day, cell);
+        LocalDateTime end = parseTime(workHours.get(1), day, cell);
+        if (start.isAfter(end)) {
+            end = end.plusDays(1);
+        }
+        return new LocalDateTime[]{start, end};
     }
 
     /**
@@ -143,7 +179,7 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
      *
      * @param headerRow the row containing the headers
      * @return a list of headers extracted from the row
-     * @throws EmptyFileException if no headers are found in the Excel file
+     * @throws EmptyFileException   if no headers are found in the Excel file
      * @throws InvalidCellException if the "employee id" column is not found or if a date cell has an invalid format
      */
     private List<LocalDateTime> extractHeaders(Row headerRow) {
