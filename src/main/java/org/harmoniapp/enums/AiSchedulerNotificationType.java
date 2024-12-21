@@ -3,6 +3,9 @@ package org.harmoniapp.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * Enum representing different types of AI scheduler notifications.
+ */
 @Getter
 @AllArgsConstructor
 public enum AiSchedulerNotificationType {

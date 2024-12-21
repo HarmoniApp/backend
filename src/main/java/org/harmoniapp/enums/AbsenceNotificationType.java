@@ -3,6 +3,9 @@ package org.harmoniapp.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * Enum representing different types of absence notifications.
+ */
 @Getter
 @AllArgsConstructor
 public enum AbsenceNotificationType {
@@ -16,6 +19,12 @@ public enum AbsenceNotificationType {
     private final String title;
     private final String messageTemplate;
 
+    /**
+     * Formats the message template with the provided arguments.
+     *
+     * @param args the arguments to format the message template
+     * @return the formatted message
+     */
     public String formatMessage(Object... args) {
         return messageTemplate.formatted(args);
     }

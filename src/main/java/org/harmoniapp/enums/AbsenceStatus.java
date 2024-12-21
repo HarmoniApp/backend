@@ -3,6 +3,9 @@ package org.harmoniapp.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * Enum representing different statuses of absences.
+ */
 @Getter
 @AllArgsConstructor
 public enum AbsenceStatus {
