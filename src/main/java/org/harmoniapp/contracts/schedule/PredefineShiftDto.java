@@ -21,7 +21,7 @@ public record PredefineShiftDto(
         long id,
 
         @NotEmpty(message = "Shift name cannot be empty")
-        @Pattern(regexp = "^[a-zA-Z0-9\\-\\s]+$", message = "Shift name must contain only letters, digits, dashes, and spaces")
+        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Shift name must contain only letters, digits, dashes, and spaces")
         String name,
 
         @NotNull(message = "Start time cannot be null")
