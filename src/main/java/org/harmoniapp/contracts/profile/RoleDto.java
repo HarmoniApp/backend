@@ -8,8 +8,8 @@ import org.harmoniapp.entities.profile.Role;
 /**
  * Data Transfer Object for Role.
  *
- * @param id    the unique identifier of the role
- * @param name  the name of the role
+ * @param id   the unique identifier of the role
+ * @param name the name of the role
  */
 public record RoleDto(
         long id,
@@ -29,10 +29,7 @@ public record RoleDto(
      * @return the resulting RoleDto
      */
     public static RoleDto fromEntity(Role role) {
-        return new RoleDto(
-                role.getId(),
-                role.getName(),
-                role.getColor());
+        return new RoleDto(role.getId(), role.getName(), role.getColor());
     }
 
     /**
@@ -41,10 +38,6 @@ public record RoleDto(
      * @return the resulting Role entity
      */
     public Role toEntity() {
-        return new Role(
-                this.id,
-                this.name,
-                this.color
-        );
+        return new Role(this.id, this.name, this.color);
     }
 }

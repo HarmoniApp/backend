@@ -20,8 +20,9 @@ import java.time.LocalDateTime;
  * @param read      indicates if the notification has been read
  * @param createdAt the timestamp when the notification was created
  */
+@Builder
 public record NotificationDto(
-        long id,
+        Long id,
 
         @NotNull(message = "User ID cannot be null")
         @Positive(message = "User ID must be a positive number")
@@ -37,18 +38,17 @@ public record NotificationDto(
 
         boolean read,
 
-        @JsonProperty("created_at")LocalDateTime createdAt
-        ) {
+        @JsonProperty("created_at") LocalDateTime createdAt
+) {
 
     public static NotificationDto createNotification(long receiverId, String title, String message) {
-        return new NotificationDto(
-                0L, // id is set automatically by the database
-                receiverId,
-                title,
-                message,
-                false,
-                LocalDateTime.now()
-        );
+        return NotificationDto.builder()
+                .userId(receiverId)
+                .title(title)
+                .message(message)
+                .read(false)
+                .createdAt(LocalDateTime.now())
+                .build();
     }
 
     /**
@@ -58,14 +58,14 @@ public record NotificationDto(
      * @return the resulting NotificationDto
      */
     public static NotificationDto fromEntity(Notification notification) {
-        return new NotificationDto(
-                notification.getId(),
-                notification.getUser().getId(),
-                notification.getTitle(),
-                notification.getMessage(),
-                notification.getRead(),
-                notification.getCreatedAt()
-        );
+        return NotificationDto.builder()
+                .id(notification.getId())
+                .userId(notification.getUser().getId())
+                .title(notification.getTitle())
+                .message(notification.getMessage())
+                .read(notification.getRead())
+                .createdAt(notification.getCreatedAt())
+                .build();
     }
 
     /**
@@ -75,13 +75,13 @@ public record NotificationDto(
      * @return the resulting Notification entity
      */
     public Notification toEntity(User user) {
-        return new Notification(
-                this.id,
-                user,
-                this.title,
-                this.message,
-                this.read,
-                this.createdAt != null ? this.createdAt : LocalDateTime.now()
-        );
+        return Notification.builder()
+                .id(this.id)
+                .user(user)
+                .title(this.title)
+                .message(this.message)
+                .read(this.read)
+                .createdAt(this.createdAt != null ? this.createdAt : LocalDateTime.now())
+                .build();
     }
 }

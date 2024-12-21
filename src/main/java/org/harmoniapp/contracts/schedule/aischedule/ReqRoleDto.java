@@ -16,8 +16,7 @@ public record ReqRoleDto(
 
         @NotNull(message = "Quantity cannot be null")
         @Positive(message = "Quantity must be a positive number")
-        int quantity
-) {
+        int quantity) {
 }
 
 
