@@ -198,8 +198,11 @@ public class MessageServiceImpl implements MessageService {
                     .filter(member -> !member.getId().equals(messages.getFirst().senderId()))
                     .forEach(member -> sendMessage("/client/groupMessages/readStatus/" + member.getId(), messages));
         } else {
-            long userId2 = messages.getFirst().receiverId();
-            sendMessage("/client/messages/readStatus/" + userId2, messages);
+            long senderId = messages.getFirst().senderId();
+            long receiverId = messages.getFirst().receiverId();
+
+            sendMessage("/client/messages/readStatus/" + senderId, messages);
+            sendMessage("/client/messages/readStatus/" + receiverId, messages);
         }
     }
 }
