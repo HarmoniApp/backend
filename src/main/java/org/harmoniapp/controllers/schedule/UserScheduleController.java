@@ -24,9 +24,8 @@ public class UserScheduleController {
      * @return UserScheduleDto containing the user's details along with their shifts and absences for the specified week
      */
     @GetMapping("/user/{userId}/week")
-    public UserScheduleDto getUserWeeklySchedule(
-            @PathVariable Long userId,
-            @ModelAttribute ScheduleRequestDto scheduleRequestDto) {
+    public UserScheduleDto getUserWeeklySchedule(@PathVariable Long userId,
+                                                 @ModelAttribute ScheduleRequestDto scheduleRequestDto) {
         return userScheduleService.getUserWeeklySchedule(userId, scheduleRequestDto);
     }
 }

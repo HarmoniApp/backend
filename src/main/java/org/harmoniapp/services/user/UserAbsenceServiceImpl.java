@@ -2,7 +2,7 @@ package org.harmoniapp.services.user;
 
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class UserAbsenceServiceImpl implements UserAbsenceService {
      */
     @Override
     public int getUserAvailableAbsenceDays(long id) {
-        User user = repositoryCollector.getUsers().findByIdAndIsActive(id, true)
+        User user = repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return user.getAvailableAbsenceDays() + user.getUnusedAbsenceDays();
     }
@@ -74,12 +74,12 @@ public class UserAbsenceServiceImpl implements UserAbsenceService {
      * Resets the available absence days for a user based on their contract type.
      *
      * @param user the user whose available absence days are to be reset
-     * @throws EntityNotFound if the contract type is not found
+     * @throws EntityNotFoundException if the contract type is not found
      */
-    private void resetAvailableAbsenceDays(User user) throws EntityNotFound {
+    private void resetAvailableAbsenceDays(User user) throws EntityNotFoundException {
         int newAbsenceDays = repositoryCollector.getContractTypes()
                 .findById(user.getContractType().getId())
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono typu umowy"))
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono typu umowy"))
                 .getAbsenceDays();
         user.setAvailableAbsenceDays(newAbsenceDays);
     }
@@ -90,7 +90,7 @@ public class UserAbsenceServiceImpl implements UserAbsenceService {
      */
     @Scheduled(cron = "0 0 0 1 1 ?")
     public void scheduledCarryOverPreviousYearAbsenceDays() {
-        List<User> users = repositoryCollector.getUsers().findAllByIsActive(true);
+        List<User> users = repositoryCollector.getUsers().findAllByIsActiveTrue();
         for (User user : users) {
             carryOverPreviousYearAbsenceDays(user);
         }
@@ -102,7 +102,7 @@ public class UserAbsenceServiceImpl implements UserAbsenceService {
      */
     @Scheduled(cron = "0 0 0 1 10 ?")
     public void scheduledExpireUnusedAbsenceDays() {
-        List<User> users = repositoryCollector.getUsers().findAllByIsActive(true);
+        List<User> users = repositoryCollector.getUsers().findAllByIsActiveTrue();
         for (User user : users) {
             expireUnusedAbsenceDays(user);
         }

@@ -77,7 +77,6 @@ public class UserController {
      * @return The updated UserDto object.
      */
     @PatchMapping("/{id}")
-    @ResponseStatus(HttpStatus.CREATED)
     public UserDto updateUser(@PathVariable long id, @Valid @RequestBody UserDto userDto) {
         return service.update(id, userDto);
     }

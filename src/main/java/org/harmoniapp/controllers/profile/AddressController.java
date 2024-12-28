@@ -36,12 +36,17 @@ public class AddressController {
      * @return A list of all departments.
      */
     @GetMapping("/departments/name")
-    public List<DepartmentDto> getAllDepartments(){
+    public List<DepartmentDto> getAllDepartments() {
         return service.getAllDepartments();
     }
 
+    /**
+     * Retrieves all addresses associated with departments.
+     *
+     * @return A list of AddressDto objects associated with departments.
+     */
     @GetMapping("/departments")
-    public List<AddressDto> getAllDepartmentsAddress(){
+    public List<AddressDto> getAllDepartmentsAddress() {
         return service.getAllDepartmentsAddress();
     }
 

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
-import org.harmoniapp.exception.TranslationException;
+import org.harmoniapp.exception.TranslationFailsException;
 import org.harmoniapp.utils.LanguageCodeMapper;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class TranslationServiceImpl implements TranslationService {
-
     private final OkHttpClient client = new OkHttpClient();
     private static final Dotenv dotenv = Dotenv.configure().filename(".env").load();
     private final String apiKey = dotenv.get("API_MS_TRANSLATOR_KEY");
@@ -30,13 +29,13 @@ public class TranslationServiceImpl implements TranslationService {
     /**
      * Translates the given text to the specified target language.
      *
-     * @param text the text to be translated
+     * @param text           the text to be translated
      * @param targetLanguage the target language code
      * @return the translated text
-     * @throws TranslationException if an error occurs during translation
+     * @throws TranslationFailsException if an error occurs during translation
      */
     @Override
-    public String translate(String text, String targetLanguage) throws TranslationException {
+    public String translate(String text, String targetLanguage) throws TranslationFailsException {
         RequestBody body = createRequestBody(text);
         HttpUrl url = parseUrl(targetLanguage);
         Request request = createRequest(url, body);
@@ -49,15 +48,15 @@ public class TranslationServiceImpl implements TranslationService {
      *
      * @param text the text to be translated
      * @return the request body containing the JSON payload
-     * @throws TranslationException if an error occurs while creating the JSON request body
+     * @throws TranslationFailsException if an error occurs while creating the JSON request body
      */
-    private RequestBody createRequestBody(String text){
+    private RequestBody createRequestBody(String text) {
         try {
             String requestBodyJson = objectMapper.writeValueAsString(List.of(Map.of("Text", text)));
             MediaType mediaType = MediaType.get("application/json");
             return RequestBody.create(requestBodyJson, mediaType);
         } catch (IOException e) {
-            throw new TranslationException("Error creating JSON request body: " + e.getMessage());
+            throw new TranslationFailsException("Error creating JSON request body: " + e.getMessage());
         }
     }
 
@@ -79,7 +78,7 @@ public class TranslationServiceImpl implements TranslationService {
     /**
      * Creates an HTTP request for the translation API.
      *
-     * @param url the URL for the translation API
+     * @param url  the URL for the translation API
      * @param body the request body containing the JSON payload
      * @return the constructed HTTP request
      */
@@ -99,7 +98,7 @@ public class TranslationServiceImpl implements TranslationService {
      *
      * @param request the HTTP request to be sent
      * @return the response body as a string
-     * @throws TranslationException if an error occurs during the request
+     * @throws TranslationFailsException if an error occurs during the request
      */
     private String sendRequest(Request request) {
         try (Response response = client.newCall(request).execute()) {
@@ -108,7 +107,7 @@ public class TranslationServiceImpl implements TranslationService {
             }
             return response.body().string();
         } catch (IOException e) {
-            throw new TranslationException(e.getMessage());
+            throw new TranslationFailsException(e.getMessage());
         }
     }
 
@@ -117,7 +116,7 @@ public class TranslationServiceImpl implements TranslationService {
      *
      * @param responseBody the response body as a JSON string
      * @return the translated text extracted from the JSON response
-     * @throws TranslationException if an error occurs while parsing the JSON response
+     * @throws TranslationFailsException if an error occurs while parsing the JSON response
      */
     private String parseResponse(String responseBody) {
         try {
@@ -125,7 +124,7 @@ public class TranslationServiceImpl implements TranslationService {
             JsonNode translations = jsonArray.get(0).get("translations");
             return translations.get(0).get("text").asText();
         } catch (IOException e) {
-            throw new TranslationException("Error parsing JSON response: " + e.getMessage());
+            throw new TranslationFailsException("Error parsing JSON response: " + e.getMessage());
         }
     }
 }

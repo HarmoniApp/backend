@@ -5,8 +5,8 @@ import org.harmoniapp.entities.absence.AbsenceType;
 /**
  * Data Transfer Object for AbsenceType.
  *
- * @param id    the unique identifier of the AbsenceType
- * @param name  the name of the AbsenceType
+ * @param id   the unique identifier of the AbsenceType
+ * @param name the name of the AbsenceType
  */
 public record AbsenceTypeDto(long id, String name) {
 
@@ -17,10 +17,7 @@ public record AbsenceTypeDto(long id, String name) {
      * @return the resulting AbsenceTypeDto
      */
     public static AbsenceTypeDto fromEntity(AbsenceType absenceType) {
-        return new AbsenceTypeDto(
-                absenceType.getId(),
-                absenceType.getName()
-        );
+        return new AbsenceTypeDto(absenceType.getId(), absenceType.getName());
     }
 
     /**
@@ -29,9 +26,6 @@ public record AbsenceTypeDto(long id, String name) {
      * @return the resulting AbsenceType entity
      */
     public AbsenceType toEntity() {
-        return new AbsenceType(
-                this.id,
-                this.name
-        );
+        return new AbsenceType(this.id, this.name);
     }
 }

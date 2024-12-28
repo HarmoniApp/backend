@@ -6,7 +6,7 @@ import org.harmoniapp.entities.profile.Role;
 import org.harmoniapp.entities.schedule.PredefineShift;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.exception.EntityNotFound;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.geneticalgorithm.Employee;
 import org.harmoniapp.geneticalgorithm.Gen;
 import org.springframework.stereotype.Component;
@@ -53,13 +53,13 @@ public class AlgorithmEntityMapperImpl implements AlgorithmEntityMapper {
      * @param predefineShifts the list of predefined shifts
      * @param shiftId         the ID of the shift to find
      * @return the predefined shift with the specified ID
-     * @throws EntityNotFound if no predefined shift with the specified ID is found
+     * @throws EntityNotFoundException if no predefined shift with the specified ID is found
      */
     private PredefineShift findPredefineShift(List<PredefineShift> predefineShifts, long shiftId) {
         return predefineShifts.stream()
                 .filter(ps -> ps.getId().equals(shiftId))
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono predefiniowanej zmiany o id: " + shiftId));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono predefiniowanej zmiany o id: " + shiftId));
     }
 
     /**
@@ -130,13 +130,13 @@ public class AlgorithmEntityMapperImpl implements AlgorithmEntityMapper {
      * @param users      the list of users
      * @param employeeId the employee ID to search for
      * @return the user with the specified employee ID
-     * @throws EntityNotFound if no user with the specified employee ID is found
+     * @throws EntityNotFoundException if no user with the specified employee ID is found
      */
     private User findUserByEmployeeId(List<User> users, String employeeId) {
         return users.stream()
                 .filter(u -> u.getEmployeeId().equals(employeeId))
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono użytkownika o id pracownika: " + employeeId));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono użytkownika o id pracownika: " + employeeId));
     }
 
     /**
@@ -145,12 +145,12 @@ public class AlgorithmEntityMapperImpl implements AlgorithmEntityMapper {
      * @param roles    the list of roles
      * @param roleName the name of the role to find
      * @return the role with the specified name
-     * @throws EntityNotFound if no role with the specified name is found
+     * @throws EntityNotFoundException if no role with the specified name is found
      */
     private Role findRoleByName(List<Role> roles, String roleName) {
         return roles.stream()
                 .filter(r -> r.getName().equals(roleName))
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono roli o nazwie: " + roleName));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono roli o nazwie: " + roleName));
     }
 }

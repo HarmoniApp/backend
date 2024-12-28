@@ -12,10 +12,19 @@ import java.util.function.Function;
  */
 public record PageDto<T>(List<T> content, int pageSize, int pageNumber, int totalPages) {
 
-    public static <T, U> PageDto<T> mapPage(Page<U> surcePage, Function<U, T> mapper) {
-        return new PageDto<>(surcePage.getContent().stream().map(mapper).toList(),
-                surcePage.getSize(),
-                surcePage.getNumber() + 1,
-                surcePage.getTotalPages());
+    /**
+     * Maps a `Page` object to a `PageDto` object.
+     *
+     * @param <T> the type of elements in the target `PageDto`
+     * @param <U> the type of elements in the source `Page`
+     * @param sourcePage the source `Page` object to map from
+     * @param mapper a function to convert elements from type `U` to type `T`
+     * @return a `PageDto` object containing the mapped data
+     */
+    public static <T, U> PageDto<T> mapPage(Page<U> sourcePage, Function<U, T> mapper) {
+        return new PageDto<>(sourcePage.getContent().stream().map(mapper).toList(),
+                sourcePage.getSize(),
+                sourcePage.getNumber() + 1,
+                sourcePage.getTotalPages());
     }
 }

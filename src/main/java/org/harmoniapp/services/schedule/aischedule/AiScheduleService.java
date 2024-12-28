@@ -1,6 +1,6 @@
 package org.harmoniapp.services.schedule.aischedule;
 
-import org.harmoniapp.contracts.schedule.aischedule.AiSchedulerResponse;
+import org.harmoniapp.contracts.schedule.aischedule.AiSchedulerResponseDto;
 import org.harmoniapp.contracts.schedule.aischedule.ScheduleRequirement;
 import org.springframework.security.core.Authentication;
 
@@ -18,12 +18,12 @@ public interface AiScheduleService {
      * @param authentication  the authentication information of the user
      * @return the generated schedule response
      */
-    AiSchedulerResponse generateSchedule(List<ScheduleRequirement> requirementsDto, Authentication authentication);
+    AiSchedulerResponseDto generateSchedule(List<ScheduleRequirement> requirementsDto, Authentication authentication);
 
     /**
      * Revokes the current schedule.
      *
      * @return the response after revoking the schedule
      */
-    AiSchedulerResponse revokeSchedule();
+    AiSchedulerResponseDto revokeSchedule();
 }

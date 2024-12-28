@@ -27,7 +27,7 @@ public class PredefineShiftController {
      */
     @GetMapping("/{id}")
     public PredefineShiftDto getPredefineShift(@PathVariable long id) {
-        return predefineShiftService.get(id);
+        return predefineShiftService.getById(id);
     }
 
     /**
@@ -61,7 +61,7 @@ public class PredefineShiftController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public PredefineShiftDto updatePredefineShift(@PathVariable long id, @Valid @RequestBody PredefineShiftDto predefineShiftDto) {
-        return predefineShiftService.update(id, predefineShiftDto);
+        return predefineShiftService.updateById(id, predefineShiftDto);
     }
 
     /**
@@ -72,6 +72,6 @@ public class PredefineShiftController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePredefineShift(@PathVariable long id) {
-        predefineShiftService.delete(id);
+        predefineShiftService.deleteById(id);
     }
 }

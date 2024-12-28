@@ -80,6 +80,7 @@ public class User {
 
     @ColumnDefault("default.jpg")
     @NotNull(message = "Photo cannot be null")
+    @Pattern(regexp = "^[^<>:\"/\\\\|?*]+(\\\\.[A-Za-z0-9]{1,5})?$", message = "Photo must be a valid file name")
     private String photo;
 
     @Column(name = "failed_login_attempts")
