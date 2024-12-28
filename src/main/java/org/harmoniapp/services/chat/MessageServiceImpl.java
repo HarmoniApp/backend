@@ -141,6 +141,7 @@ public class MessageServiceImpl implements MessageService {
             websocketMessageService.sendStatusUpdate(group, messages);
         } else if (messages.getFirst().receiverId() != null) {
             websocketMessageService.sendStatusUpdate(messages.getFirst().receiverId(), messages);
+            websocketMessageService.sendStatusUpdate(messages.getFirst().senderId(), messages);
         }
     }
 
