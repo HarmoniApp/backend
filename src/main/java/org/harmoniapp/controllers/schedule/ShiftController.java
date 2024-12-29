@@ -33,7 +33,7 @@ public class ShiftController {
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') || @securityService.isShiftOwner(#id, authentication)")
     public ShiftDto getShift(@PathVariable long id) {
-        return shiftService.get(id);
+        return shiftService.getById(id);
     }
 
     /**
@@ -72,7 +72,7 @@ public class ShiftController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public ShiftDto updateShift(@PathVariable long id, @RequestBody ShiftDto shiftDto) {
-        return shiftService.update(id, shiftDto);
+        return shiftService.updateById(id, shiftDto);
     }
 
     /**
@@ -83,7 +83,6 @@ public class ShiftController {
      * @return a list of ShiftDto with the 'published' status set to true
      */
     @PatchMapping("/{start}/{end}")
-    @ResponseStatus(HttpStatus.CREATED)
     public List<ShiftDto> publishShifts(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
                                         @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
         return shiftService.publish(start, end);
@@ -97,6 +96,6 @@ public class ShiftController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteShift(@PathVariable long id) {
-        shiftService.delete(id);
+        shiftService.deleteById(id);
     }
 }

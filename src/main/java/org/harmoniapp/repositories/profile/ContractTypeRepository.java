@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface ContractTypeRepository extends JpaRepository<ContractType, Long> {
 
+    @NotNull
     @Override
     @Cacheable("contractTypes")
     List<ContractType> findAll();

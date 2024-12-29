@@ -8,8 +8,8 @@ import org.harmoniapp.contracts.schedule.aischedule.ScheduleRequirement;
 import org.harmoniapp.entities.profile.Role;
 import org.harmoniapp.entities.schedule.PredefineShift;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.exception.EntityNotFound;
-import org.harmoniapp.exception.NotEnoughEmployees;
+import org.harmoniapp.exception.EntityNotFoundException;
+import org.harmoniapp.exception.InvalidAiScheduleRequirementsException;
 import org.harmoniapp.geneticalgorithm.Employee;
 import org.harmoniapp.geneticalgorithm.Gen;
 import org.harmoniapp.geneticalgorithm.Requirements;
@@ -37,6 +37,7 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      */
     @Override
     public AggregatedScheduleData prepareData(List<ScheduleRequirement> requirementsDto) {
+        validAndSortRequirements(requirementsDto);
         requirementsDto.sort(Comparator.comparing(ScheduleRequirement::date));
         List<User> users = findActiveUsersWithoutAbsence(requirementsDto);
         Map<String, List<Employee>> employees = prepareEmployees(requirementsDto, users);
@@ -47,6 +48,22 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
         List<Gen> shifts = prepareShifts(requirementsDto, predefineShifts, roles);
 
         return new AggregatedScheduleData(users, predefineShifts, roles, employees, shifts);
+    }
+
+    /**
+     * Validates the schedule requirements and sorts them by date.
+     *
+     * @param requirementsDto the list of schedule requirements
+     * @throws InvalidAiScheduleRequirementsException if there is more than one requirement for a single day
+     */
+    private void validAndSortRequirements(List<ScheduleRequirement> requirementsDto) {
+        requirementsDto.sort(Comparator.comparing(ScheduleRequirement::date));
+        for (int i = 0; i < requirementsDto.size() - 1; i++) {
+            if (requirementsDto.get(i).date().equals(requirementsDto.get(i + 1).date())) {
+                throw new InvalidAiScheduleRequirementsException(
+                        "Data %s została podana wiele razy". formatted(requirementsDto.get(i).date()));
+            }
+        }
     }
 
     /**
@@ -115,10 +132,10 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param requirementsDto the list of schedule requirements
      * @param employees       the map of employees grouped by role
      * @param roles           the list of roles
-     * @throws NotEnoughEmployees if there are not enough employees to generate a schedule
+     * @throws InvalidAiScheduleRequirementsException if there are not enough employees to generate a schedule
      */
     private void verifyUserQuantity(List<ScheduleRequirement> requirementsDto, Map<String, List<Employee>> employees,
-                                    List<Role> roles) throws NotEnoughEmployees {
+                                    List<Role> roles) throws InvalidAiScheduleRequirementsException {
         Map<String, Integer> required = summarizeRequiredEmployees(requirementsDto, roles);
         Map<String, Integer> available = calculateAvailableEmployees(requirementsDto, employees);
         checkEmployeeAvailability(required, available);
@@ -148,13 +165,13 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param roles  the list of roles
      * @param roleId the ID of the role to find
      * @return the name of the role
-     * @throws EntityNotFound if no role with the given ID is found
+     * @throws EntityNotFoundException if no role with the given ID is found
      */
     private String findRoleNameById(List<Role> roles, Long roleId) {
         return roles.stream()
                 .filter(r -> r.getId().equals(roleId))
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFound("Nie znaleziono roli o id: " + roleId))
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono roli o id: " + roleId))
                 .getName();
     }
 
@@ -179,15 +196,15 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      *
      * @param required  a map of roles and the number of required employees for each role
      * @param available a map of roles and the number of available employees for each role
-     * @throws NotEnoughEmployees if there are not enough employees available to meet the requirements
+     * @throws InvalidAiScheduleRequirementsException if there are not enough employees available to meet the requirements
      */
-    private void checkEmployeeAvailability(Map<String, Integer> required, Map<String, Integer> available) throws NotEnoughEmployees {
+    private void checkEmployeeAvailability(Map<String, Integer> required, Map<String, Integer> available) throws InvalidAiScheduleRequirementsException {
         required.forEach((role, requiredCount) -> {
             int availableCount = available.getOrDefault(role, 0);
             if (availableCount < requiredCount) {
                 String message = String.format("Za mało pracowników o roli %s, wymagane zmiany do obsadzenia: %d, możliwe zmiany do obsadzenia: %d",
                         role, requiredCount, availableCount);
-                throw new NotEnoughEmployees(message);
+                throw new InvalidAiScheduleRequirementsException(message);
             }
         });
     }

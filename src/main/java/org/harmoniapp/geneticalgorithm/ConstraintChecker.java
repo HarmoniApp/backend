@@ -2,10 +2,11 @@ package org.harmoniapp.geneticalgorithm;
 
 import lombok.AllArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Represents a constraint checker for the schedule.
@@ -33,13 +34,9 @@ public class ConstraintChecker implements CheckConstraint {
      */
     @Override
     public double checkViolations(List<Gen> chromosome) {
-        double violations = 0.0;
-
-        for (Gen shift : chromosome) {
-            violations += violationsEmployeeCount(shift) ? hardPenalty : 0;
-            violations += violationsUniqueEmployee(shift) ? hardPenalty : 0;
-            violations += violationsRoleMatch(shift) ? hardPenalty : 0;
-        }
+        double violations = chromosome.stream()
+                .mapToDouble(this::calculateShiftViolations)
+                .sum();
 
         violations += violationsMaxShiftPerWeek(chromosome);
 
@@ -51,29 +48,44 @@ public class ConstraintChecker implements CheckConstraint {
     }
 
     /**
+     * Calculates the total violations for a single shift.
+     *
+     * @param shift The shift to check.
+     * @return The total violations for the shift.
+     */
+    private double calculateShiftViolations(Gen shift) {
+        return (violationsEmployeeCount(shift) ? hardPenalty : 0)
+                + (violationsUniqueEmployee(shift) ? hardPenalty : 0)
+                + (violationsRoleMatch(shift) ? hardPenalty : 0);
+    }
+
+    /**
      * Checks the quantity of shifts per day.
      *
      * @param shiftsByDay the shifts grouped by day
      * @return the total penalty of the violations
      */
     private double checkQuantityOfShiftsPerDay(List<List<Gen>> shiftsByDay) {
-        double violations = 0.0;
+        return shiftsByDay.stream()
+                .mapToDouble(this::calculateDayViolations)
+                .sum();
+    }
 
-        for (List<Gen> shifts : shiftsByDay) {
-            Map<Employee, Integer> employeeShifts = new HashMap<>();
-            for (Gen shift : shifts) {
-                for (Employee emp : shift.employees()) {
-                    employeeShifts.put(emp, employeeShifts.getOrDefault(emp, 0) + 1);
-                }
-            }
-            for (int count : employeeShifts.values()) {
-                if (count > 1) {
-                    violations += hardPenalty;
-                }
-            }
-        }
+    /**
+     * Calculates violations for a single day based on employee shift counts.
+     *
+     * @param shifts List of shifts for the day.
+     * @return The calculated violations for the day.
+     */
+    private double calculateDayViolations(List<Gen> shifts) {
+        Map<Employee, Long> employeeShiftCounts = shifts.stream()
+                .flatMap(shift -> shift.employees().stream())
+                .collect(Collectors.groupingBy(emp -> emp, Collectors.counting()));
 
-        return violations;
+        return employeeShiftCounts.values().stream()
+                .filter(count -> count > 1)
+                .mapToDouble(count -> hardPenalty)
+                .sum();
     }
 
     /**
@@ -83,11 +95,10 @@ public class ConstraintChecker implements CheckConstraint {
      * @return the shifts grouped by day
      */
     private List<List<Gen>> groupByDay(List<Gen> chromosome) {
-        Map<Integer, List<Gen>> shiftsByDay = new HashMap<>();
-        for (Gen shift : chromosome) {
-            shiftsByDay.computeIfAbsent(shift.day(), k -> new ArrayList<>()).add(shift);
-        }
-        return new ArrayList<>(shiftsByDay.values());
+        return chromosome.stream()
+                .collect(Collectors.groupingBy(Gen::day))
+                .values().stream()
+                .toList();
     }
 
     /**
@@ -117,22 +128,14 @@ public class ConstraintChecker implements CheckConstraint {
      * @return the total penalty of the violations
      */
     private double violationsMaxShiftPerWeek(List<Gen> chromosome) {
-        double violations = 0.0;
-
         Map<Employee, Integer> totalEmployeeCount = new HashMap<>();
-        for (Gen shift : chromosome) {
-            for (Employee emp : shift.employees()) {
-                totalEmployeeCount.put(emp, totalEmployeeCount.getOrDefault(emp, 0) + 1);
-            }
-        }
+        chromosome.stream()
+                .flatMap(shift -> shift.employees().stream())
+                .forEach(emp -> totalEmployeeCount.merge(emp, 1, Integer::sum));
 
-        for (int count : totalEmployeeCount.values()) {
-            if (count > maxShiftPerWeek) {
-                violations += hardPenalty;
-            }
-        }
-
-        return violations;
+        return totalEmployeeCount.values().stream()
+                .filter(count -> count > maxShiftPerWeek)
+                .count() * hardPenalty;
     }
 
     /**
@@ -142,16 +145,10 @@ public class ConstraintChecker implements CheckConstraint {
      * @return true if the role match is violated, false otherwise
      */
     private boolean violationsRoleMatch(Gen shift) {
-        for (Requirements req : shift.requirements()) {
-            long count = shift.employees().stream()
-                    .filter(emp -> emp.role().equals(req.role()))
-                    .count();
-
-            if (count != req.employeesNumber()) {
-                return true;
-            }
-        }
-        return false;
+        return shift.requirements().stream()
+                .anyMatch(req -> shift.employees().stream()
+                        .filter(emp -> emp.role().equals(req.role()))
+                        .count() != req.employeesNumber());
     }
 
     /**
@@ -161,28 +158,73 @@ public class ConstraintChecker implements CheckConstraint {
      * @return the total penalty of the violations
      */
     private double checkEarlierShiftNextDay(List<List<Gen>> days) {
-        double violations = 0.0;
-
-        for (int i = 0; i < days.size() - 1; i++) {
-            List<Gen> currentDayShifts = days.get(i);
-            List<Gen> nextDayShifts = days.get(i + 1);
-            if (currentDayShifts.isEmpty() || nextDayShifts.isEmpty()) {
-                continue;
-            }
-            for (Gen currentDayShift : currentDayShifts) {
-                for (Employee emp : currentDayShift.employees()) {
-                    for (Gen nextDayShift : nextDayShifts) {
-                        if (nextDayShift.startTime().isBefore(currentDayShift.startTime())) {
-                            if (nextDayShift.employees().contains(emp)) {
-                                violations += softPenalty;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return violations;
+        return IntStream.range(0, days.size() - 1)
+                .filter(i -> !days.get(i).isEmpty() && !days.get(i + 1).isEmpty())
+                .mapToDouble(i -> processShiftsForDay(days.get(i), days.get(i + 1)))
+                .sum();
     }
+
+    /**
+     * Processes the shifts for a single day, checking for violations between current and next day shifts.
+     *
+     * @param currentDayShifts List of shifts for the current day.
+     * @param nextDayShifts    List of shifts for the next day.
+     * @return The calculated violations for the day.
+     */
+    private double processShiftsForDay(List<Gen> currentDayShifts, List<Gen> nextDayShifts) {
+        return currentDayShifts.stream()
+                .mapToDouble(shift -> processShiftEmployees(shift, nextDayShifts))
+                .sum();
+    }
+
+    /**
+     * Processes employees of a shift, checking if they violate next day shift rules.
+     *
+     * @param currentDayShift The current day shift.
+     * @param nextDayShifts   List of shifts for the next day.
+     * @return The calculated violations for the shift.
+     */
+    private double processShiftEmployees(Gen currentDayShift, List<Gen> nextDayShifts) {
+        return currentDayShift.employees().stream()
+                .mapToDouble(emp -> checkNextDayShiftsForEmployee(emp, currentDayShift, nextDayShifts))
+                .sum();
+    }
+
+    /**
+     * Checks next day shifts for violations for a specific employee.
+     *
+     * @param emp             The employee to check.
+     * @param currentDayShift The current day shift.
+     * @param nextDayShifts   List of shifts for the next day.
+     * @return The calculated violations for the employee.
+     */
+    private double checkNextDayShiftsForEmployee(Employee emp, Gen currentDayShift, List<Gen> nextDayShifts) {
+        return nextDayShifts.stream()
+                .mapToDouble(nextDayShift -> checkNextDayShiftForEmployee(emp, currentDayShift, nextDayShift))
+                .sum();
+    }
+
+    /**
+     * Checks if an employee violates the next day shift rules.
+     *
+     * @param emp             The employee to check.
+     * @param currentDayShift The current day shift.
+     * @param nextDayShift    The next day shift.
+     * @return The calculated violations for the employee.
+     */
+    private double checkNextDayShiftForEmployee(Employee emp, Gen currentDayShift, Gen nextDayShift) {
+        return isNextDayShiftEarlier(currentDayShift, nextDayShift) && nextDayShift.employees().contains(emp) ? softPenalty : 0;
+    }
+
+    /**
+     * Determines if a shift on the next day starts earlier than a shift on the current day.
+     *
+     * @param currentDayShift The shift from the current day.
+     * @param nextDayShift    The shift from the next day.
+     * @return true if the next day shift starts earlier, false otherwise.
+     */
+    private boolean isNextDayShiftEarlier(Gen currentDayShift, Gen nextDayShift) {
+        return nextDayShift.startTime().isBefore(currentDayShift.startTime());
+    }
+
 }

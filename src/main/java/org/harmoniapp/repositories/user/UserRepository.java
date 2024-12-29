@@ -4,6 +4,7 @@ import org.harmoniapp.entities.user.User;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -19,11 +20,13 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     boolean existsById(@NotNull Long id);
 
-    Optional<User> findByIdAndIsActive(Long id, boolean active);
+    Optional<User> findByIdAndIsActiveTrue(Long id);
 
-    Page<User> findAllByIsActive(boolean active, Pageable pageable);
+    Page<User> findAllByIsActiveTrue(Pageable pageable);
 
-    List<User> findAllByIsActive(boolean isActive);
+    List<User> findByIsActiveTrue(Sort sort);
+
+    List<User> findAllByIsActiveTrue();
 
     @Query("""
             select u from User u left join u.roles roles left join u.languages languages
@@ -38,17 +41,17 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     @Query("""
             select u from User u left join u.roles roles left join u.languages languages
-            where u.isActive = ?2 and
+            where u.isActive = true and
                   (
                   upper(u.firstname) like concat(?1, '%') or
                   upper(u.surname) like concat(?1, '%')
                   )""")
-    List<User> FindAllBySearch(String search, boolean active);
+    List<User> findAllActiveBySearch(String search);
 
     @Query("""
         select u from User u
         where u.isActive = ?2 and upper(u.firstname) in ?1 and upper(u.surname) in ?1""")
-    List<User> findAllBySearchName(List<String> search, boolean active);
+    List<User> findAllActiveBySearchName(List<String> search);
 
     @Query("""
         select u from User u left join u.roles roles
@@ -82,7 +85,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
             select u from User u inner join u.roles roles
             where upper(roles.name) like upper('ADMIN') and u.isActive = true""")
     List<User> findAllActiveSupervisors();
-
 
     Set<User> findByIdInAndIsActiveTrue(Collection<Long> ids);
 }

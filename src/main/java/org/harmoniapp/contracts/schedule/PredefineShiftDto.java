@@ -3,6 +3,7 @@ package org.harmoniapp.contracts.schedule;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import org.harmoniapp.entities.schedule.PredefineShift;
 
 import java.time.LocalTime;
@@ -15,11 +16,12 @@ import java.time.LocalTime;
  * @param start the start time of the predefined shift
  * @param end   the end time of the predefined shift
  */
+@Builder
 public record PredefineShiftDto(
         long id,
 
         @NotEmpty(message = "Shift name cannot be empty")
-        @Pattern(regexp = "^[a-zA-Z0-9\\-\\s]+$", message = "Shift name must contain only letters, digits, dashes, and spaces")
+        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Shift name must contain only letters, digits, dashes, and spaces")
         String name,
 
         @NotNull(message = "Start time cannot be null")
@@ -35,12 +37,12 @@ public record PredefineShiftDto(
      * @return the resulting PredefineShiftDto
      */
     public static PredefineShiftDto fromEntity(PredefineShift predefineShift) {
-        return new PredefineShiftDto(
-                predefineShift.getId(),
-                predefineShift.getName(),
-                predefineShift.getStart(),
-                predefineShift.getEnd()
-        );
+        return PredefineShiftDto.builder()
+                .id(predefineShift.getId())
+                .name(predefineShift.getName())
+                .start(predefineShift.getStart())
+                .end(predefineShift.getEnd())
+                .build();
     }
 
     /**
@@ -49,11 +51,11 @@ public record PredefineShiftDto(
      * @return the resulting PredefineShift entity
      */
     public PredefineShift toEntity() {
-        return new PredefineShift(
-                this.id,
-                this.name,
-                this.start,
-                this.end
-        );
+        return PredefineShift.builder()
+                .id(this.id)
+                .name(this.name)
+                .start(this.start)
+                .end(this.end)
+                .build();
     }
 }

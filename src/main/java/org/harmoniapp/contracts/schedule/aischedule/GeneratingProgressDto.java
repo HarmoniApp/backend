@@ -6,5 +6,5 @@ package org.harmoniapp.contracts.schedule.aischedule;
  * @param generation the current generation number
  * @param fitness    the fitness score of the current generation
  */
-public record GeneratingProgressDto(int generation, double fitness) {
+public record GeneratingProgressDto(double generation, double fitness) {
 }

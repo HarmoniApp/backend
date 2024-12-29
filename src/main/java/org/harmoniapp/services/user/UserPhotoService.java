@@ -1,5 +1,6 @@
 package org.harmoniapp.services.user;
 
+import org.harmoniapp.contracts.user.PhotoDto;
 import org.harmoniapp.contracts.user.UserDto;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public interface UserPhotoService  {
      * Retrieves the photo of the user with the given ID.
      *
      * @param id the ID of the user
-     * @return a ResponseEntity containing the InputStreamResource of the photo
+     * @return the user's photo as a PhotoDto
      */
-    ResponseEntity<InputStreamResource> getUserPhoto(long id);
+    PhotoDto getUserPhoto(long id);
 }

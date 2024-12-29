@@ -21,6 +21,5 @@ public record ScheduleRequirement(
 
         @NotEmpty(message = "Shifts cannot be empty")
         @Valid
-        List<ReqShiftDto> shifts
-) {
+        List<ReqShiftDto> shifts) {
 }

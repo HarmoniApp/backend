@@ -29,12 +29,12 @@ public record AddressDto(
 
         @NotEmpty(message = "City cannot be empty")
         @Size(max = 50, message = "City must be less than or equal to 50 characters")
-        @Pattern(regexp = "^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ -]+$", message = "City must contain only letters, spaces and dashes")
+        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "City must contain only letters, spaces and dashes")
         String city,
 
         @NotEmpty(message = "Street cannot be empty")
         @Size(max = 100, message = "Street must be less than or equal to 100 characters")
-        @Pattern(regexp = "^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ, -]+$", message = "Street must contain only letters, spaces, commas and dashes")
+        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ',\\-\\s]+$", message = "Street must contain only letters, spaces, commas and dashes")
         String street,
 
         @NotEmpty(message = "Building number cannot be empty")
@@ -47,7 +47,7 @@ public record AddressDto(
         String apartment,
 
         @Size(max = 100, message = "Department name must be less than or equal to 100 characters")
-        @Pattern(regexp = "^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ0-9 ]+$", message = "Department name must contain only letters, numbers, and spaces")
+        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Department name must contain only letters, numbers, and spaces")
         @JsonProperty("department_name") String departmentName) {
 
     /**
@@ -57,15 +57,15 @@ public record AddressDto(
      * @return An AddressDto representing the Address entity.
      */
     public static AddressDto fromEntity(Address address) {
-        return new AddressDto(
-                address.getId(),
-                address.getZipCode(),
-                address.getCity(),
-                address.getStreet(),
-                address.getBuildingNumber(),
-                address.getApartment(),
-                address.getDepartmentName()
-        );
+        return AddressDto.builder()
+                .id(address.getId())
+                .zipCode(address.getZipCode())
+                .city(address.getCity())
+                .street(address.getStreet())
+                .buildingNumber(address.getBuildingNumber())
+                .apartment(address.getApartment())
+                .departmentName(address.getDepartmentName())
+                .build();
     }
 
     /**
@@ -74,14 +74,14 @@ public record AddressDto(
      * @return An Address entity representing this AddressDto.
      */
     public Address toEntity() {
-        return new Address(
-                id,
-                zipCode,
-                city,
-                street,
-                buildingNumber,
-                apartment,
-                departmentName
-        );
+        return Address.builder()
+                .id(id)
+                .zipCode(zipCode)
+                .city(city)
+                .street(street)
+                .buildingNumber(buildingNumber)
+                .apartment(apartment)
+                .departmentName(departmentName)
+                .build();
     }
 }

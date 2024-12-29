@@ -3,6 +3,7 @@ package org.harmoniapp.controllers.notification;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.notification.NotificationDto;
 import org.harmoniapp.services.notification.NotificationService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,11 +56,12 @@ public class NotificationController {
      * Deletes a notification by its ID.
      *
      * <p>This endpoint is protected by security measures, and will only allow the owner of the notification
-     *  to delete it.</p>
+     * to delete it.</p>
      *
      * @param id the ID of the notification to delete
      */
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@securityService.isNotificationOwner(#id, authentication)")
     public void deleteNotification(@PathVariable Long id) {
         notificationService.deleteById(id);

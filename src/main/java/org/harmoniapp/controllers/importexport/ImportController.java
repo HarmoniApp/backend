@@ -3,6 +3,7 @@ package org.harmoniapp.controllers.importexport;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.services.importexport.ImportService;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +28,10 @@ public class ImportController {
      */
     @PostMapping("/users/import-excel")
     public ResponseEntity<InputStreamResource> importUsersFromExcel(@RequestPart MultipartFile file) {
-        return service.importUsersFromExcel(file);
+        InputStreamResource resource = service.importUsersFromExcel(file);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(resource);
     }
 
     /**
@@ -38,6 +42,7 @@ public class ImportController {
      */
     @PostMapping("/shifts/import-excel")
     public ResponseEntity<String> importScheduleFromExcel(@RequestPart MultipartFile file) {
-        return service.importScheduleFromExcel(file);
+        String result = service.importScheduleFromExcel(file);
+        return ResponseEntity.ok(result);
     }
 }

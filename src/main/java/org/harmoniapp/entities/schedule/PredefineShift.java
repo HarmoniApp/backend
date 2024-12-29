@@ -3,10 +3,8 @@ package org.harmoniapp.entities.schedule;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.Pattern;
+import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalTime;
@@ -18,6 +16,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PredefineShift {
 
     @Id
@@ -26,6 +25,7 @@ public class PredefineShift {
 
     @Column(unique = true)
     @NotEmpty(message = "Name is required")
+    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Name must contain only letters, digits, dashes, and spaces")
     private String name;
 
     @Column(name = "\"start\"")
