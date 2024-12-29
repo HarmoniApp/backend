@@ -12,6 +12,8 @@ public interface NotificationService {
 
     NotificationDto create(NotificationDto notificationDto);
 
+    NotificationDto markAsReadById(long notificationId);
+
     List<NotificationDto> markAllAsReadByUserId(long userId);
 
     void deleteById(long notificationId);
