@@ -31,13 +31,13 @@ public class Address {
     @Column(length = 50)
     @NotEmpty(message = "City cannot be empty")
     @Size(max = 50, message = "City must be less than or equal to 50 characters")
-    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "City must contain only letters, spaces and dashes")
+    @Pattern(regexp = "^[A-Za-z Ā-ɏØ-öø-ÿ'\\-\\s]+$", message = "City must contain only letters, spaces and dashes")
     private String city;
 
     @Column(length = 100)
     @NotEmpty(message = "Street cannot be empty")
     @Size(max = 100, message = "Street must be less than or equal to 100 characters")
-    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ',\\-\\s]+$", message = "Street must contain only letters, spaces, commas and dashes")
+    @Pattern(regexp = "^[A-Za-z Ā-ɏØ-öø-ÿ',\\-\\s]+$", message = "Street must contain only letters, spaces, commas and dashes")
     private String street;
 
     @Column(name = "building_number", length = 10)
@@ -52,7 +52,7 @@ public class Address {
 
     @Column(name = "department_name", length = 100)
     @Size(max = 100, message = "Department name must be less than or equal to 100 characters")
-    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Department name must contain only letters, numbers, and spaces")
+    @Pattern(regexp = "^[A-Za-z Ā-ɏØ-öø-ÿ'\\-\\s]+$", message = "Department name must contain only letters, numbers, and spaces")
     private String departmentName;
 
     @Override
