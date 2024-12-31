@@ -25,7 +25,7 @@ public class PredefineShift {
 
     @Column(unique = true)
     @NotEmpty(message = "Name is required")
-    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Name must contain only letters, digits, dashes, and spaces")
+    @Pattern(regexp = "^[A-Za-z Ā-ɏØ-öø-ÿ'\\-\\s]+$", message = "Name must contain only letters, digits, dashes, and spaces")
     private String name;
 
     @Column(name = "\"start\"")
