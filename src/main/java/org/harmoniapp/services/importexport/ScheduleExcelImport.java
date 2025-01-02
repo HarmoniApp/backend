@@ -191,9 +191,9 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
             throw new EmptyFileException("No headers found in the Excel file");
         }
         Cell cell = cellIterator.next();
-        if (!cell.getStringCellValue().equalsIgnoreCase("employee id")) {
+        if (!cell.getStringCellValue().equalsIgnoreCase("id pracownika")) {
             throw new InvalidCellException("Invalid cell: " + cell.getAddress().formatAsString()
-                    + " - expected header: Employee ID");
+                    + " - expected header: id pracownika");
         }
         while (cellIterator.hasNext()) {
             cell = cellIterator.next();
