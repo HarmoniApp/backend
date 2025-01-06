@@ -7,7 +7,6 @@ import org.harmoniapp.enums.AbsenceNotificationType;
 /**
  * This class is responsible for creating absence notifications.
  */
-//Strategy pattern???
 public class AbsenceNotification {
 
     /**
