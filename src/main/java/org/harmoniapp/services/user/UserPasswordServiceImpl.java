@@ -1,7 +1,7 @@
 package org.harmoniapp.services.user;
 
 import lombok.RequiredArgsConstructor;
-import org.harmoniapp.contracts.user.UserNewPassword;
+import org.harmoniapp.contracts.user.UserNewPasswordDto;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.exception.EasyPasswordException;
 import org.harmoniapp.repositories.RepositoryCollector;
@@ -60,7 +60,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
      * @throws EasyPasswordException if the new password is compromised
      */
     @Override
-    public String changePassword(long id, UserNewPassword pwd) throws EasyPasswordException {
+    public String changePassword(long id, UserNewPasswordDto pwd) throws EasyPasswordException {
         validatePassword(pwd.newPassword());
         User user = getUserById(id);
         updatePassword(user, pwd.newPassword());
