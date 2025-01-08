@@ -10,12 +10,12 @@ import jakarta.validation.constraints.Positive;
  * @param quantity the quantity of the role
  */
 public record ReqRoleDto(
-        @NotNull(message = "Role ID cannot be null")
-        @Positive(message = "Role ID must be a positive number")
+        @NotNull(message = "ID roli nie może być puste")
+        @Positive(message = "ID roli musi być liczbą dodatnią")
         Long roleId,
 
-        @NotNull(message = "Quantity cannot be null")
-        @Positive(message = "Quantity must be a positive number")
+        @NotNull(message = "Liczebność nie może być pusta")
+        @Positive(message = "Liczebność musi być liczbą dodatnią")
         int quantity) {
 }
 

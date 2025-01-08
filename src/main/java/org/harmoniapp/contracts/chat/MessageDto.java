@@ -26,19 +26,19 @@ public record MessageDto(
         Long id,
 
         @JsonProperty("sender_id")
-        @NotNull(message = "Sender ID cannot be null")
-        @Positive(message = "Sender ID must be positive")
+        @NotNull(message = "ID nadawcy nie może być puste")
+        @Positive(message = "ID nadawcy musi być liczbą dodatnią")
         Long senderId,
 
         @JsonProperty("receiver_id")
-        @Positive(message = "Receiver ID must be positive")
+        @Positive(message = "ID odbiorcy musi być liczbą dodatnią")
         Long receiverId,
 
         @JsonProperty("group_id")
-        @Positive(message = "Group ID must be positive")
+        @Positive(message = "ID grupy musi być liczbą dodatnią")
         Long groupId,
 
-        @NotBlank(message = "Content cannot be blank")
+        @NotBlank(message = "Treść wiadomości nie może być pusta")
         String content,
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

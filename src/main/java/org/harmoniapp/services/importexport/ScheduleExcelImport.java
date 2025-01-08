@@ -42,12 +42,12 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
 
         Iterator<Row> rows = sheet.rowIterator();
         if (!rows.hasNext()) {
-            throw new EmptyFileException("No rows found in the Excel file");
+            throw new EmptyFileException("Nie znaleziono wierszy w pliku Excel");
         }
         List<LocalDateTime> dateHeaders = extractHeaders(rows.next());
         List<Shift> shiftList = processShiftRows(rows, users, dateHeaders);
         repositoryCollector.getShifts().saveAll(shiftList);
-        return "Schedule imported successfully";
+        return "Harmonogram zaimportowany pomyślnie";
     }
 
     /**
@@ -82,8 +82,8 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
         return users.stream()
                 .filter(u -> u.getEmployeeId().equals(empId))
                 .findFirst()
-                .orElseThrow(() -> new InvalidCellException("Invalid cell: "
-                        + cell.getAddress().formatAsString() + " - invalid employee ID"));
+                .orElseThrow(() -> new InvalidCellException("Nieprawidłowa komórka: "
+                        + cell.getAddress().formatAsString() + " - nieprawidłowe ID pracownika"));
     }
 
     /**
@@ -170,7 +170,7 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
             LocalTime localTime = LocalTime.parse(time.trim());
             return day.plusHours(localTime.getHour()).plusMinutes(localTime.getMinute());
         } catch (Exception e) {
-            throw new InvalidCellException("Invalid cell: " + cell.getAddress().formatAsString() + " - expected format: HH:mm-HH:mm");
+            throw new InvalidCellException("Nieprawidłowa kmórka: " + cell.getAddress().formatAsString() + " - oczekiwany format: HH:mm-HH:mm");
         }
     }
 
@@ -180,7 +180,7 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
      * @param headerRow the row containing the headers
      * @return a list of headers extracted from the row
      * @throws EmptyFileException   if no headers are found in the Excel file
-     * @throws InvalidCellException if the "employee id" column is not found or if a date cell has an invalid format
+     * @throws InvalidCellException if the "id pracownika" column is not found or if a date cell has an invalid format
      */
     private List<LocalDateTime> extractHeaders(Row headerRow) {
         List<LocalDateTime> headers = new ArrayList<>();
@@ -188,12 +188,12 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
 
         Iterator<Cell> cellIterator = headerRow.cellIterator();
         if (!cellIterator.hasNext()) {
-            throw new EmptyFileException("No headers found in the Excel file");
+            throw new EmptyFileException("Nie znaleziono wierszy w pliku Excel");
         }
         Cell cell = cellIterator.next();
-        if (!cell.getStringCellValue().equalsIgnoreCase("employee id")) {
-            throw new InvalidCellException("Invalid cell: " + cell.getAddress().formatAsString()
-                    + " - expected header: Employee ID");
+        if (!cell.getStringCellValue().equalsIgnoreCase("id pracownika")) { //TODO: sprawdzić, jak wygląda faktycznie plik
+            throw new InvalidCellException("Nieprawidłowa kmórka: " + cell.getAddress().formatAsString()
+                    + " - oczekiwany nagłówek: Id pracownika");
         }
         while (cellIterator.hasNext()) {
             cell = cellIterator.next();
@@ -202,7 +202,8 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
                 LocalDateTime date = cell.getLocalDateTimeCellValue();
                 headers.add(date);
             } catch (IllegalStateException e) {
-                throw new InvalidCellException("Invalid cell: " + cell.getAddress().formatAsString() + " - expected date format");
+                throw new InvalidCellException("Nieprawidłowa komórka: " + cell.getAddress().formatAsString()
+                        + " - oczekiwany format daty: yyyy-mm-dd");
             }
         }
         return headers;

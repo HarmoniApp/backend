@@ -15,11 +15,11 @@ import java.util.List;
  * @param shifts the list of shifts for the schedule requirement
  */
 public record ScheduleRequirement(
-        @NotNull(message = "Date cannot be null")
-        @Future(message = "Date must be in the future")
+        @NotNull(message = "Data nie może być pusta")
+        @Future(message = "Data musi być w przyszłości")
         LocalDate date,
 
-        @NotEmpty(message = "Shifts cannot be empty")
+        @NotEmpty(message = "Zmiany nie mogą być puste")
         @Valid
         List<ReqShiftDto> shifts) {
 }

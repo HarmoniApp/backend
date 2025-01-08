@@ -29,7 +29,7 @@ public class AdminOrOwnerQueryParamAuthorizationManager extends AdminOrOwnerVali
 
         Long userId = Long.parseLong(paramsMap.get("user_id"));
         if (userId == null) {
-            throw new AccessDeniedException("Access denied");
+            throw new AccessDeniedException("Odmowa dostępu");
         }
         return new AuthorizationDecision(hasUserId(authenticationSupplier.get(), userId));
     }

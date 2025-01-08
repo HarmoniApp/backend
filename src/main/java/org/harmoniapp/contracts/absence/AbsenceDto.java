@@ -31,22 +31,22 @@ import java.time.LocalDate;
 public record AbsenceDto(
         long id,
 
-        @NotNull(message = "Start date cannot be null")
-        @FutureOrPresent(message = "Start date must be in the future or present")
+        @NotNull(message = "Data początkowa nie może być pusta")
+        @FutureOrPresent(message = "Data początkowa musi być w przyszłości lub teraźniejszości")
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate start,
 
-        @NotNull(message = "End date cannot be null")
-        @FutureOrPresent(message = "End date must be in the future or present")
+        @NotNull(message = "Data końcowa nie może być pusta")
+        @FutureOrPresent(message = "Data końcowa musi być w przyszłości lub teraźniejszości")
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate end,
 
-        @NotNull(message = "User ID cannot be null")
-        @Positive(message = "User ID must be a positive number")
+        @NotNull(message = "ID użytkownika nie może być puste")
+        @Positive(message = "ID użytkownika musi być liczbą dodatnią")
         @JsonProperty("user_id") Long userId,
 
-        @NotNull(message = "Absence type ID cannot be null")
-        @Positive(message = "Absence ID must be a positive number")
+        @NotNull(message = "ID typu nieobecności nie może być puste")
+        @Positive(message = "ID typu nieobecności musi być liczbą dodatnią")
         @JsonProperty("absence_type_id") Long absenceTypeId,
 
         Status status,

@@ -29,17 +29,17 @@ public abstract class ExcelImport {
         Sheet sheet;
         assert file.getOriginalFilename() != null;
         if (!(file.getOriginalFilename().toLowerCase().endsWith(".xlsx") || file.getOriginalFilename().toLowerCase().endsWith(".xls"))) {
-            throw new UnsupportedFileTypeException("File must be an Excel file");
+            throw new UnsupportedFileTypeException("Plik musi być w formacie Excel");
         }
         try (Workbook wb = WorkbookFactory.create(file.getInputStream())) {
             sheet = wb.getSheetAt(0);
             if (sheet == null) {
-                throw new EmptyFileException("Sheet not found");
+                throw new EmptyFileException("Nie znaleziono arkusza w pliku");
             }
         } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("File not found");
+            throw new IllegalArgumentException("Plk nie został znaleziony");
         } catch (IOException e) {
-            throw new IllegalArgumentException("Error reading file");
+            throw new IllegalArgumentException("Błąd odczytu pliku");
         }
         return sheet;
     }

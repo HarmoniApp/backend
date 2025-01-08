@@ -83,7 +83,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
 
     private User getUserById(long id) {
         return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika"));
     }
 
     /**

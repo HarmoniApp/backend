@@ -27,17 +27,17 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @NotNull(message = "User cannot be null")
+    @NotNull(message = "Użytkownik nie może być pusty")
     private User user;
 
-    @NotEmpty(message = "Title cannot be null")
+    @NotEmpty(message = "Tytuł nie może być pusty")
     private String title;
 
-    @NotEmpty(message = "Message cannot be null")
+    @NotEmpty(message = "Wiadomość nie może być pusta")
     private String message;
 
     @ColumnDefault("false")
-    @NotNull(message = "Read cannot be null")
+    @NotNull(message = "Status odczytania nie może być pusty")
     private Boolean read;
 
     @Column(name = "created_at")

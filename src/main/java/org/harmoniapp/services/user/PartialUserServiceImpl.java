@@ -42,7 +42,7 @@ public class PartialUserServiceImpl implements PartialUserService {
      */
     private User getUserById(long id) {
         return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika"));
     }
 
     /**

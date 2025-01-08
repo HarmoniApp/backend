@@ -25,16 +25,16 @@ public class Shift {
     private Long id;
 
     @Column(name = "\"start\"")
-    @NotNull(message = "Start cannot be null")
+    @NotNull(message = "Data początkowa nie może być pusta")
     private LocalDateTime start;
 
     @Column(name = "\"end\"")
-    @NotNull(message = "End cannot be null")
+    @NotNull(message = "Data końcowa nie może być pusta")
     private LocalDateTime end;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @NotNull(message = "User cannot be null")
+    @NotNull(message = "Użytkownik nie może być pusty")
     private User user;
 
     @ManyToOne
@@ -42,7 +42,7 @@ public class Shift {
     private Role role;
 
     @ColumnDefault("false")
-    @NotNull(message = "Published cannot be null")
+    @NotNull(message = "Status publikacji nie może być pusty")
     private Boolean published;
 
     @Override

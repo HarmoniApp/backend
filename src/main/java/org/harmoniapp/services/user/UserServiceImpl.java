@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
      */
     private User getUserById(long id) {
         return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika"));
     }
 
     /**
@@ -149,7 +149,7 @@ public class UserServiceImpl implements UserService {
      */
     private void validateContractDates(UserDto userDto) {
         if (userDto.contractExpiration().isBefore(userDto.contractSignature())) {
-            throw new IllegalArgumentException("Contract expiration date must be after the contract signature date.");
+            throw new IllegalArgumentException("Data wygaśnięcia umowy nie może być przed datą podpisania umowy");
         }
     }
 
@@ -202,7 +202,7 @@ public class UserServiceImpl implements UserService {
      */
     private void setUserDetails(User user) {
         if (user.getContractType() == null) {
-            throw new IllegalArgumentException("Contract type is required");
+            throw new IllegalArgumentException("Typ umowy nie został ustawiony");
         }
         user.setIsActive(true);
         user.setPhoto("default.jpg");
@@ -210,7 +210,7 @@ public class UserServiceImpl implements UserService {
         user.setUnusedAbsenceDays(0);
 
         LocalDate now = LocalDate.now();
-        user.setUnusedAbsenceExpiration(LocalDate.of(now.getYear(), 9, 30)); //TODO: Czy jest to potrzebne?
+        user.setUnusedAbsenceExpiration(LocalDate.of(now.getYear(), 9, 30));
     }
 
     /**
@@ -228,7 +228,7 @@ public class UserServiceImpl implements UserService {
                         .map(p -> languages.stream()
                                 .filter(l -> l.getId().equals(p.id()))
                                 .findFirst()
-                                .orElseThrow(() -> new IllegalArgumentException("Language with ID " + p.id() + " not found"))
+                                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono języka o ID " + p.id()))
                         )
                         .collect(Collectors.toSet()));
     }
@@ -249,7 +249,7 @@ public class UserServiceImpl implements UserService {
                                 roles.stream()
                                         .filter(r -> r.getId().equals(p.id()))
                                         .findFirst()
-                                        .orElseThrow(() -> new IllegalArgumentException("Role with ID " + p.id() + " not found"))
+                                        .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono roli o ID " + p.id()))
                         )
                         .collect(Collectors.toSet()));
     }

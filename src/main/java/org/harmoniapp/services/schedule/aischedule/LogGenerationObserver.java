@@ -17,6 +17,6 @@ public record LogGenerationObserver() implements GenerationObserver {
      */
     @Override
     public void onGenerationUpdate(double progress, double fitness) {
-        log.trace("Progress: {}%, Fitness: {}", progress, fitness);
+        log.trace("Postęp: {}%, Dopasowanie: {}", progress, fitness);
     }
 }

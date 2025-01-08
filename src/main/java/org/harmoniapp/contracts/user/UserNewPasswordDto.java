@@ -1,6 +1,6 @@
 package org.harmoniapp.contracts.user;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * A record representing a new password for a user.
@@ -8,6 +8,6 @@ import jakarta.validation.constraints.NotEmpty;
  * @param newPassword the new password for the user
  */
 public record UserNewPasswordDto(
-        @NotEmpty(message = "New password cannot be empty")
+        @NotBlank(message = "Nowe hasło nie może być puste")
         String newPassword) {
 }

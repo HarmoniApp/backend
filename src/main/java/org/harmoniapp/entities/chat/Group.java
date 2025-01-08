@@ -25,7 +25,7 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty(message = "Group name cannot be empty")
+    @NotEmpty(message = "Nazwa grupy nie może być pusta")
     private String name;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -34,7 +34,7 @@ public class Group {
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    @UniqueElements(message = "Group members must be unique")
+    @UniqueElements(message = "Członkowie grupy muszą być unikalni")
     private Set<User> members;
 
     @Override

@@ -45,7 +45,7 @@ public class ConversationMemberQueryParamAuthorizationManager extends GroupAcces
             Long userId2 = Long.parseLong(paramsMap.get("userId2"));
             return new AuthorizationDecision(isOnByOneMember(authentication, userId1, userId2));
         } else {
-            throw new AccessDeniedException("Conversation participation cannot be determined");
+            throw new AccessDeniedException("Odmowa dostępu");
         }
     }
 

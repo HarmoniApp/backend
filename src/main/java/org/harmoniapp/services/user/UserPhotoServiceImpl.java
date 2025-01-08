@@ -51,7 +51,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
             InputStream in = new FileInputStream(photoPath.toString());
             return new PhotoDto(new InputStreamResource(in), determineContentType(photo));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to read photo file", e);
+            throw new RuntimeException("Odczyt pliku nie powiódł się", e);
         }
     }
 
@@ -76,7 +76,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
             repositoryCollector.getUsers().save(user);
             deleteOldPhoto(uploadDirectory, oldPhoto);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save file", e);
+            throw new RuntimeException("Zapis pliku nie powiódł się", e);
         }
 
         return UserDto.fromEntity(user);
@@ -115,7 +115,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      */
     private User getUserById(long id) {
         return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono użytkownika"));
     }
 
     /**
@@ -149,7 +149,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null ||
                 !(originalFilename.endsWith(".jpg") || originalFilename.endsWith(".png") || originalFilename.endsWith(".jpeg"))) {
-            throw new UnsupportedFileTypeException("File must be a JPG or PNG image");
+            throw new UnsupportedFileTypeException("Plik musi być w formacie JPG lub PNG");
         }
     }
 
@@ -198,7 +198,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
                 Files.delete(oldPhotoPath);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to delete old photo", e);
+            throw new RuntimeException("Usunięcie zdjęci nie powiodło się", e);
         }
     }
 

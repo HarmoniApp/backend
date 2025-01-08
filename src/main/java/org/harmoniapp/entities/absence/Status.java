@@ -24,8 +24,8 @@ public class Status {
     private Long id;
 
     @Column(unique = true)
-    @NotEmpty(message = "Name is required")
-    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Name must contain only letters, digits, dashes, and spaces")
+    @NotEmpty(message = "Nazwa nieobecności nie może być pusta")
+    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Nazwa nieobecności może zawierać tylko litery, spacje, myślniki i apostrofy")
     private String name;
 
     @Override

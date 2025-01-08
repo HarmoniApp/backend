@@ -14,12 +14,12 @@ import org.harmoniapp.entities.profile.Role;
 public record RoleDto(
         long id,
 
-        @NotEmpty(message = "Role name cannot be empty")
-        @Pattern(regexp = "^[a-zA-Z0-9 ]+$", message = "Role name must contain only letters, digits, and spaces")
+        @NotEmpty(message = "Nazwa roli nie może być pusta")
+        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ0-9 ]+$", message = "Nazwa roli musi zawierać tylko litery, cyfry i spacje")
         String name,
 
-        @Size(min = 7, max = 7, message = "Color must be exactly 7 characters long")
-        @Pattern(regexp = "^#[0-9a-fA-F]{6}$", message = "Color must be a valid hex code in the format #RRGGBB")
+        @Size(min = 7, max = 7, message = "Kolor musi być poprawnym kodem heksadecymalnym w formacie #RRGGBB")
+        @Pattern(regexp = "^#[0-9a-fA-F]{6}$", message = "Kolor musi być poprawnym kodem heksadecymalnym w formacie #RRGGBB")
         String color) {
 
     /**

@@ -38,7 +38,7 @@ public class AbsenceNotification {
             case EMPLOYER_UPDATED -> {
                 return absence.getUser().getId();
             }
-            default -> throw new IllegalArgumentException("Unknown notification type");
+            default -> throw new IllegalArgumentException("Nieznany typ powiadomienia");
         }
     }
 
@@ -58,7 +58,7 @@ public class AbsenceNotification {
             case EMPLOYER_UPDATED -> {
                 return type.formatMessage(absence.getStart(), absence.getEnd(), absence.getStatus().getName());
             }
-            default -> throw new IllegalArgumentException("Unknown notification type");
+            default -> throw new IllegalArgumentException("Nieznany typ powiadomienia");
         }
     }
 

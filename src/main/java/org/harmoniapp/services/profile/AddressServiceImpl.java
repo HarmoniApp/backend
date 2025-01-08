@@ -66,7 +66,7 @@ public class AddressServiceImpl implements AddressService {
      * @return a list of all DepartmentDto objects
      */
     @Override
-    public List<DepartmentDto> getAllDepartments() { //TODO: add caching
+    public List<DepartmentDto> getAllDepartments() {
         return repositoryCollector.getAddresses()
                 .findByDepartmentNameNotNull()
                 .stream()

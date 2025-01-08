@@ -20,14 +20,14 @@ import java.time.LocalTime;
 public record PredefineShiftDto(
         long id,
 
-        @NotEmpty(message = "Shift name cannot be empty")
-        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Shift name must contain only letters, digits, dashes, and spaces")
+        @NotEmpty(message = "Nazwa zmiany nie może być pusta")
+        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Nazwa musi zawierać tylko litery, spacje, myślniki i apostrofy")
         String name,
 
-        @NotNull(message = "Start time cannot be null")
+        @NotNull(message = "Czas rozpoczęcia nie może być pusty")
         LocalTime start,
 
-        @NotNull(message = "End time cannot be null")
+        @NotNull(message = "Czas zakończenia nie może być pusty")
         LocalTime end) {
 
     /**

@@ -58,7 +58,7 @@ public class ShiftNotificationSenderImpl implements ShiftNotificationSender {
             case PUBLISHED_SHIFT, DELETED_SHIFT -> {
                 return createNotification(receiverId, type.getTitle(), type.formatMessage(shift.getStart(), shift.getEnd()));
             }
-            default -> throw new IllegalArgumentException("Unknown notification type");
+            default -> throw new IllegalArgumentException("Nieznany typ powiadomienia");
         }
     }
 

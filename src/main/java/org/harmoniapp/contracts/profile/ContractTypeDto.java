@@ -14,10 +14,10 @@ import org.harmoniapp.entities.profile.ContractType;
 public record ContractTypeDto(
         long id,
 
-        @NotEmpty(message = "Name cannot be empty")
+        @NotEmpty(message = "Nazwa nie może być pusta")
         String name,
 
-        @Min(value = 0, message = "Absence days must be zero or a positive number")
+        @Min(value = 0, message = "Dni nieobecności muszą być liczbą nieujemną")
         @JsonProperty("absence_days") int absenceDays) {
 
     /**

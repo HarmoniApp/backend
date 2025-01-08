@@ -27,7 +27,7 @@ public class UserAbsenceServiceImpl implements UserAbsenceService {
     @Override
     public int getUserAvailableAbsenceDays(long id) {
         User user = repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkowika"));
         return user.getAvailableAbsenceDays() + user.getUnusedAbsenceDays();
     }
 

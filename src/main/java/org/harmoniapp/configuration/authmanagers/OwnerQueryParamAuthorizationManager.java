@@ -31,7 +31,7 @@ public class OwnerQueryParamAuthorizationManager implements AuthorizationManager
 
         Long userId = Long.parseLong(paramsMap.get("userId"));
         if (userId == null) {
-            throw new AccessDeniedException("Access denied");
+            throw new AccessDeniedException("Odmowa dostępu");
         }
         Authentication authentication = authenticationSupplier.get();
         return new AuthorizationDecision(hasUserId(authentication, userId));

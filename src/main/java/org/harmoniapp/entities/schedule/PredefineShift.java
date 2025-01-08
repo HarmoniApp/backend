@@ -24,16 +24,16 @@ public class PredefineShift {
     private Long id;
 
     @Column(unique = true)
-    @NotEmpty(message = "Name is required")
-    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Name must contain only letters, digits, dashes, and spaces")
+    @NotEmpty(message = "Nazwa zmiany nie może być pusta")
+    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Nazwa zmiany może zawierać tylko litery, spacje, myślniki i apostrofy")
     private String name;
 
     @Column(name = "\"start\"")
-    @NotNull(message = "Start time is required")
+    @NotNull(message = "Czas rozpoczęcia jest wymagany")
     private LocalTime start;
 
     @Column(name = "\"end\"")
-    @NotNull(message = "End time is required")
+    @NotNull(message = "Czas zakończenia jest wymagany")
     private LocalTime end;
 
     @Override

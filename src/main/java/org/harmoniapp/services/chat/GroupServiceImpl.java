@@ -54,7 +54,7 @@ public class GroupServiceImpl implements GroupService {
      *
      * @param groupDto the data transfer object containing the details of the group to be created
      * @return the created GroupDto
-     * @throws IllegalArgumentException if any user ID in the groupDto is not found or inactive
+     * @throws EntityNotFoundException if any user ID in the groupDto is not found or inactive
      */
     @Override
     @Transactional
@@ -62,7 +62,7 @@ public class GroupServiceImpl implements GroupService {
         Set<User> members = repositoryCollector.getUsers().findByIdInAndIsActiveTrue(groupDto.membersIds());
         for (Long userId : groupDto.membersIds()) {
             if (members.stream().noneMatch(user -> user.getId().equals(userId))) {
-                throw new IllegalArgumentException("User not found with ID: " + userId);
+                throw new EntityNotFoundException("Nie znaleziono użytkownika o ID: " + userId);
             }
         }
 
@@ -118,7 +118,7 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     public void delete(long groupId) {
         if (!repositoryCollector.getGroups().existsById(groupId)) {
-            throw new EntityNotFoundException("Group not found with ID: " + groupId);
+            throw new EntityNotFoundException("Nie znaleziono grupy o ID: " + groupId);
         }
         repositoryCollector.getMessages().deleteByGroupId(groupId);
         repositoryCollector.getGroups().deleteById(groupId);
@@ -146,10 +146,10 @@ public class GroupServiceImpl implements GroupService {
     private User getUserById(long userId, boolean isActive) {
         if (isActive) {
             return repositoryCollector.getUsers().findByIdAndIsActiveTrue(userId)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                    .orElseThrow(() -> new EntityNotFoundException("Nie znalezioon użytkownika o ID: " + userId));
         } else {
             return repositoryCollector.getUsers().findById(userId)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                    .orElseThrow(() -> new EntityNotFoundException("Nie znalezioon użytkownika o ID: " + userId));
         }
     }
 

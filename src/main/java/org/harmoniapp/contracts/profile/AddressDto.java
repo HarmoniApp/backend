@@ -22,32 +22,32 @@ import org.harmoniapp.entities.profile.Address;
 public record AddressDto(
         long id,
 
-        @NotEmpty(message = "Zip code cannot be empty")
-        @Size(min = 5, max = 10, message = "Zip code must be between 5 and 10 characters")
-        @Pattern(regexp = "^[0-9\\-]+$", message = "Zip code must contain only digits and optional dashes")
+        @NotEmpty(message = "Kod pocztowy nie może być pusty")
+        @Size(min = 5, max = 10, message = "Kod pocztowy musi zawierać od 5 do 10 znaków")
+        @Pattern(regexp = "^[0-9\\-]+$", message = "Kod pocztowy musi zawierać tylko cyfry i myślniki")
         @JsonProperty("zip_code") String zipCode,
 
-        @NotEmpty(message = "City cannot be empty")
-        @Size(max = 50, message = "City must be less than or equal to 50 characters")
-        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "City must contain only letters, spaces and dashes")
+        @NotEmpty(message = "Miasto nie może być puste")
+        @Size(max = 50, message = "Miasto musi zawierać mniej niż 50 znaków")
+        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Miasto musi zawierać tylko litery, spacje, apostrofy i myślniki")
         String city,
 
-        @NotEmpty(message = "Street cannot be empty")
-        @Size(max = 100, message = "Street must be less than or equal to 100 characters")
-        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ',\\-\\s]+$", message = "Street must contain only letters, spaces, commas and dashes")
+        @NotEmpty(message = "Ulica nie może być pusta")
+        @Size(max = 100, message = "Ulica musi zawierać mniej niż 100 znaków")
+        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ',\\-\\s]+$", message = "Ulica musi zawierać tylko litery, spacje, apostrofy i myślniki")
         String street,
 
-        @NotEmpty(message = "Building number cannot be empty")
-        @Size(min = 1, max = 10, message = "Building number must be between 1 and 10 characters")
-        @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Building number must contain only alphanumeric characters")
+        @NotEmpty(message = "Numer budynku nie może być pusty")
+        @Size(min = 1, max = 10, message = "Numer budynku musi zawierać od 1 do 10 znaków")
+        @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Numer budynku musi zawierać tylko litery i cyfry")
         @JsonProperty("building_number") String buildingNumber,
 
-        @Size(max = 10, message = "Apartment number must be less than or equal to 10 characters")
-        @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "Apartment number must contain only alphanumeric characters")
+        @Size(max = 10, message = "Numer mieszkania musi zawierać mniej niż 10 znaków")
+        @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "Numer mieszkania musi zawierać tylko litery i cyfry")
         String apartment,
 
-        @Size(max = 100, message = "Department name must be less than or equal to 100 characters")
-        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Department name must contain only letters, numbers, and spaces")
+        @Size(max = 100, message = "Nazwa oddziału musi zawierać mniej niż 100 znaków")
+        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Nazwa oddziału musi zawierać tylko litery, spacje, apostrofy i myślniki")
         @JsonProperty("department_name") String departmentName) {
 
     /**

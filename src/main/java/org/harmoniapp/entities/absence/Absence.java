@@ -26,41 +26,41 @@ public class Absence {
     private Long id;
 
     @Column(name = "\"start\"")
-    @NotNull(message = "Start date cannot be null")
+    @NotNull(message = "Data początkowa nie może być pusta")
     private LocalDate start;
 
     @Column(name = "\"end\"")
-    @NotNull(message = "End date cannot be null")
+    @NotNull(message = "Data końcowa nie może być pusta")
     private LocalDate end;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @NotNull(message = "User cannot be null")
+    @NotNull(message = "Użytkownik nie może być pusty")
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "absence_type_id")
-    @NotNull(message = "Absence type cannot be null")
+    @NotNull(message = "Typ nieobecności nie może być pusty")
     private AbsenceType absenceType;
 
     @ManyToOne
     @JoinColumn(name = "status_id")
-    @NotNull(message = "Status cannot be null")
+    @NotNull(message = "Status nie może być pusty")
     private Status status;
 
     @Column(updatable = false)
-    @NotNull(message = "Submission date cannot be null")
-    @PastOrPresent(message = "Submission date must be in the past or present")
+    @NotNull(message = "Data złożenia nie może być pusta")
+    @PastOrPresent(message = "Data złożenia musi być w przeszłości lub teraźniejszości")
     private LocalDate submission;
 
-    @NotNull(message = "Updated date cannot be null")
-    @PastOrPresent(message = "Updated date must be in the past or present")
+    @NotNull(message = "Data aktualizacji nie może być pusta")
+    @PastOrPresent(message = "Data aktualizacji musi być w przeszłości lub teraźniejszości")
     @UpdateTimestamp
     private LocalDate updated;
 
     @Column(name = "working_days")
-    @NotNull(message = "Working days cannot be null")
-    @PositiveOrZero(message = "Working days must be a positive number or zero")
+    @NotNull(message = "Licza dni roboczych nie może być pusta")
+    @PositiveOrZero(message = "Liczba dni roboczych musi być większa lub równa 0")
     private Long workingDays;
 
     @Override
