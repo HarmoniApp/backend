@@ -1,7 +1,5 @@
 package org.harmoniapp.geneticalgorithm;
 
-import lombok.AllArgsConstructor;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,16 +9,30 @@ import java.util.stream.IntStream;
 /**
  * Represents a constraint checker for the schedule.
  */
-@AllArgsConstructor
 public class ConstraintChecker implements CheckConstraint {
+    private static ConstraintChecker instance;
+
     private final double hardPenalty;
     private final double softPenalty;
     private final int maxShiftPerWeek;
 
     /**
+     * Returns the singleton instance of the ConstraintChecker.
+     * If the instance is null, it creates a new ConstraintChecker with default parameters.
+     *
+     * @return the singleton instance of ConstraintChecker
+     */
+    public static ConstraintChecker getInstance() {
+        if (instance == null) {
+            instance = new ConstraintChecker();
+        }
+        return instance;
+    }
+
+    /**
      * Creates a new ConstraintChecker instance with default parameters.
      */
-    public ConstraintChecker() {
+    private ConstraintChecker() {
         this.hardPenalty = 0.8;
         this.softPenalty = 0.3;
         this.maxShiftPerWeek = 5;
@@ -84,7 +96,7 @@ public class ConstraintChecker implements CheckConstraint {
 
         return employeeShiftCounts.values().stream()
                 .filter(count -> count > 1)
-                .mapToDouble(count -> hardPenalty)
+                .mapToDouble(count -> softPenalty)
                 .sum();
     }
 
@@ -224,7 +236,6 @@ public class ConstraintChecker implements CheckConstraint {
      * @return true if the next day shift starts earlier, false otherwise.
      */
     private boolean isNextDayShiftEarlier(Gen currentDayShift, Gen nextDayShift) {
-        return nextDayShift.startTime().isBefore(currentDayShift.startTime());
+        return nextDayShift.startTime().isBefore(currentDayShift.endTime().plusHours(11));
     }
-
 }
