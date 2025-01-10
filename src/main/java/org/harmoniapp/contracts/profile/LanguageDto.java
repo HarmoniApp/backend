@@ -15,7 +15,7 @@ public record LanguageDto(
         Long id,
 
         @NotEmpty(message = "Nazwa języka nie może być pusta")
-        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ]+$", message = "Nazwa języka musi zawierać tylko litery")
+        @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ]+$", message = "Nazwa języka musi zawierać tylko litery")
         String name,
         @Pattern(regexp = "^[a-zA-Z]{2}$", message = "Kod języka musi składać się z dwóch liter")
         String code) {
