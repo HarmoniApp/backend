@@ -15,7 +15,7 @@ public record RoleDto(
         long id,
 
         @NotEmpty(message = "Role name cannot be empty")
-        @Pattern(regexp = "^[a-zA-Z0-9 ]+$", message = "Role name must contain only letters, digits, and spaces")
+        @Pattern(regexp = "^[a-zA-Z0-9 Ā-ɏØ-öø-ÿ]+$", message = "Role name must contain only letters, digits, and spaces")
         String name,
 
         @Size(min = 7, max = 7, message = "Color must be exactly 7 characters long")
