@@ -1,6 +1,6 @@
 package org.harmoniapp.services.user;
 
-import org.harmoniapp.contracts.user.UserNewPassword;
+import org.harmoniapp.contracts.user.UserNewPasswordDto;
 import org.harmoniapp.entities.user.User;
 
 /**
@@ -32,7 +32,7 @@ public interface UserPasswordService {
      * @param pwd the new password details
      * @return the new password
      */
-    String changePassword(long id, UserNewPassword pwd);
+    String changePassword(long id, UserNewPasswordDto pwd);
 
     /**
      * Generates a new password for the user with the given ID.

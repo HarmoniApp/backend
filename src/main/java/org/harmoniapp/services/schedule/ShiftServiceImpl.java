@@ -169,7 +169,7 @@ public class ShiftServiceImpl implements ShiftService {
      */
     private User getUserById(long id, RepositoryCollector repositoryCollector) {
         return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika"));
     }
 
     /**

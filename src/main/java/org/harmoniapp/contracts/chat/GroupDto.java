@@ -17,10 +17,10 @@ import java.util.Set;
 public record GroupDto(
         Long id,
 
-        @NotEmpty(message = "Name is required")
+        @NotEmpty(message = "Nazwa grupy jest wymagana")
         String name,
 
-        @NotEmpty(message = "Members are required")
+        @NotEmpty(message = "Grupa musi zawierać co najmniej jednego członka")
         List<Long> membersIds) {
 
     /**

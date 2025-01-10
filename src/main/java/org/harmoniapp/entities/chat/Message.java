@@ -1,7 +1,7 @@
 package org.harmoniapp.entities.chat;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,7 +29,7 @@ public class Message {
 
     @ManyToOne
     @JoinColumn(name = "sender_id")
-    @NotNull
+    @NotNull(message = "Nadawca nie może być pusty")
     private User sender;
 
     @ManyToOne
@@ -40,7 +40,7 @@ public class Message {
     @JoinColumn(name = "group_id")
     private Group group;
 
-    @NotEmpty(message = "Message cannot be empty")
+    @NotBlank(message = "Wiadomość nie może być pusta")
     private String content;
 
     @Column(name = "sent_at")
@@ -49,7 +49,7 @@ public class Message {
 
     @Column(name = "is_read")
     @ColumnDefault("false")
-    @NotNull
+    @NotNull(message = "Status odczytania nie może być pusty")
     private boolean isRead;
 
     @Override

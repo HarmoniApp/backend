@@ -24,16 +24,16 @@ import java.time.LocalDateTime;
 public record NotificationDto(
         Long id,
 
-        @NotNull(message = "User ID cannot be null")
-        @Positive(message = "User ID must be a positive number")
+        @NotNull(message = "ID użytkownika nie może być puste")
+        @Positive(message = "ID użytkownika musi być liczbą dodatnią")
         @JsonProperty("user_id") Long userId,
 
-        @NotNull(message = "Title cannot be null")
-        @Size(min = 1, max = 100, message = "Title must be between 1 and 100 characters")
+        @NotNull(message = "Tytuł nie może być pusty")
+        @Size(min = 1, max = 100, message = "Tytuł musi zawierać od 1 do 100 znaków")
         String title,
 
-        @NotNull(message = "Message cannot be null")
-        @Size(min = 1, max = 300, message = "Message must be between 1 and 300 characters")
+        @NotNull(message = "Wiadomość nie może być pusta")
+        @Size(min = 1, max = 300, message = "Wiadomość musi zawierać od 1 do 300 znaków")
         String message,
 
         boolean read,

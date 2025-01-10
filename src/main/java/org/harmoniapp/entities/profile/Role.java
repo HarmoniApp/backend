@@ -1,6 +1,7 @@
 package org.harmoniapp.entities.profile;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -24,12 +25,12 @@ public class Role {
     private Long id;
 
     @Column(unique = true)
-    @NotEmpty(message = "Name is required")
-    @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Name must contain only letters, spaces, hyphens and apostrophes")
+    @NotBlank(message = "Nazwa nie może być pusta")
+    @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Nazwa może zawierać tylko litery, spacje, myślniki i apostrofy")
     private String name;
 
-    @NotEmpty(message = "Color is required")
-    @Pattern(regexp = "^#([A-Fa-f0-9]{6})$", message = "Color must be a valid hex color")
+    @NotEmpty(message = "Kolor nie może być pusty")
+    @Pattern(regexp = "^#([A-Fa-f0-9]{6})$", message = "Kolor musi być w formacie #RRGGBB")
     private String color;
 
     @Override

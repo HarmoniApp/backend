@@ -11,17 +11,18 @@ import java.util.List;
 @Data
 public class Chromosome {
     private List<Gen> gens;
+    private CheckConstraint checker;
     private double fitness;
 
     /**
      * Constructs a Chromosome with the given genes and evaluates its fitness.
      *
      * @param gens the list of genes
-     * @param checker the constraint checker to evaluate fitness
      */
-    public Chromosome(List<Gen> gens, CheckConstraint checker) {
+    public Chromosome(List<Gen> gens) {
         this.gens = gens;
-        evaluateFitness(checker);
+        this.checker = ConstraintChecker.getInstance();
+        evaluateFitness();
     }
 
     /**
@@ -35,10 +36,8 @@ public class Chromosome {
 
     /**
      * Evaluates the fitness of the chromosome based on constraint violations.
-     *
-     * @param checker the constraint checker to evaluate fitness
      */
-    public void evaluateFitness(CheckConstraint checker) {
+    public void evaluateFitness() {
         double violations = checker.checkViolations(this.gens);
         this.fitness = 1 / (1 + violations);
     }

@@ -1,8 +1,9 @@
 package org.harmoniapp.entities.profile;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,12 +26,13 @@ public class ContractType {
     private Long id;
 
     @Column(unique = true)
-    @NotEmpty(message = "Name is required")
-    @Pattern(regexp = "^[A-Za-z Ā-ɏØ-öø-ÿ'\\-\\s]+$", message = "Name must contain only letters, spaces, hyphens and apostrophes")
+    @NotBlank(message = "Nazwa umowy nie może być pusta")
+    @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Nazwa umowy może zawierać tylko litery, spacje, myślniki i apostrofy")
     private String name;
 
     @Column(name = "absence_days")
     @ColumnDefault("0")
+    @PositiveOrZero(message = "Liczba dni nieobecności musi być nieujemna")
     private Integer absenceDays;
 
     @Override

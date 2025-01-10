@@ -23,36 +23,36 @@ public class Address {
     private Long id;
 
     @Column(name = "zip_code", length = 10)
-    @NotEmpty(message = "Zip code cannot be empty")
-    @Size(min = 5, max = 10, message = "Zip code must be between 5 and 10 characters")
-    @Pattern(regexp = "^[0-9\\-]+$", message = "Zip code must contain only digits and optional dashes")
+    @NotEmpty(message = "Kod pocztowy nie może być pusty")
+    @Size(min = 5, max = 10, message = "Kod pocztowy musi mieć od 5 do 10 znaków")
+    @Pattern(regexp = "^[0-9\\-]+$", message = "Kod pocztowy musi zawierać tylko cyfry i myślniki")
     private String zipCode;
 
     @Column(length = 50)
-    @NotEmpty(message = "City cannot be empty")
-    @Size(max = 50, message = "City must be less than or equal to 50 characters")
-    @Pattern(regexp = "^[A-Za-z Ā-ɏØ-öø-ÿ'\\-\\s]+$", message = "City must contain only letters, spaces and dashes")
+    @NotEmpty(message = "Miasto nie może być puste")
+    @Size(max = 50, message = "Miasto musi mieć mniej niż 50 znaków")
+    @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Miasto musi zawierać tylko litery, spacje, myślniki i apostrofy")
     private String city;
 
     @Column(length = 100)
-    @NotEmpty(message = "Street cannot be empty")
-    @Size(max = 100, message = "Street must be less than or equal to 100 characters")
-    @Pattern(regexp = "^[A-Za-z Ā-ɏØ-öø-ÿ',\\-\\s]+$", message = "Street must contain only letters, spaces, commas and dashes")
+    @NotEmpty(message = "Ulica nie może być pusta")
+    @Size(max = 100, message = "Ulica musi mieć mniej niż 100 znaków")
+    @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ',\\-\\s]+$", message = "Ulica musi zawierać tylko litery, spacje, myślniki, przecinki i apostrofy")
     private String street;
 
     @Column(name = "building_number", length = 10)
-    @NotEmpty(message = "Building number cannot be empty")
-    @Size(min = 1, max = 10, message = "Building number must be between 1 and 10 characters")
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Building number must contain only alphanumeric characters")
+    @NotEmpty(message = "Numer budynku nie może być pusty")
+    @Size(min = 1, max = 10, message = "Numer budynku musi mieć od 1 do 10 znaków")
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Numer budynku musi zawierać tylko litery i cyfry")
     private String buildingNumber;
 
-    @Size(max = 10, message = "Apartment number must be less than or equal to 10 characters")
-    @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "Apartment number must contain only alphanumeric characters")
+    @Size(max = 10, message = "Numer mieszkania musi mieć mniej niż 10 znaków")
+    @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "Numer mieszkania musi zawierać tylko litery i cyfry")
     private String apartment;
 
     @Column(name = "department_name", length = 100)
-    @Size(max = 100, message = "Department name must be less than or equal to 100 characters")
-    @Pattern(regexp = "^[A-Za-z Ā-ɏØ-öø-ÿ'\\-\\s]+$", message = "Department name must contain only letters, numbers, and spaces")
+    @Size(max = 100, message = "Nazwa oddziału musi mieć mniej niż 100 znaków")
+    @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Nazwa oddziału musi zawierać tylko litery, spacje, myślniki i apostrofy")
     private String departmentName;
 
     @Override

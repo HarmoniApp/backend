@@ -28,21 +28,21 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty(message = "Username is required")
+    @NotBlank(message = "Imię nie może być puste")
     private String firstname;
 
-    @NotEmpty(message = "Surname is required")
+    @NotBlank(message = "Nazwisko nie może być puste")
     private String surname;
 
     @Column(unique = true)
-    @NotEmpty(message = "E-mail is required")
-    @Email(message = "E-mail is invalid")
+    @NotBlank(message = "E-mail jest wymagany")
+    @Email(message = "E-mail jest niepoprawny")
     private String email;
 
     @Column(length = 68)
-    @NotEmpty(message = "Password is required")
+    @NotBlank(message = "Hasło jest wymagane")
     @Pattern(regexp = "^(\\{bcrypt})?\\$2[aby]\\$\\d*\\$[a-zA-Z0-9/.]{53}$",
-            message = "Password must be a valid hash")
+            message = "Hasło musi być zaszyfrowane algorytmem bcrypt")
     private String password;
 
     @ManyToOne
@@ -57,7 +57,7 @@ public class User {
 
     @ManyToOne
     @JoinColumn
-    @NotNull(message = "Residence cannot be null")
+    @NotNull(message = "Adres zamieszkania nie może być pusty")
     private Address residence;
 
     @ManyToOne
@@ -68,46 +68,46 @@ public class User {
     @JoinColumn
     private User supervisor;
 
-    @Column(name = "phone_number", unique = true)
-    @NotEmpty(message = "Phone number is required")
+    @Column(name = "phone_number")
+    @NotBlank(message = "Numer telefonu jest wymagany")
     private String phoneNumber;
 
     @Column(name = "employee_id", length = 20, unique = true)
-    @NotEmpty(message = "Employee ID is required")
-    @Size(max = 20, message = "Employee ID must be less than or equal to 20 characters")
-    @Pattern(regexp = "^[a-zA-Z0-9-]+$", message = "Employee ID must contain only letters, numbers, and dashes")
+    @NotEmpty(message = "ID pracownika nie może być puste")
+    @Size(max = 20, message = "ID pracownika musi mieć mniej niż 20 znaków")
+    @Pattern(regexp = "^[a-zA-Z0-9-]+$", message = "ID pracownika musi zawierać tylko litery, cyfry i myślniki")
     private String employeeId;
 
     @ColumnDefault("default.jpg")
-    @NotNull(message = "Photo cannot be null")
-    @Pattern(regexp = "^[^<>:\"/\\\\|?*]+(\\\\.[A-Za-z0-9]{1,5})?$", message = "Photo must be a valid file name")
+    @NotBlank(message = "Zdjęcie nie może być puste")
+    @Pattern(regexp = "^[^<>:\"/\\\\|?*]+(\\\\.[A-Za-z0-9]{1,5})?$", message = "Zdjęcie musi być plikiem graficznym")
     private String photo;
 
     @Column(name = "failed_login_attempts")
     @ColumnDefault("0")
-    @NotNull(message = "Failed login attempts cannot be null")
-    @PositiveOrZero(message = "Failed login attempts must be zero or a positive number")
+    @NotNull(message = "Liczba nieudanych prób logowania nie może być pusta")
+    @PositiveOrZero(message = "Liczba nieudanych prób logowania musi być nieujemna")
     private Integer failedLoginAttempts;
 
     @Column(name = "password_expiration_date")
     @ColumnDefault("CURRENT_DATE - INTERVAL '1 day'")
-    @NotNull(message = "Password expiration date cannot be null")
+    @NotNull(message = "Wygaśnięcie hasła nie może być puste")
     private LocalDate passwordExpirationDate;
 
     @Column(name = "is_active")
     @ColumnDefault("true")
-    @NotNull(message = "Is active cannot be null")
+    @NotNull(message = "Status konta nie może być pusty")
     private Boolean isActive;
 
     @Column(name = "available_absence_days")
-    @NotNull(message = "Available absence days cannot be null")
-    @PositiveOrZero(message = "Available absence days must be zero or a positive number")
+    @NotNull(message = "Liczba dostępnych dni nieobecności nie może być pusta")
+    @PositiveOrZero(message = "Liczba dostępnych dni nieobecności musi być nieujemna")
     private Integer availableAbsenceDays;
 
     @Column(name = "unused_absence_days")
     @ColumnDefault("0")
-    @NotNull(message = "Unused absence days cannot be null")
-    @PositiveOrZero(message = "Unused absence days must be zero or a positive number")
+    @NotNull(message = "Liczba niewykorzystanych dni nieobecności nie może być pusta")
+    @PositiveOrZero(message = "Licba niewykorzystanych dni nieobecności musi być nieujemna")
     private Integer unusedAbsenceDays;
 
     @Column(name = "unused_absence_expiration")
@@ -118,7 +118,7 @@ public class User {
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    @UniqueElements(message = "Roles must be unique")
+    @UniqueElements(message = "Role muszą być unikalne")
     private Set<Role> roles;
 
     @ManyToMany
@@ -126,7 +126,7 @@ public class User {
             name = "user_language",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "language_id"))
-    @UniqueElements(message = "Languages must be unique")
+    @UniqueElements(message = "Języki muszą być unikalne")
     private Set<Language> languages;
 
     @Override

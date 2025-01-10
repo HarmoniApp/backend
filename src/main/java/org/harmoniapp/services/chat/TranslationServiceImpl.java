@@ -16,7 +16,7 @@ import java.util.Map;
 /*
  * This file uses Microsoft Translator Text API.
  * Licensed under the MIT License.
- * Copyright (c) Microsoft Corporation. All rights reserved.
+ * More details: https://www.microsoft.com/translator
  */
 
 /**
@@ -62,7 +62,7 @@ public class TranslationServiceImpl implements TranslationService {
             MediaType mediaType = MediaType.get("application/json");
             return RequestBody.create(requestBodyJson, mediaType);
         } catch (IOException e) {
-            throw new TranslationFailsException("Error creating JSON request body: " + e.getMessage());
+            throw new TranslationFailsException("Nie udało się utworzyć ciała żądania: " + e.getMessage());
         }
     }
 
@@ -109,7 +109,7 @@ public class TranslationServiceImpl implements TranslationService {
     private String sendRequest(Request request) {
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code: " + response);
+                throw new IOException("Nieoczekiwany kod: " + response);
             }
             return response.body().string();
         } catch (IOException e) {
@@ -130,7 +130,7 @@ public class TranslationServiceImpl implements TranslationService {
             JsonNode translations = jsonArray.get(0).get("translations");
             return translations.get(0).get("text").asText();
         } catch (IOException e) {
-            throw new TranslationFailsException("Error parsing JSON response: " + e.getMessage());
+            throw new TranslationFailsException("Nie udało się przetłumaczyć tekstu: " + e.getMessage());
         }
     }
 }

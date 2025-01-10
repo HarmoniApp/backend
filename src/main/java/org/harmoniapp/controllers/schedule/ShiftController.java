@@ -1,5 +1,6 @@
 package org.harmoniapp.controllers.schedule;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.schedule.ShiftDto;
 import org.harmoniapp.services.schedule.ShiftService;
@@ -58,7 +59,7 @@ public class ShiftController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ShiftDto addShift(@RequestBody ShiftDto shiftDto) {
+    public ShiftDto addShift(@Valid @RequestBody ShiftDto shiftDto) {
         return shiftService.create(shiftDto);
     }
 
@@ -71,7 +72,7 @@ public class ShiftController {
      */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ShiftDto updateShift(@PathVariable long id, @RequestBody ShiftDto shiftDto) {
+    public ShiftDto updateShift(@PathVariable long id, @Valid @RequestBody ShiftDto shiftDto) {
         return shiftService.updateById(id, shiftDto);
     }
 

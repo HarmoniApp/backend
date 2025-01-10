@@ -1,6 +1,7 @@
 package org.harmoniapp.contracts.schedule;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -25,18 +26,16 @@ import java.time.LocalDateTime;
 public record ShiftDto(
         Long id,
 
-        @NotNull(message = "Start time cannot be null")
+        @NotNull(message = "Data początkowa nie może być pusta")
         LocalDateTime start,
 
-        @NotNull(message = "End time cannot be null")
+        @NotNull(message = "Data końcowa nie może być pusta")
         LocalDateTime end,
 
-        @NotNull(message = "User ID cannot be null")
-        @Positive(message = "User ID must be a positive number")
+        @NotNull(message = "ID użytkownika nie może być puste")
+        @Positive(message = "ID użytkownika musi być liczbą dodatnią")
         @JsonProperty("user_id") Long userId,
 
-        @NotNull(message = "Role Name cannot be null")
-        @NotEmpty(message = "Role Name cannot be empty")
         @JsonProperty("role_name") String roleName,
 
         boolean published) {

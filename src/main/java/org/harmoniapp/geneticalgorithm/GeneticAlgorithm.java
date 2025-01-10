@@ -15,7 +15,6 @@ public class GeneticAlgorithm implements Algorithm {
     private final int maxGenerations;
     private final double mutationRate;
     private final double crossoverRate;
-    private final CheckConstraint constraintChecker;
     private final Random random;
     private final int reportInterval;
     private List<GenerationObserver> observers;
@@ -28,8 +27,7 @@ public class GeneticAlgorithm implements Algorithm {
         this.tournamentSize = 10;
         this.maxGenerations = 100000;
         this.mutationRate = 0.02;
-        this.crossoverRate = 0.6;
-        this.constraintChecker = new ConstraintChecker();
+        this.crossoverRate = 0.7;
         this.random = new Random();
         this.reportInterval = 100;
         this.observers = new ArrayList<>();
@@ -46,8 +44,7 @@ public class GeneticAlgorithm implements Algorithm {
         this.tournamentSize = 10;
         this.maxGenerations = 100000;
         this.mutationRate = 0.02;
-        this.crossoverRate = 0.6;
-        this.constraintChecker = new ConstraintChecker();
+        this.crossoverRate = 0.7;
         this.random = new Random();
         this.reportInterval = reportInterval;
         this.observers = new ArrayList<>();
@@ -74,7 +71,7 @@ public class GeneticAlgorithm implements Algorithm {
                 break;
             }
         }
-
+        notifyObservers(maxGenerations, bestChromosome);
         return bestChromosome;
     }
 
@@ -95,7 +92,7 @@ public class GeneticAlgorithm implements Algorithm {
      * @param bestChromosome the chromosome of the current generation
      */
     public void notifyObservers(int generation, Chromosome bestChromosome) {
-        if ((generation % reportInterval == 0 || bestChromosome.getFitness() == 1)) {
+        if (generation % reportInterval == 0 || bestChromosome.getFitness() == 1 || generation == maxGenerations) {
             double progress = (double) generation / this.maxGenerations * 100;
             observers.forEach(observer -> observer.onGenerationUpdate(progress, bestChromosome.getFitness()));
         }
@@ -154,11 +151,12 @@ public class GeneticAlgorithm implements Algorithm {
                         shift.id(),
                         shift.day(),
                         shift.startTime(),
+                        shift.endTime(),
                         selectRandomEmployees(shift.requirements(), employees),
                         shift.requirements()
                 ))
                 .toList();
-        return new Chromosome(gens, constraintChecker);
+        return new Chromosome(gens);
     }
 
     /**
@@ -186,7 +184,7 @@ public class GeneticAlgorithm implements Algorithm {
      */
     private void addBestChromosomes(List<Chromosome> newPopulation, Chromosome best) {
         newPopulation.add(best);
-        newPopulation.add(best);
+//        newPopulation.add(best);
     }
 
     /**
@@ -197,15 +195,14 @@ public class GeneticAlgorithm implements Algorithm {
      * @param employeesByRole the list of employees grouped by role
      */
     private void generateOffspring(List<Chromosome> newPopulation, List<Chromosome> population, Map<String, List<Employee>> employeesByRole) {
-        for (int i = 0; i < populationSize / 2 - 1; i++) {
+        for (int i = 0; i < populationSize - 1; i++) {
             Chromosome parent1 = tournamentSelection(population);
             Chromosome parent2 = tournamentSelection(population);
-            List<Chromosome> offspring = crossover(parent1, parent2);
-            for (Chromosome child : offspring) {
-                child = mutate(child, employeesByRole);
-                child.evaluateFitness(constraintChecker);
-                newPopulation.add(child);
-            }
+            Chromosome child = crossover(parent1, parent2);
+
+            child = mutate(child, employeesByRole);
+            child.evaluateFitness();
+            newPopulation.add(child);
         }
     }
 
@@ -230,25 +227,18 @@ public class GeneticAlgorithm implements Algorithm {
      * @param parent2 the second parent chromosome
      * @return the offspring chromosomes
      */
-    private List<Chromosome> crossover(Chromosome parent1, Chromosome parent2) {
+    private Chromosome crossover(Chromosome parent1, Chromosome parent2) {
         if (random.nextDouble() > crossoverRate) {
-            return List.of(parent1, parent2);
+            return parent1;
         }
 
         List<Gen> gens1 = parent1.getGens();
         List<Gen> gens2 = parent2.getGens();
-        List<Gen> childGens1 = new ArrayList<>(gens1.size());
-        List<Gen> childGens2 = new ArrayList<>(gens1.size());
-        for (int i = 0; i < gens1.size(); i++) {
-            if (random.nextDouble() < 0.5) {
-                childGens1.add(gens2.get(i));
-                childGens2.add(gens1.get(i));
-            } else {
-                childGens1.add(gens1.get(i));
-                childGens2.add(gens2.get(i));
-            }
-        }
-        return List.of(new Chromosome(childGens1, constraintChecker), new Chromosome(childGens2, constraintChecker));
+        List<Gen> childGens = new ArrayList<>(gens1.size());
+        int splitPoint = random.nextInt(gens1.size() - 2) + 1;
+        childGens.addAll(gens1.subList(0, splitPoint));
+        childGens.addAll(gens2.subList(splitPoint, gens2.size()));
+        return new Chromosome(childGens);
     }
 
     /**
@@ -264,10 +254,20 @@ public class GeneticAlgorithm implements Algorithm {
             if (random.nextDouble() > mutationRate) continue;
 
             List<Employee> employeesForShift = selectRandomEmployees(gens.get(i).requirements(), employees);
-            gens.set(i, new Gen(gens.get(i).id(), gens.get(i).day(), gens.get(i).startTime(), employeesForShift, gens.get(i).requirements()));
-
+            gens.set(i, createGen(gens.get(i), employeesForShift));
         }
-        return new Chromosome(gens, constraintChecker);
+        return new Chromosome(gens);
+    }
+
+    /**
+     * Creates a new Gen instance with the specified employees.
+     *
+     * @param gen       the original Gen instance
+     * @param employees the list of employees to assign to the Gen
+     * @return a new Gen instance with the specified employees
+     */
+    private Gen createGen(Gen gen, List<Employee> employees) {
+        return new Gen(gen.id(), gen.day(), gen.startTime(), gen.endTime(), employees, gen.requirements());
     }
 
     /**

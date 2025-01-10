@@ -1,5 +1,6 @@
 package org.harmoniapp.controllers.auth;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.auth.LoginRequestDto;
 import org.harmoniapp.contracts.auth.LoginResponseDto;
@@ -28,7 +29,7 @@ public class LoginController {
      * @return a {@link ResponseEntity} containing the {@link LoginResponseDto} with the JWT token and HTTP status.
      */
     @PostMapping
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDTO) {
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto loginRequestDTO) {
         LoginResponseDto response = service.login(loginRequestDTO);
         return ResponseEntity.status(HttpStatus.OK)
                 .header("Authorization", "Bearer " + response.jwtToken())

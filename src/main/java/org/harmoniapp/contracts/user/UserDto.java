@@ -36,48 +36,47 @@ import java.util.List;
 public record UserDto(
         Long id,
 
-        @NotEmpty(message = "First name cannot be empty")
-        @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
-        @Pattern(regexp = "^[A-Za-z Ā-ɏØ-öø-ÿ'\\-\\s]+$", message = "Firstname must contain only letters, spaces and dashes")
+        @NotEmpty(message = "Imię nie może być puste")
+        @Size(min = 2, max = 50, message = "Imię musi zawierać od 2 do 50 znaków")
+        @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Imię musi zawierać tylko litery, spacje i myślniki")
         String firstname,
 
-        @NotEmpty(message = "Surname cannot be empty")
-        @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
-        @Pattern(regexp = "^[A-Za-z Ā-ɏØ-öø-ÿ'\\-\\s]+$", message = "Surname must contain only letters, spaces and dashes")
+        @NotEmpty(message = "Nazwisko nie może być puste")
+        @Size(min = 2, max = 50, message = "Nazwisko musi zawierać od 2 do 50 znaków")
+        @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Nazwisko musi zawierać tylko litery, spacje i myślniki")
         String surname,
 
-        @NotEmpty(message = "Email cannot be empty")
-        @Email(message = "Email should be valid")
-        @Size(max = 320, message = "Email must be less than or equal to 320 characters")
+        @NotEmpty(message = "Email nie może być pusty")
+        @Email(message = "Email musi być poprawny")
+        @Size(max = 320, message = "Email musi zawierać mniej niż 320 znaków")
         String email,
 
         String password,
 
-        @NotNull(message = "Contract type cannot be null")
+        @NotNull(message = "Typ umowy nie może być pusty")
         @JsonProperty("contract_type") ContractType contractType,
 
-        @NotNull(message = "Contract signature date cannot be null")
+        @NotNull(message = "Data podpisania umowy nie może być pusta")
         @JsonProperty("contract_signature") LocalDate contractSignature,
 
-        @NotNull(message = "Contract expiration date cannot be null")
         @JsonProperty("contract_expiration") LocalDate contractExpiration,
 
-        @NotNull(message = "Residence cannot be null")
+        @NotNull(message = "Adres zamieszkania nie może być pusty")
         @Valid
         AddressDto residence,
 
-        @NotNull(message = "Work address cannot be null")
+        @NotNull(message = "Adres pracy nie może być pusty")
         @JsonProperty("work_address") AddressDto workAddress,
 
         @JsonProperty("supervisor_id") Long supervisorId,
 
-        @NotEmpty(message = "Phone number cannot be empty")
-        @Pattern(regexp = "^(\\+?\\d{1,3}[\\s]?)?(\\d[\\s]?){9,15}$", message = "Phone number must be between 9 and 15 digits, and can contain spaces and a leading '+'")
+        @NotEmpty(message = "Numer telefonu nie może być pusty")
+        @Pattern(regexp = "^(\\+?\\d{1,3}[\\s]?)?(\\d[\\s]?){9,15}$", message = "Numer telefonu musi być poprawny")
         @JsonProperty("phone_number") String phoneNumber,
 
-        @NotEmpty(message = "Employee ID cannot be empty")
-        @Size(max = 20, message = "Employee ID must be less than or equal to 20 characters")
-        @Pattern(regexp = "^[a-zA-Z0-9-]+$", message = "Employee ID must contain only letters, numbers, and dashes")
+        @NotEmpty(message = "ID pracownika nie może być puste")
+        @Size(max = 20, message = "ID pracownika musi zawierać mniej niż 20 znaków")
+        @Pattern(regexp = "^[a-zA-Z0-9-]+$", message = "ID pracownika musi zawierać tylko litery, cyfry i myślniki")
         @JsonProperty("employee_id") String employeeId,
 
         String photo,
@@ -87,10 +86,10 @@ public record UserDto(
         @JsonProperty("available_absence_days") Integer availableAbsenceDays,
         @JsonProperty("unused_absence_days") Integer unusedAbsenceDays,
 
-        @NotEmpty(message = "Roles cannot be null or empty")
+        @NotEmpty(message = "Role nie mogą być puste")
         List<RoleDto> roles,
 
-        @NotEmpty(message = "Languages cannot be null or empty")
+        @NotEmpty(message = "Języki nie mogą być puste")
         List<LanguageDto> languages) {
 
     /**

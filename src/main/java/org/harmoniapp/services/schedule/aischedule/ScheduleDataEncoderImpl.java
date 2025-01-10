@@ -276,9 +276,11 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      */
     private Gen createGen(ReqShiftDto reqShiftDto, ScheduleRequirement scheduleRequirement,
                           List<PredefineShift> predefineShifts, List<Requirements> requirements) {
+        PredefineShift shift = findShiftStartTime(predefineShifts, reqShiftDto);
         return new Gen(reqShiftDto.shiftId().intValue(),
                 scheduleRequirement.date().getDayOfYear(),
-                findShiftStartTime(predefineShifts, reqShiftDto),
+                shift.getStart(),
+                shift.getEnd(),
                 null,
                 requirements);
     }
@@ -290,11 +292,10 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param reqShiftDto     the shift requirement DTO
      * @return the start time of the shift
      */
-    private LocalTime findShiftStartTime(List<PredefineShift> predefineShifts, ReqShiftDto reqShiftDto) {
+    private PredefineShift findShiftStartTime(List<PredefineShift> predefineShifts, ReqShiftDto reqShiftDto) {
         return predefineShifts.stream()
                 .filter(ps -> ps.getId().equals(reqShiftDto.shiftId()))
                 .findFirst()
-                .orElseThrow()
-                .getStart();
+                .orElseThrow();
     }
 }

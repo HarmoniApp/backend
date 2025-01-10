@@ -45,7 +45,7 @@ public class UserSearchServiceImpl implements UserSearchService {
      */
     private void validateSearchQuery(String q) {
         if (q == null || q.isEmpty()) {
-            throw new IllegalArgumentException("Search query must not be null or empty");
+            throw new IllegalArgumentException("Zapytanie wyszukiwania nie może być puste.");
         }
     }
 

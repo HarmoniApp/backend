@@ -14,10 +14,10 @@ import org.harmoniapp.entities.profile.Language;
 public record LanguageDto(
         Long id,
 
-        @NotEmpty(message = "Language name cannot be empty")
-        @Pattern(regexp = "^[a-zA-Z]+$", message = "Language name must contain only letters")
+        @NotEmpty(message = "Nazwa języka nie może być pusta")
+        @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ]+$", message = "Nazwa języka musi zawierać tylko litery")
         String name,
-        @Pattern(regexp = "^[a-zA-Z]{2}$", message = "Code must contain only two letters")
+        @Pattern(regexp = "^[a-zA-Z]{2}$", message = "Kod języka musi składać się z dwóch liter")
         String code) {
 
     /**

@@ -14,11 +14,11 @@ import java.util.List;
  * @param roles   the list of roles for the shift
  */
 public record ReqShiftDto(
-        @NotNull(message = "Shift ID cannot be null")
-        @Positive(message = "Shift ID must be a positive number")
+        @NotNull(message = "ID zmiany nie może być puste")
+        @Positive(message = "ID zmiany musi być liczbą dodatnią")
         Long shiftId,
 
-        @NotEmpty(message = "Roles cannot be empty")
+        @NotEmpty(message = "Role nie mogą być puste")
         @Valid
         List<ReqRoleDto> roles) {
 }

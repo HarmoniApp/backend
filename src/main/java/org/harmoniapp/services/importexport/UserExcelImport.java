@@ -64,11 +64,11 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
         Sheet sheet = readSheet(file);
         Iterator<Row> rows = sheet.rowIterator();
         if (!rows.hasNext()) {
-            throw new EmptyFileException("Empty file");
+            throw new EmptyFileException("Plik jest pusty");
         }
         List<String> headers = extractHeaders(rows.next());
         if (headers == null) {
-            throw new InvalidCellException("Invalid headers");
+            throw new InvalidCellException("Nieprawidłowe nagłówki");
         }
 
         List<UserDto> userDtoList;
@@ -108,11 +108,10 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
         List<UserDto> savedUsers = new ArrayList<>();
         for (UserDto userDto : userDtoList) {
             try {
-                //TODO: improve adding users to the database
                 UserDto newUser = userService.create(userDto);
                 savedUsers.add(newUser);
             } catch (Exception e) {
-                throw new InvalidCellException("Invalid row: " + (userDtoList.indexOf(userDto) + 2));
+                throw new InvalidCellException("Nieprawidłowy wiersz: " + (userDtoList.indexOf(userDto) + 2));
             }
         }
         return savedUsers;
@@ -197,7 +196,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
             document.add(table);
             document.close();
         } catch (DocumentException e) {
-            throw new FileGenerationException("Error while generating PDF");
+            throw new FileGenerationException("Generowanie pliku PDF nie powiodło się");
         }
 
         return out.toByteArray();
@@ -275,7 +274,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      */
     private void validateRow(Row row) {
         if (row.getLastCellNum() != expectedHeaders.size()) {
-            throw new InvalidCellException("Invalid row: " + row.getRowNum() + 1);
+            throw new InvalidCellException("Nieprawidłowy wiersz: " + (row.getRowNum() + 1));
         }
     }
 
@@ -305,7 +304,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
 
         UserDto preview = userBuilder.build();
         if (preview.languages().isEmpty() || preview.roles().isEmpty()) {
-            throw new InvalidCellException("Invalid row: " + row.getRowNum() + 1);
+            throw new InvalidCellException("Nieprawidłowy wiersz: " + (row.getRowNum() + 1));
         }
 
         return userBuilder.residence(addressBuilder.build()).build();

@@ -46,7 +46,7 @@ public class HarmoniUserDetailsService implements UserDetailsService {
      */
     private User fetchUserByUsername(String username) {
         return repositoryCollector.getUsers().findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User details not found for the user: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("Nieprawidłowy login lub hasło"));
     }
 
     /**
@@ -57,13 +57,13 @@ public class HarmoniUserDetailsService implements UserDetailsService {
      */
     private void validateUser(User user) {
         if (!user.getIsActive()) {
-            throw new UsernameNotFoundException("User account is inactive.");
+            throw new UsernameNotFoundException("Nieprawidłowy login lub hasło");
         }
         if (user.getPassword() == null) {
-            throw new UsernameNotFoundException("Invalid credentials.");
+            throw new UsernameNotFoundException("Nieprawidłowy login lub hasło");
         }
         if (user.getFailedLoginAttempts() >= 3) {
-            throw new UsernameNotFoundException("User account is locked due to multiple failed login attempts.");
+            throw new UsernameNotFoundException("Konto zablokowane. Skontaktuj się z administratorem");
         }
     }
 

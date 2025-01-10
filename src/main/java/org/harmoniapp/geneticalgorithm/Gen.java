@@ -9,8 +9,9 @@ import java.util.List;
  * @param id           the unique identifier of the shift
  * @param day          the day of the shift
  * @param startTime    the start time of the shift
+ * @param endTime      the end time of the shift
  * @param employees    the list of employees assigned to the shift
  * @param requirements the list of requirements for the shift
  */
-public record Gen(int id, int day, LocalTime startTime, List<Employee> employees, List<Requirements> requirements) {
+public record Gen(int id, int day, LocalTime startTime, LocalTime endTime, List<Employee> employees, List<Requirements> requirements) {
 }

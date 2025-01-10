@@ -246,7 +246,7 @@ public class AbsenceServiceImpl implements AbsenceService {
      */
     private void validateUpdateStatusData(Absence absence, long updateStatusId) {
         if (updateStatusId == AbsenceStatus.AWAITING.getId()) {
-            throw new InvalidAbsenceStatusException("Invalid status ID");
+            throw new InvalidAbsenceStatusException("Nieprawidłowy status");
         }
         if (absence.getStart().isBefore(LocalDate.now())) {
             throw new InvalidDateException("Nie można zmienić statusu wniosku o urlop, który rozpoczą się w przeszłości");

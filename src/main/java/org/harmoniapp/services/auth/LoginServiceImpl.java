@@ -61,7 +61,7 @@ public class LoginServiceImpl implements LoginService {
      */
     private User findUserByEmail(String email) {
         return repositoryCollector.getUsers().findByEmail(email)
-                .orElseThrow(() -> new AccessDeniedException("Invalid credentials"));
+                .orElseThrow(() -> new AccessDeniedException("Nieprawidłowy email lub hasło"));
     }
 
     /**
@@ -79,7 +79,7 @@ public class LoginServiceImpl implements LoginService {
             return authenticationManager.authenticate(authentication);
         } catch (BadCredentialsException e) {
             incrementFailedLoginAttempts(user);
-            throw new AccessDeniedException("Invalid credentials");
+            throw new AccessDeniedException("Nieprawidłowy email lub hasło");
         }
     }
 

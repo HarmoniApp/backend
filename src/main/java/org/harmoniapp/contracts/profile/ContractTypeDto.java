@@ -3,6 +3,7 @@ package org.harmoniapp.contracts.profile;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import org.harmoniapp.entities.profile.ContractType;
 
 /**
@@ -14,10 +15,11 @@ import org.harmoniapp.entities.profile.ContractType;
 public record ContractTypeDto(
         long id,
 
-        @NotEmpty(message = "Name cannot be empty")
+        @NotEmpty(message = "Nazwa nie może być pusta")
+        @Pattern(regexp = "^[A-Za-Ā-ɏØ-öø-ÿ'\\-\\s]+$", message = "Nazwa musi zawierać tylko litery, spacje, apostrofy i myślniki")
         String name,
 
-        @Min(value = 0, message = "Absence days must be zero or a positive number")
+        @Min(value = 0, message = "Dni nieobecności muszą być liczbą nieujemną")
         @JsonProperty("absence_days") int absenceDays) {
 
     /**

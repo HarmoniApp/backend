@@ -24,8 +24,8 @@ public class Language {
     private Long id;
 
     @Column(unique = true)
-    @NotEmpty(message = "Name is required")
-    @Pattern(regexp = "^[A-Za-z Ā-ɏØ-öø-ÿ'\\-\\s]+$", message = "Name must contain only letters, spaces, hyphens and apostrophes")
+    @NotEmpty(message = "Nazwa języka nie może być pusta")
+    @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Nazwa języka może zawierać tylko litery, spacje, myślniki i apostrofy")
     private String name;
 
     private String code;
