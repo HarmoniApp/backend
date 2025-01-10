@@ -107,21 +107,6 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Marks a notification as read by its ID.
-     *
-     * @param notificationId the ID of the notification to mark as read
-     * @return a NotificationDto object representing the marked notification
-     * @throws EntityNotFoundException if the notification with the specified ID does not exist
-     */
-    @Override
-    @Transactional
-    public NotificationDto markAsReadById(long notificationId) {
-        Notification notification = repositoryCollector.getNotifications().findById(notificationId)
-                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono powiadomienia o podanym ID: " + notificationId));
-        return markAsRead(notification);
-    }
-
-    /**
      * Marks all unread notifications as read for a specific user.
      *
      * @param userId the ID of the user whose unread notifications are to be marked as read
