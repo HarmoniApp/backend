@@ -26,7 +26,7 @@ public class Role {
 
     @Column(unique = true)
     @NotBlank(message = "Nazwa nie może być pusta")
-    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Nazwa może zawierać tylko litery, spacje, myślniki i apostrofy")
+    @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Nazwa może zawierać tylko litery, spacje, myślniki i apostrofy")
     private String name;
 
     @NotEmpty(message = "Kolor nie może być pusty")

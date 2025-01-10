@@ -21,7 +21,7 @@ public record PredefineShiftDto(
         long id,
 
         @NotEmpty(message = "Nazwa zmiany nie może być pusta")
-        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Nazwa musi zawierać tylko litery, spacje, myślniki i apostrofy")
+        @Pattern(regexp = "^[A-Za-Ā-ɏØ-öø-ÿ'\\-\\s]+$", message = "Nazwa musi zawierać tylko litery, spacje, myślniki i apostrofy")
         String name,
 
         @NotNull(message = "Czas rozpoczęcia nie może być pusty")

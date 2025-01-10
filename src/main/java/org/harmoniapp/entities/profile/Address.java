@@ -31,13 +31,13 @@ public class Address {
     @Column(length = 50)
     @NotEmpty(message = "Miasto nie może być puste")
     @Size(max = 50, message = "Miasto musi mieć mniej niż 50 znaków")
-    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Miasto musi zawierać tylko litery, spacje, myślniki i apostrofy")
+    @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Miasto musi zawierać tylko litery, spacje, myślniki i apostrofy")
     private String city;
 
     @Column(length = 100)
     @NotEmpty(message = "Ulica nie może być pusta")
     @Size(max = 100, message = "Ulica musi mieć mniej niż 100 znaków")
-    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ',\\-\\s]+$", message = "Ulica musi zawierać tylko litery, spacje, myślniki, przecinki i apostrofy")
+    @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ',\\-\\s]+$", message = "Ulica musi zawierać tylko litery, spacje, myślniki, przecinki i apostrofy")
     private String street;
 
     @Column(name = "building_number", length = 10)
@@ -52,7 +52,7 @@ public class Address {
 
     @Column(name = "department_name", length = 100)
     @Size(max = 100, message = "Nazwa oddziału musi mieć mniej niż 100 znaków")
-    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Nazwa oddziału musi zawierać tylko litery, spacje, myślniki i apostrofy")
+    @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Nazwa oddziału musi zawierać tylko litery, spacje, myślniki i apostrofy")
     private String departmentName;
 
     @Override

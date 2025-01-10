@@ -27,7 +27,7 @@ public class ContractType {
 
     @Column(unique = true)
     @NotBlank(message = "Nazwa umowy nie może być pusta")
-    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Nazwa umowy może zawierać tylko litery, spacje, myślniki i apostrofy")
+    @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Nazwa umowy może zawierać tylko litery, spacje, myślniki i apostrofy")
     private String name;
 
     @Column(name = "absence_days")

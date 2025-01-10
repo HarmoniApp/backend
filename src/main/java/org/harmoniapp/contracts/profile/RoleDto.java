@@ -15,7 +15,7 @@ public record RoleDto(
         long id,
 
         @NotEmpty(message = "Nazwa roli nie może być pusta")
-        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ0-9 ]+$", message = "Nazwa roli musi zawierać tylko litery, cyfry i spacje")
+        @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ0-9 ]+$", message = "Nazwa roli musi zawierać tylko litery, cyfry i spacje")
         String name,
 
         @Size(min = 7, max = 7, message = "Kolor musi być poprawnym kodem heksadecymalnym w formacie #RRGGBB")

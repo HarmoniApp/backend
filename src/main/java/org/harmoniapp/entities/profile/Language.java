@@ -25,7 +25,7 @@ public class Language {
 
     @Column(unique = true)
     @NotEmpty(message = "Nazwa języka nie może być pusta")
-    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Nazwa języka może zawierać tylko litery, spacje, myślniki i apostrofy")
+    @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Nazwa języka może zawierać tylko litery, spacje, myślniki i apostrofy")
     private String name;
 
     private String code;

@@ -38,12 +38,12 @@ public record UserDto(
 
         @NotEmpty(message = "Imię nie może być puste")
         @Size(min = 2, max = 50, message = "Imię musi zawierać od 2 do 50 znaków")
-        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Imię musi zawierać tylko litery, spacje i myślniki")
+        @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Imię musi zawierać tylko litery, spacje i myślniki")
         String firstname,
 
         @NotEmpty(message = "Nazwisko nie może być puste")
         @Size(min = 2, max = 50, message = "Nazwisko musi zawierać od 2 do 50 znaków")
-        @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ'\\-\\s]+$", message = "Nazwisko musi zawierać tylko litery, spacje i myślniki")
+        @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ'\\-\\s]+$", message = "Nazwisko musi zawierać tylko litery, spacje i myślniki")
         String surname,
 
         @NotEmpty(message = "Email nie może być pusty")

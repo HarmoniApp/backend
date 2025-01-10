@@ -13,6 +13,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+/*
+ * This file uses Microsoft Translator Text API.
+ * Licensed under the MIT License.
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ */
+
 /**
  * Service implementation for handling text translations.
  */

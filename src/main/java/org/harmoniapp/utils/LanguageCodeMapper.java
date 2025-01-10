@@ -10,7 +10,6 @@ public class LanguageCodeMapper {
     private static final Map<String, String> languageCodeMap = new HashMap<>();
 
     static {
-        // Initialize the language code map with predefined mappings
         languageCodeMap.put("ae", "ar");
         languageCodeMap.put("bd", "bn");
         languageCodeMap.put("gb", "en");

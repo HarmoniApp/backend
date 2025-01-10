@@ -191,9 +191,9 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
             throw new EmptyFileException("Nie znaleziono wierszy w pliku Excel");
         }
         Cell cell = cellIterator.next();
-        if (!cell.getStringCellValue().equalsIgnoreCase("id pracownika")) { //TODO: sprawdzić, jak wygląda faktycznie plik
+        if (!cell.getStringCellValue().equalsIgnoreCase("id pracownika")) {
             throw new InvalidCellException("Nieprawidłowa kmórka: " + cell.getAddress().formatAsString()
-                    + " - oczekiwany nagłówek: Id pracownika");
+                    + " - oczekiwany nagłówek: id pracownika");
         }
         while (cellIterator.hasNext()) {
             cell = cellIterator.next();

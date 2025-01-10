@@ -42,21 +42,6 @@ public class NotificationController {
     }
 
     /**
-     * Marks a notification as read.
-     *
-     * <p>This endpoint is protected by security measures, and will only allow the owner of the notification
-     * to mark it as read.</p>
-     *
-     * @param id the ID of the notification to mark as read
-     * @return the updated NotificationDto object representing the read notification
-     */
-    @PatchMapping("/{id}/read")
-    @PreAuthorize("@securityService.isNotificationOwner(#id, authentication)")
-    public NotificationDto markNotificationAsRead(@PathVariable Long id) {
-        return notificationService.markAsReadById(id);
-    }
-
-    /**
      * Marks all unread notifications for a specific user as read.
      *
      * @param id the ID of the user whose unread notifications will be marked as read
