@@ -292,7 +292,7 @@ public class AbsenceServiceImpl implements AbsenceService {
      */
     private void sendNotification(Absence savedAbsence, AbsenceNotificationType type) {
         NotificationDto notificationDto = AbsenceNotification.createNotification(savedAbsence, type);
-        notificationService.create(notificationDto);
+        if (notificationDto != null) notificationService.create(notificationDto);
     }
 
     /**

@@ -328,24 +328,24 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
                                                 List<ContractType> contractTypes, List<User> supervisors, List<Address> departments) {
         cell.setCellType(CellType.STRING);
         switch (header) {
-            case "id pracownika" -> userBuilder.employeeId(cell.getStringCellValue());
-            case "imie" -> userBuilder.firstname(cell.getStringCellValue());
-            case "nazwisko" -> userBuilder.surname(cell.getStringCellValue());
-            case "mail" -> userBuilder.email(cell.getStringCellValue());
-            case "numer telefonu" -> userBuilder.phoneNumber(cell.getStringCellValue());
-            case "miasto" -> addressBuilder.city(cell.getStringCellValue());
-            case "ulica" -> addressBuilder.street(cell.getStringCellValue());
-            case "numer mieszkania" -> addressBuilder.apartment(cell.getStringCellValue());
-            case "kod pocztowy" -> addressBuilder.zipCode(cell.getStringCellValue());
-            case "numer budynku" -> addressBuilder.buildingNumber(cell.getStringCellValue());
-            case "role" -> userBuilder.roles(getRoles(cell.getStringCellValue(), roles));
-            case "jezyki" -> userBuilder.languages(getLanguages(cell.getStringCellValue(), languages));
-            case "typ umowy" -> userBuilder.contractType(getContractType(cell.getStringCellValue(), contractTypes));
-            case "podpisanie umowy" -> userBuilder.contractSignature(LocalDate.parse(cell.getStringCellValue()));
-            case "wygasniecie umowy" -> userBuilder.contractExpiration(LocalDate.parse(cell.getStringCellValue()));
+            case "id pracownika" -> userBuilder.employeeId(cell.getStringCellValue().trim());
+            case "imie" -> userBuilder.firstname(cell.getStringCellValue().trim());
+            case "nazwisko" -> userBuilder.surname(cell.getStringCellValue().trim());
+            case "mail" -> userBuilder.email(cell.getStringCellValue().trim());
+            case "numer telefonu" -> userBuilder.phoneNumber(cell.getStringCellValue().trim());
+            case "miasto" -> addressBuilder.city(cell.getStringCellValue().trim());
+            case "ulica" -> addressBuilder.street(cell.getStringCellValue().trim());
+            case "numer mieszkania" -> addressBuilder.apartment(cell.getStringCellValue().trim());
+            case "kod pocztowy" -> addressBuilder.zipCode(cell.getStringCellValue().trim());
+            case "numer budynku" -> addressBuilder.buildingNumber(cell.getStringCellValue().trim());
+            case "role" -> userBuilder.roles(getRoles(cell.getStringCellValue().trim(), roles));
+            case "jezyki" -> userBuilder.languages(getLanguages(cell.getStringCellValue().trim(), languages));
+            case "typ umowy" -> userBuilder.contractType(getContractType(cell.getStringCellValue().trim(), contractTypes));
+            case "podpisanie umowy" -> userBuilder.contractSignature(LocalDate.parse(cell.getStringCellValue().trim()));
+            case "wygasniecie umowy" -> userBuilder.contractExpiration(LocalDate.parse(cell.getStringCellValue().trim()));
             case "id przelozonego" ->
-                    userBuilder.supervisorId(getSupervisorId(cell.getStringCellValue(), supervisors));
-            case "oddzial" -> userBuilder.workAddress(getDepartment(cell.getStringCellValue(), departments));
+                    userBuilder.supervisorId(getSupervisorId(cell.getStringCellValue().trim(), supervisors));
+            case "oddzial" -> userBuilder.workAddress(getDepartment(cell.getStringCellValue().trim(), departments));
         }
     }
 

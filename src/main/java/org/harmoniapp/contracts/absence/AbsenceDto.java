@@ -49,7 +49,7 @@ public record AbsenceDto(
         @Positive(message = "ID typu nieobecności musi być liczbą dodatnią")
         @JsonProperty("absence_type_id") Long absenceTypeId,
 
-        Status status,
+        StatusDto status,
 
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate submission,
@@ -73,7 +73,7 @@ public record AbsenceDto(
                 .end(absence.getEnd())
                 .userId(absence.getUser().getId())
                 .absenceTypeId(absence.getAbsenceType().getId())
-                .status(absence.getStatus())
+                .status(StatusDto.fromEntity(absence.getStatus()))
                 .submission(absence.getSubmission())
                 .updated(absence.getUpdated())
                 .workingDays(absence.getWorkingDays())

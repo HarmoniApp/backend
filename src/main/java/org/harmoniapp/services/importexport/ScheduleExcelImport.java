@@ -78,7 +78,7 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
      * @throws InvalidCellException if the employee ID is not found in the list of users
      */
     private User getUser(List<User> users, Cell cell) {
-        String empId = getCellValueAsString(cell);
+        String empId = getCellValueAsString(cell).trim();
         return users.stream()
                 .filter(u -> u.getEmployeeId().equals(empId))
                 .findFirst()
@@ -191,7 +191,7 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
             throw new EmptyFileException("Nie znaleziono wierszy w pliku Excel");
         }
         Cell cell = cellIterator.next();
-        if (!cell.getStringCellValue().equalsIgnoreCase("id pracownika")) {
+        if (!cell.getStringCellValue().trim().equalsIgnoreCase("id pracownika")) {
             throw new InvalidCellException("Nieprawidłowa kmórka: " + cell.getAddress().formatAsString()
                     + " - oczekiwany nagłówek: id pracownika");
         }
