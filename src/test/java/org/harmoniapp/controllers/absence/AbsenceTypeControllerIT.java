@@ -15,9 +15,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -39,13 +39,13 @@ public class AbsenceTypeControllerIT {
     }
 
     @BeforeAll
-    public static void setUp(@Autowired LoginService loginService, WebApplicationContext applicationContext) {
+    public static void setUp(@Autowired LoginService loginService) {
         // Login as an admin to get a JWT token
-        var credentialsAdmin = new LoginRequestDto("jan.kowalski@example.com", "password");
+        var credentialsAdmin = new LoginRequestDto("jan.kowalski@example.com", "StrongPassword!2137");
         jwtAdmin = loginService.login(credentialsAdmin).jwtToken();
 
         // Login as a user to get a JWT token
-        var credentialsUser = new LoginRequestDto("piotr.wisniewski@example.com", "password");
+        var credentialsUser = new LoginRequestDto("piotr.wisniewski@example.com", "StrongPassword!2137");
         jwtUser = loginService.login(credentialsUser).jwtToken();
     }
 
@@ -53,6 +53,7 @@ public class AbsenceTypeControllerIT {
     public void getAbsenceTypeAsAdminTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/absence-type/{id}", 1L)
                         .header("Authorization", "Bearer " + jwtAdmin))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L));
@@ -62,6 +63,7 @@ public class AbsenceTypeControllerIT {
     public void getAbsenceTypeAsUserTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/absence-type/{id}", 1L)
                         .header("Authorization", "Bearer " + jwtUser))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L));
@@ -71,6 +73,7 @@ public class AbsenceTypeControllerIT {
     public void getAbsenceTypeMissingElementTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/absence-type/{id}", 100L)
                         .header("Authorization", "Bearer " + jwtAdmin))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
@@ -78,6 +81,7 @@ public class AbsenceTypeControllerIT {
     public void getAbsenceTypeWithoutJWTTokeTest() throws Exception {
         assertThrows(BadCredentialsException.class, () -> {
             mockMvc.perform(MockMvcRequestBuilders.get("/absence-type/{id}", 1L))
+                    .andDo(MockMvcResultHandlers.print())
                     .andExpect(MockMvcResultMatchers.status().isUnauthorized());
         });
     }
@@ -87,6 +91,7 @@ public class AbsenceTypeControllerIT {
         mockMvc.perform(MockMvcRequestBuilders.get("/absence-type")
                         .header("Authorization", "Bearer " + jwtAdmin)
                         .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
@@ -98,6 +103,7 @@ public class AbsenceTypeControllerIT {
         mockMvc.perform(MockMvcRequestBuilders.get("/absence-type")
                         .header("Authorization", "Bearer " + jwtUser)
                         .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
@@ -108,6 +114,7 @@ public class AbsenceTypeControllerIT {
     public void getAllAbsenceTypeWithoutJWTTokenTest() throws Exception {
         assertThrows(BadCredentialsException.class, () -> {
             mockMvc.perform(MockMvcRequestBuilders.get("/absence-type"))
+                    .andDo(MockMvcResultHandlers.print())
                     .andExpect(MockMvcResultMatchers.status().isUnauthorized());
         });
     }

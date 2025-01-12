@@ -66,8 +66,8 @@ public class ProjectSecurityTestConfig extends AbstractProjectSecurityConfig{
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
                                                        PasswordEncoder passwordEncoder) {
-        HarmoniUserPasswordAuthenticationProvider authenticationProvider =
-                new HarmoniUserPasswordAuthenticationProvider(userDetailsService);
+        HarmoniProdUserPasswordAuthenticationProvider authenticationProvider =
+                new HarmoniProdUserPasswordAuthenticationProvider(userDetailsService, passwordEncoder);
         ProviderManager providerManager = new ProviderManager(authenticationProvider);
         providerManager.setEraseCredentialsAfterAuthentication(false);
         return providerManager;

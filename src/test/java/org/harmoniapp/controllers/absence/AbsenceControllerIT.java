@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -48,13 +47,13 @@ public class AbsenceControllerIT {
     }
 
     @BeforeAll
-    public static void setUp(@Autowired LoginService loginService, WebApplicationContext applicationContext) {
+    public static void setUp(@Autowired LoginService loginService) {
         // Login as an admin to get a JWT token
-        var credentialsAdmin = new LoginRequestDto("jan.kowalski@example.com", "password");
+        var credentialsAdmin = new LoginRequestDto("jan.kowalski@example.com", "StrongPassword!2137");
         jwtAdmin = loginService.login(credentialsAdmin).jwtToken();
 
         // Login as a user to get a JWT token
-        var credentialsUser = new LoginRequestDto("piotr.wisniewski@example.com", "password");
+        var credentialsUser = new LoginRequestDto("piotr.wisniewski@example.com", "StrongPassword!2137");
         jwtUser = loginService.login(credentialsUser).jwtToken();
     }
 

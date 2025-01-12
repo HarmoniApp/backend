@@ -15,9 +15,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -39,13 +39,13 @@ public class StatusControllerIT {
     }
 
     @BeforeAll
-    public static void setUp(@Autowired LoginService loginService, WebApplicationContext applicationContext) {
+    public static void setUp(@Autowired LoginService loginService) {
         // Login as an admin to get a JWT token
-        var credentialsAdmin = new LoginRequestDto("jan.kowalski@example.com", "password");
+        var credentialsAdmin = new LoginRequestDto("jan.kowalski@example.com", "StrongPassword!2137");
         jwtAdmin = loginService.login(credentialsAdmin).jwtToken();
 
         // Login as a user to get a JWT token
-        var credentialsUser = new LoginRequestDto("piotr.wisniewski@example.com", "password");
+        var credentialsUser = new LoginRequestDto("piotr.wisniewski@example.com", "StrongPassword!2137");
         jwtUser = loginService.login(credentialsUser).jwtToken();
     }
 
@@ -53,6 +53,7 @@ public class StatusControllerIT {
     public void testGetAllStatusesAsAdmin() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/status")
                         .header("Authorization", "Bearer " + jwtAdmin))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(4));
@@ -62,6 +63,7 @@ public class StatusControllerIT {
     public void testGetAllStatusesAsUser() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/status")
                         .header("Authorization", "Bearer " + jwtUser))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(4));
@@ -71,6 +73,7 @@ public class StatusControllerIT {
     public void testGetAllStatusesUnauthorized() throws Exception {
         assertThrows(BadCredentialsException.class, () -> {
             mockMvc.perform(MockMvcRequestBuilders.get("/status"))
+                    .andDo(MockMvcResultHandlers.print())
                     .andExpect(MockMvcResultMatchers.status().isUnauthorized());
         });
     }
