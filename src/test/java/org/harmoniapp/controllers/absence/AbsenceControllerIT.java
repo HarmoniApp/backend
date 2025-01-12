@@ -1,8 +1,6 @@
-package org.harmoniapp.controllers;
+package org.harmoniapp.controllers.absence;
 
 import org.harmoniapp.contracts.auth.LoginRequestDto;
-import org.harmoniapp.controllers.absence.AbsenceController;
-import org.harmoniapp.exception.AbsenceDaysExceededException;
 import org.harmoniapp.services.auth.LoginService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -11,8 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -75,6 +73,7 @@ public class AbsenceControllerIT {
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].user_id").value(3));
     }
@@ -87,6 +86,7 @@ public class AbsenceControllerIT {
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber").value(2));
@@ -100,6 +100,7 @@ public class AbsenceControllerIT {
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize").value(10))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber").value(1));
@@ -136,6 +137,7 @@ public class AbsenceControllerIT {
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].status.id").value(1));
     }
@@ -149,6 +151,7 @@ public class AbsenceControllerIT {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber").value(2));
     }
@@ -161,6 +164,7 @@ public class AbsenceControllerIT {
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize").value(10))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber").value(1));
@@ -172,6 +176,7 @@ public class AbsenceControllerIT {
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray());
     }
 
@@ -200,6 +205,7 @@ public class AbsenceControllerIT {
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber").value(2));
@@ -213,6 +219,7 @@ public class AbsenceControllerIT {
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize").value(10))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber").value(1));
@@ -232,6 +239,7 @@ public class AbsenceControllerIT {
                         .content(absenceJson))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.user_id").value(userId))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.absence_type_id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.start").value(start))
@@ -290,6 +298,7 @@ public class AbsenceControllerIT {
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status.id").value(2));
     }
 
@@ -299,6 +308,7 @@ public class AbsenceControllerIT {
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status.id").value(4));
     }
 
