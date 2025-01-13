@@ -2,7 +2,6 @@ package org.harmoniapp.controllers.chat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.harmoniapp.contracts.auth.LoginRequestDto;
-import org.harmoniapp.contracts.chat.ChatRequestDto;
 import org.harmoniapp.contracts.chat.MessageDto;
 import org.harmoniapp.services.auth.LoginService;
 import org.junit.jupiter.api.BeforeAll;
