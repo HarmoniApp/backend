@@ -2,6 +2,7 @@ package org.harmoniapp.services.schedule;
 
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.enums.ShiftNotificationType;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public interface ShiftNotificationSender {
      * @param shifts the list of shifts to notify about
      * @param type the type of notification to send
      */
+    @Transactional
     void send(List<Shift> shifts, ShiftNotificationType type);
 
     /**
@@ -24,5 +26,6 @@ public interface ShiftNotificationSender {
      * @param shift the shift to notify about
      * @param type the type of notification to send
      */
+    @Transactional
     void send(Shift shift, ShiftNotificationType type);
 }

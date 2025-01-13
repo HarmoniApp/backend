@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 public record ScheduleRequirement(
         @NotNull(message = "Data nie może być pusta")
         @Future(message = "Data musi być w przyszłości")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         LocalDate date,
 
         @NotEmpty(message = "Zmiany nie mogą być puste")

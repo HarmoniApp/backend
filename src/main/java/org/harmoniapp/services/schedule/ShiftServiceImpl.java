@@ -129,7 +129,7 @@ public class ShiftServiceImpl implements ShiftService {
     public ShiftDto create(ShiftDto shiftDto) {
         validateUserId(shiftDto.userId());
         validateShiftTimes(shiftDto);
-        User user = getUserById(shiftDto.userId(), repositoryCollector);
+        User user = getUserById(shiftDto.userId());
         Role role = getRoleByName(shiftDto.roleName());
         return createNewShift(shiftDto, user, role);
     }
@@ -148,7 +148,7 @@ public class ShiftServiceImpl implements ShiftService {
     public ShiftDto updateById(long id, ShiftDto shiftDto) {
         validateUserId(shiftDto.userId());
         Shift existingShift = findExistingShift(id);
-        User user = getUserById(shiftDto.userId(), repositoryCollector);
+        User user = getUserById(shiftDto.userId());
         Role role = getRoleByName(shiftDto.roleName());
 
         if (existingShift == null) {
@@ -163,11 +163,10 @@ public class ShiftServiceImpl implements ShiftService {
      * Retrieves a User entity by its ID.
      *
      * @param id                  the ID of the user to retrieve
-     * @param repositoryCollector the RepositoryCollector object to use for the retrieval
      * @return the User entity with the specified ID
      * @throws IllegalArgumentException if the user with the specified ID does not exist
      */
-    private User getUserById(long id, RepositoryCollector repositoryCollector) {
+    private User getUserById(long id) {
         return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika"));
     }
@@ -263,6 +262,7 @@ public class ShiftServiceImpl implements ShiftService {
      * @throws EntityNotFoundException if the shift with the specified ID does not exist
      */
     @Override
+    @Transactional
     public void deleteById(long id) throws EntityNotFoundException {
         Shift shift = findExistingShift(id);
         if (shift == null) {

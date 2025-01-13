@@ -7,6 +7,7 @@ import org.harmoniapp.enums.ShiftNotificationType;
 import org.harmoniapp.services.notification.NotificationService;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class ShiftNotificationSenderImpl implements ShiftNotificationSender {
      * @param type   the type of notification to be sent
      */
     @Override
+    @Transactional
     @Async
     public void send(List<Shift> shifts, ShiftNotificationType type) {
         shifts.forEach(shift -> send(shift, type));
@@ -38,6 +40,7 @@ public class ShiftNotificationSenderImpl implements ShiftNotificationSender {
      * @param type  the type of notification to be sent
      */
     @Override
+    @Transactional
     @Async
     public void send(Shift shift, ShiftNotificationType type) {
         NotificationDto notificationDto = createNotification(shift, type);

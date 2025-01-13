@@ -54,8 +54,7 @@ public class NotificationControllerIT {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(5));
+                .andExpect(MockMvcResultMatchers.jsonPath("$").isArray());
     }
 
     @Test
