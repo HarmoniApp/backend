@@ -1,6 +1,7 @@
 package org.harmoniapp.controllers.chat;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.chat.ChatPartnerDto;
 import org.harmoniapp.contracts.chat.ChatRequestDto;
@@ -38,7 +39,7 @@ public class MessageController {
      * @return a list of chat partner DTOs
      */
     @GetMapping("/all-chat-partners")
-    public List<ChatPartnerDto> getAllChatPartners(@RequestParam Long userId) {
+    public List<ChatPartnerDto> getAllChatPartners(@RequestParam @Positive Long userId) {
         return service.getAllChatPartners(userId);
     }
 
@@ -49,8 +50,8 @@ public class MessageController {
      * @return the last message as a string
      */
     @GetMapping("/last")
-    public String getLasMessageByUsersId(@ModelAttribute ChatRequestDto chatRequestDto) {
-        return service.getLastMessageByUsersId(chatRequestDto);
+    public String getLasMessage(@ModelAttribute ChatRequestDto chatRequestDto) {
+        return service.getLastMessage(chatRequestDto);
     }
 
     /**

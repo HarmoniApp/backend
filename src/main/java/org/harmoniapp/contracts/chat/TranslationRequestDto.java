@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @param translate      whether to translate the text
  * @param targetLanguage the target language for translation, if any
  */
-public record TranslationRequestDto(@RequestParam(defaultValue = "false") boolean translate,
+public record TranslationRequestDto(@RequestParam(required = false, defaultValue = "false") Boolean translate,
                                     @RequestParam(required = false) String targetLanguage) {
 }

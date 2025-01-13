@@ -75,7 +75,7 @@ public class AclConfigImpl implements AclConfig {
      */
     private void configureChatEndpoints(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(request -> request
-                .requestMatchers("/group/chat-partners/**").access(ownerQueryParamAuthorizationManager)
+                .requestMatchers("/message/all-chat-partners/**").access(ownerQueryParamAuthorizationManager)
                 .requestMatchers(new AntPathRequestMatcher("/group", "POST")).hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/group/details/{groupId}/**","/group/{groupId}/**").access(groupMemberAuthorizationManager)
                 .requestMatchers("/group/**").hasAnyRole("USER", "ADMIN")

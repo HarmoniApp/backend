@@ -35,7 +35,7 @@ public interface MessageService {
      * @param chatRequestDto the chat request details
      * @return the last message as a string
      */
-    String getLastMessageByUsersId(ChatRequestDto chatRequestDto);
+    String getLastMessage(ChatRequestDto chatRequestDto);
 
     /**
      * Creates a new message.

@@ -20,6 +20,9 @@ public interface ExtractQueryParams {
      */
     default Map<String, String> getQueryParams(RequestAuthorizationContext ctx) {
         String queryStr = ctx.getRequest().getQueryString();
+        if (queryStr == null) {
+            return new HashMap<>();
+        }
         List<String> paramsList = Arrays.stream(queryStr.split("&", -1)).toList();
         Map<String, String> paramsMap = new HashMap<>();
         for (String param : paramsList) {
