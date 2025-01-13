@@ -73,7 +73,12 @@ public class AddressServiceImpl implements AddressService {
                 .map(DepartmentDto::fromEntity)
                 .toList();
     }
-    //TODO: extract
+
+    /**
+     * Retrieves all AddressDto objects that belong to departments.
+     *
+     * @return a list of AddressDto objects that belong to departments
+     */
     public List<AddressDto> getAllDepartmentsAddress() {
         return repositoryCollector.getAddresses()
                 .findByDepartmentNameNotNull()

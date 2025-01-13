@@ -117,7 +117,8 @@ public class AclConfigImpl implements AclConfig {
         http.authorizeHttpRequests(request -> request
                 .requestMatchers("/address/**").hasRole("ADMIN")
                 .requestMatchers("/contract-type/**").hasRole("ADMIN")
-                .requestMatchers("/language/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers(new AntPathRequestMatcher("/language/**", "GET")).hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/language/**").hasRole("ADMIN")
                 .requestMatchers("/role/user/{id}/**").access(adminOrOwnerAuthorizationManager)
                 .requestMatchers("/role/**").hasRole("ADMIN"));
     }

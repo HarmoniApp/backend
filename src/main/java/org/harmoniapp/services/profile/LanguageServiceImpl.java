@@ -121,7 +121,7 @@ public class LanguageServiceImpl implements LanguageService {
     private Language updateLanguage(Language language, LanguageDto languageDto) {
         Language newLanguage = languageDto.toEntity();
         newLanguage.setId(language.getId());
-        return repositoryCollector.getLanguages().save(language);
+        return repositoryCollector.getLanguages().save(newLanguage);
     }
 
     /**
