@@ -12,6 +12,7 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.harmoniapp.contracts.profile.AddressDto;
+import org.harmoniapp.contracts.profile.ContractTypeDto;
 import org.harmoniapp.contracts.profile.LanguageDto;
 import org.harmoniapp.contracts.profile.RoleDto;
 import org.harmoniapp.contracts.user.UserDto;
@@ -384,10 +385,11 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @param contractTypes    the list of contract types to search.
      * @return the matching contract type, or null if no match is found.
      */
-    private ContractType getContractType(String contractTypeName, List<ContractType> contractTypes) {
+    private ContractTypeDto getContractType(String contractTypeName, List<ContractType> contractTypes) {
         return contractTypes.stream()
                 .filter(c -> c.getName().equals(contractTypeName))
                 .findFirst()
+                .map(ContractTypeDto::fromEntity)
                 .orElse(null);
     }
 

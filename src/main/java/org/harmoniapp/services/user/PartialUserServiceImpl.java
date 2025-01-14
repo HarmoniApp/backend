@@ -6,6 +6,7 @@ import org.harmoniapp.contracts.PageRequestDto;
 import org.harmoniapp.contracts.user.PartialUserDto;
 import org.harmoniapp.contracts.user.UserSearchParamsDto;
 import org.harmoniapp.entities.user.User;
+import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.data.domain.Page;
 import org.springframework.lang.Nullable;
@@ -39,10 +40,11 @@ public class PartialUserServiceImpl implements PartialUserService {
      *
      * @param id the ID of the user
      * @return the user entity
+     * @throws EntityNotFoundException if the user is not found
      */
     private User getUserById(long id) {
         return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika"));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono użytkownika"));
     }
 
     /**

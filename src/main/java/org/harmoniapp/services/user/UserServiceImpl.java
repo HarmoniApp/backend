@@ -11,6 +11,7 @@ import org.harmoniapp.entities.profile.Language;
 import org.harmoniapp.entities.profile.Role;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.exception.EntityNotFoundException;
+import org.harmoniapp.exception.InvalidDateException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.services.profile.AddressService;
 import org.springframework.data.domain.Page;
@@ -133,11 +134,11 @@ public class UserServiceImpl implements UserService {
      *
      * @param id The ID of the user to retrieve.
      * @return The User entity corresponding to the specified ID.
-     * @throws IllegalArgumentException if the user with the specified ID is not found.
+     * @throws EntityNotFoundException if the user with the specified ID is not found.
      */
     private User getUserById(long id) {
         return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika"));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono użytkownika"));
     }
 
     /**
@@ -145,11 +146,11 @@ public class UserServiceImpl implements UserService {
      * Ensures that the contract expiration date is after the contract signature date.
      *
      * @param userDto The UserDto object containing the contract dates to validate.
-     * @throws IllegalArgumentException if the contract expiration date is before the contract signature date.
+     * @throws InvalidDateException if the contract expiration date is before the contract signature date.
      */
     private void validateContractDates(UserDto userDto) {
         if (userDto.contractExpiration().isBefore(userDto.contractSignature())) {
-            throw new IllegalArgumentException("Data wygaśnięcia umowy nie może być przed datą podpisania umowy");
+            throw new InvalidDateException("Data wygaśnięcia umowy nie może być przed datą podpisania umowy");
         }
     }
 
@@ -162,7 +163,7 @@ public class UserServiceImpl implements UserService {
      */
     private void setContractType(User user, UserDto userDto) {
         ContractType contractType = repositoryCollector.getContractTypes()
-                .findById(userDto.contractType().getId())
+                .findById(userDto.contractType().id())
                 .orElseThrow(IllegalArgumentException::new);
         user.setContractType(contractType);
     }

@@ -147,8 +147,8 @@ public class AclConfigImpl implements AclConfig {
      */
     private void configureUserEndpoints(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(request -> request
-                .requestMatchers("/user/simple/empId/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/user/simple/**", "/user/supervisor", "/user/search").hasRole("ADMIN")
+                .requestMatchers("/user/simple/empId/**", "/user/simple/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/user/supervisor", "/user/search").hasRole("ADMIN")
                 .requestMatchers("/user/{id}/photo").authenticated()
                 .requestMatchers(new AntPathRequestMatcher("/user/{id}/changePassword"),
                         new AntPathRequestMatcher("/user/{id}/uploadPhoto"),

@@ -94,7 +94,7 @@ public class UserExcelExport extends ExcelExport implements ExportUser {
             case 9 -> row.createCell(cellIdx).setCellValue(user.residence().buildingNumber());
             case 10 -> row.createCell(cellIdx).setCellValue(userDataService.getRoles(user));
             case 11 -> row.createCell(cellIdx).setCellValue(userDataService.getLanguages(user));
-            case 12 -> row.createCell(cellIdx).setCellValue(user.contractType().getName());
+            case 12 -> row.createCell(cellIdx).setCellValue(user.contractType().name());
             case 13 -> row.createCell(cellIdx).setCellValue(user.contractSignature().toString());
             case 14 -> row.createCell(cellIdx).setCellValue(user.contractExpiration().toString());
             case 15 -> row.createCell(cellIdx).setCellValue(userDataService.getSupervisorEmployeeId(user));

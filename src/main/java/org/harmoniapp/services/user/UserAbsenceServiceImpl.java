@@ -23,11 +23,12 @@ public class UserAbsenceServiceImpl implements UserAbsenceService {
      *
      * @param id the ID of the user
      * @return the sum of available absence days and unused absence days
+     * @throws EntityNotFoundException if the user is not found
      */
     @Override
     public int getUserAvailableAbsenceDays(long id) {
         User user = repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkowika"));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono użytkowika"));
         return user.getAvailableAbsenceDays() + user.getUnusedAbsenceDays();
     }
 

@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import org.harmoniapp.contracts.profile.AddressDto;
+import org.harmoniapp.contracts.profile.ContractTypeDto;
 import org.harmoniapp.contracts.profile.LanguageDto;
 import org.harmoniapp.contracts.profile.RoleDto;
 import org.harmoniapp.entities.profile.ContractType;
@@ -54,7 +55,7 @@ public record UserDto(
         String password,
 
         @NotNull(message = "Typ umowy nie może być pusty")
-        @JsonProperty("contract_type") ContractType contractType,
+        @JsonProperty("contract_type") ContractTypeDto contractType,
 
         @NotNull(message = "Data podpisania umowy nie może być pusta")
         @JsonProperty("contract_signature") LocalDate contractSignature,
@@ -116,7 +117,7 @@ public record UserDto(
                 .surname(user.getSurname())
                 .email(user.getEmail())
                 .password(password)
-                .contractType(user.getContractType())
+                .contractType(ContractTypeDto.fromEntity(user.getContractType()))
                 .contractSignature(user.getContractSignature())
                 .contractExpiration(user.getContractExpiration())
                 .residence(AddressDto.fromEntity(user.getResidence()))
@@ -145,7 +146,7 @@ public record UserDto(
                 .surname(this.surname)
                 .email(this.email)
                 .password(this.password)
-                .contractType(this.contractType)
+                .contractType(this.contractType.toEntity())
                 .contractSignature(this.contractSignature)
                 .contractExpiration(this.contractExpiration)
                 .phoneNumber(this.phoneNumber)
