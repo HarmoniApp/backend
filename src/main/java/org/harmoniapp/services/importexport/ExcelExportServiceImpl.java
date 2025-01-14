@@ -2,6 +2,7 @@ package org.harmoniapp.services.importexport;
 
 
 import lombok.RequiredArgsConstructor;
+import org.harmoniapp.exception.InvalidDateException;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +36,14 @@ public class ExcelExportServiceImpl implements ExcelExportService {
      */
     @Override
     public InputStreamResource exportShifts(String start, String end) {
-        LocalDate startDate = LocalDate.parse(start);
-        LocalDate endDate = LocalDate.parse(end);
+        LocalDate startDate;
+        LocalDate endDate;
+        try {
+            startDate = LocalDate.parse(start);
+            endDate = LocalDate.parse(end);
+        } catch (Exception e) {
+            throw new InvalidDateException("Nieprawidłowy format daty");
+        }
         return scheduleExcelExport.exportShifts(startDate, endDate);
     }
 }

@@ -3,11 +3,6 @@ package org.harmoniapp.controllers.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.harmoniapp.contracts.auth.LoginRequestDto;
-import org.harmoniapp.contracts.profile.AddressDto;
-import org.harmoniapp.contracts.profile.ContractTypeDto;
-import org.harmoniapp.contracts.profile.LanguageDto;
-import org.harmoniapp.contracts.profile.RoleDto;
-import org.harmoniapp.contracts.user.UserDto;
 import org.harmoniapp.services.auth.LoginService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -16,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
@@ -30,8 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.time.LocalDate;
-import java.util.List;
 
 /**
  * Test class for {@link UserPhotoController} class
@@ -46,7 +38,6 @@ public class UserPhotoControllerIT {
 
     private final MockMvc mockMvc;
     private static String jwtUser;
-    private static ObjectMapper mapper;
 
     @Autowired
     public UserPhotoControllerIT(MockMvc mockMvc) {
@@ -58,9 +49,6 @@ public class UserPhotoControllerIT {
         // Login as a user to get a JWT token
         var credentialsUser = new LoginRequestDto("piotr.wisniewski@example.com", "StrongPassword!2137");
         jwtUser = loginService.login(credentialsUser).jwtToken();
-
-        mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
     }
 
     @Test
@@ -130,10 +118,10 @@ public class UserPhotoControllerIT {
 
     @Test
     public void uploadPhotoInvalidFileFormatTest() throws Exception {
-        MockMultipartFile largeFile = new MockMultipartFile(
-                "file", "largeFile.exe", "application/octet-stream", "dummy content".getBytes()); // Large content
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "file", "largeFile.exe", "application/octet-stream", "dummy content".getBytes());
         mockMvc.perform(MockMvcRequestBuilders.multipart("/user/3/uploadPhoto")
-                        .file(largeFile)
+                        .file(mockFile)
                         .with(request -> {
                             request.setMethod("PATCH");
                             return request;

@@ -78,7 +78,10 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
      * @throws InvalidCellException if the employee ID is not found in the list of users
      */
     private User getUser(List<User> users, Cell cell) {
-        String empId = getCellValueAsString(cell).trim();
+        if (cell == null) {
+            return null;
+        }
+        String empId = getCellValueAsString(cell);
         return users.stream()
                 .filter(u -> u.getEmployeeId().equals(empId))
                 .findFirst()
@@ -135,6 +138,9 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
      * @return the string value of the cell
      */
     private String getCellValueAsString(Cell cell) {
+        if (cell == null) {
+            return "";
+        }
         cell.setCellType(CellType.STRING);
         return cell.getStringCellValue().trim();
     }

@@ -304,7 +304,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
         }
 
         UserDto preview = userBuilder.build();
-        if (preview.languages().isEmpty() || preview.roles().isEmpty()) {
+        if (preview.languages() == null || preview.languages().isEmpty() || preview.roles().isEmpty()) {
             throw new InvalidCellException("Nieprawidłowy wiersz: " + (row.getRowNum() + 1));
         }
 
