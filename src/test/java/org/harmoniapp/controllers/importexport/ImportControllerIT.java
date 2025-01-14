@@ -24,7 +24,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 /**
- * Test class for {@link ImportController} class
+ * Test class for {@link ImportController} class.
  */
 @SpringBootTest
 @ExtendWith(SpringExtension.class)

@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Test class for {@link SupervisorController} class
+ * Test class for {@link SupervisorController} class.
  */
 @SpringBootTest
 @ExtendWith(SpringExtension.class)

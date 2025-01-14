@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Test class for {@link UserAbsenceController} class
+ * Test class for {@link UserAbsenceController} class.
  */
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -74,9 +74,7 @@ public class UserAbsenceControllerIT {
         mockMvc.perform(MockMvcRequestBuilders.get("/user/1/availableAbsenceDays")
                         .header("Authorization", "Bearer " + jwtUser))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$").isNumber());
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test

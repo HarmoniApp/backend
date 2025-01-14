@@ -1,7 +1,5 @@
 package org.harmoniapp.controllers.schedule;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.harmoniapp.contracts.auth.LoginRequestDto;
 import org.harmoniapp.services.auth.LoginService;
 import org.junit.jupiter.api.BeforeAll;

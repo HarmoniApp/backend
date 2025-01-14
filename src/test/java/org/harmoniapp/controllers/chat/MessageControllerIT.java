@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,7 +20,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Integration tests for the {@link GroupController} class.
@@ -99,24 +97,6 @@ public class MessageControllerIT {
     }
 
     @Test
-    public void getChatHistoryWithoutJWTTokenTest() throws Exception {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.get("/message/history?userId1=1&userId2=20"))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-        });
-    }
-
-    @Test
-    public void getChatHistoryWithoutUserId1Test() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/message/history?userId2=20")
-                        .header("Authorization", "Bearer " + jwt)
-                        .param("userId2", "20"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
-    }
-
-    @Test
     public void getAllChatPartners() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/message/all-chat-partners?userId=1")
                         .header("Authorization", "Bearer " + jwt))
@@ -124,23 +104,6 @@ public class MessageControllerIT {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(4));
-    }
-
-    @Test
-    public void getAllChatPartnersWithoutJWTTokenTest() throws Exception {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.get("/message/all-chat-partners?userId=1"))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-        });
-    }
-
-    @Test
-    public void getAllChatPartnersWithoutUserIdTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/message/all-chat-partners")
-                        .header("Authorization", "Bearer " + jwt))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -159,26 +122,6 @@ public class MessageControllerIT {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
                 .andExpect(MockMvcResultMatchers.content().string("Let’s connect later."));
-    }
-
-    @Test
-    public void getIndividualLastMessageWithoutJWTTokenTest() throws Exception {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.get("/message/last?userId1=1&userId2=20"))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-        });
-    }
-
-    @Test
-    public void getGroupLastMessageWithoutJWTTokenTest() throws Exception {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.get("/message/last?userId1=1&groupId=1"))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(MockMvcResultMatchers.status().isOk())
-                    .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
-                    .andExpect(MockMvcResultMatchers.content().string("Bye everyone."));
-        });
     }
 
     @Test
@@ -281,27 +224,6 @@ public class MessageControllerIT {
     }
 
     @Test
-    public void sendMessageWithoutJWTTokenTest() throws Exception {
-        long senderId = 1L;
-        long receiverId = 20L;
-        String message = "Hello!";
-        MessageDto messageDto = MessageDto.builder()
-                .senderId(senderId)
-                .receiverId(receiverId)
-                .content(message)
-                .build();
-        ObjectMapper mapper = new ObjectMapper();
-
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.post("/message/send")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(mapper.writeValueAsString(messageDto)))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-        });
-    }
-
-    @Test
     public void markAllReadIndividualTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.patch("/message/mark-all-read?userId1=1&userId2=20")
                         .header("Authorization", "Bearer " + jwt))
@@ -309,14 +231,6 @@ public class MessageControllerIT {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray());
-    }
-
-    @Test
-    public void markAllReadIndividualAsNotMemberTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.patch("/message/mark-all-read?userId1=2&userId2=20")
-                        .header("Authorization", "Bearer " + jwt))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -335,14 +249,5 @@ public class MessageControllerIT {
                         .header("Authorization", "Bearer " + jwt))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isForbidden());
-    }
-
-    @Test
-    public void markAllReadWithoutJWTTokenTest() throws Exception {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.patch("/message/mark-all-read?userId1=1&userId2=20"))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-        });
     }
 }

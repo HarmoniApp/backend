@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Test class for {@link PartialUserController} class
+ * Test class for {@link PartialUserController} class.
  */
 @SpringBootTest
 @ExtendWith(SpringExtension.class)

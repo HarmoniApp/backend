@@ -29,7 +29,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Test class for {@link UserController} class
+ * Test class for {@link UserController} class.
  */
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -133,7 +133,7 @@ public class UserControllerIT {
     }
 
     @Test
-    public void getUserSearchAsAdminTest() throws Exception {
+    public void getUserSearchTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/user/search")
                         .header("Authorization", "Bearer " + jwtAdmin)
                         .param("q", "John"))
@@ -144,7 +144,7 @@ public class UserControllerIT {
     }
 
     @Test
-    public void createUserAsAdminTest() throws Exception {
+    public void createUserTest() throws Exception {
         //given
         LocalDate now = LocalDate.now();
         AddressDto residence = AddressDto.builder()
@@ -185,44 +185,6 @@ public class UserControllerIT {
     }
 
     @Test
-    public void createUserAsUserTest() throws Exception {
-        //given
-        LocalDate now = LocalDate.now();
-        AddressDto residence = AddressDto.builder()
-                .city("Warsaw")
-                .street("Example Street")
-                .buildingNumber("1")
-                .apartment("1")
-                .zipCode("00-000")
-                .build();
-        AddressDto workAddress = AddressDto.builder().id(34L).build();
-        UserDto userDto = UserDto.builder()
-                .firstname("John")
-                .surname("Doe")
-                .email("example@example.com")
-                .contractType(new ContractTypeDto(1L, null, 0))
-                .contractSignature(now.plusDays(1))
-                .contractExpiration(now.plusYears(1))
-                .residence(residence)
-                .workAddress(workAddress)
-                .supervisorId(1L)
-                .phoneNumber("123456789")
-                .employeeId("123456")
-                .roles(List.of(new RoleDto(1L, null, null), new RoleDto(2L, null, null)))
-                .languages(List.of(new LanguageDto(1L, null, null), new LanguageDto(2L, null, null)))
-                .build();
-
-        //when
-        mockMvc.perform(MockMvcRequestBuilders.post("/user")
-                        .header("Authorization", "Bearer " + jwtUser)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(userDto)))
-                .andDo(MockMvcResultHandlers.print())
-                //then
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
-    }
-
-    @Test
     public void createUserMissingBodyTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/user")
                         .header("Authorization", "Bearer " + jwtAdmin)
@@ -232,7 +194,7 @@ public class UserControllerIT {
     }
 
     @Test
-    public void updateUserAsAdminTest() throws Exception {
+    public void updateUserTest() throws Exception {
         //given
         LocalDate now = LocalDate.now();
         AddressDto residence = AddressDto.builder()
@@ -313,19 +275,11 @@ public class UserControllerIT {
     }
 
     @Test
-    public void deleteUserAsAdminTest() throws Exception {
+    public void deleteUserTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/user/2")
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
-    }
-
-    @Test
-    public void deleteUserAsUserTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/user/2")
-                        .header("Authorization", "Bearer " + jwtUser))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test

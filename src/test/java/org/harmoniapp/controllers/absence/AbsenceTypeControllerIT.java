@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,8 +18,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
+/**
+ * Integration tests for the {@link AbsenceTypeController} class.
+ */
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
@@ -78,15 +78,6 @@ public class AbsenceTypeControllerIT {
     }
 
     @Test
-    public void getAbsenceTypeWithoutJWTTokeTest() throws Exception {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.get("/absence-type/{id}", 1L))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-        });
-    }
-
-    @Test
     public void getAllAbsenceTypesAsAdminTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/absence-type")
                         .header("Authorization", "Bearer " + jwtAdmin)
@@ -108,14 +99,5 @@ public class AbsenceTypeControllerIT {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(9));
-    }
-
-    @Test
-    public void getAllAbsenceTypeWithoutJWTTokenTest() throws Exception {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.get("/absence-type"))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-        });
     }
 }

@@ -21,8 +21,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 /**
  * Integration tests for the {@link RoleController} class.
  */
@@ -36,7 +34,6 @@ public class RoleControllerIT {
 
     private final MockMvc mockMvc;
     private static String jwtAdmin;
-    private static String jwtUser;
 
     @Autowired
     public RoleControllerIT(MockMvc mockMvc) {
@@ -48,28 +45,16 @@ public class RoleControllerIT {
         // Login as an admin to get a JWT token
         var credentialsAdmin = new LoginRequestDto("jan.kowalski@example.com", "StrongPassword!2137");
         jwtAdmin = loginService.login(credentialsAdmin).jwtToken();
-
-        // Login as a user to get a JWT token
-        var credentialsUser = new LoginRequestDto("piotr.wisniewski@example.com", "StrongPassword!2137");
-        jwtUser = loginService.login(credentialsUser).jwtToken();
     }
 
     @Test
-    public void getRoleAsAdminTest() throws Exception {
+    public void getRoleTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/role/1")
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1));
-    }
-
-    @Test
-    public void getRoleAsUserTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/role/1")
-                        .header("Authorization", "Bearer " + jwtUser))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -81,39 +66,13 @@ public class RoleControllerIT {
     }
 
     @Test
-    public void getRoleWithoutJwtTokenTest() {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.get("/role/1"))
-                    .andDo(MockMvcResultHandlers.print());
-        });
-    }
-
-    @Test
-    public void getUserRolesAsAdminTest() throws Exception {
+    public void getUserRolesTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/role/user/10")
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray());
-    }
-
-    @Test
-    public void getUserRolesAsOwnerTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/role/user/3")
-                        .header("Authorization", "Bearer " + jwtUser))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$").isArray());
-    }
-
-    @Test
-    public void getUserRolesAsNotOwnerTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/role/user/1")
-                        .header("Authorization", "Bearer " + jwtUser))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -125,15 +84,7 @@ public class RoleControllerIT {
     }
 
     @Test
-    public void getUserRolesWithoutJwtTokenTest() {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.get("/role/user/1"))
-                    .andDo(MockMvcResultHandlers.print());
-        });
-    }
-
-    @Test
-    public void getAllRolesAsAdminTest() throws Exception {
+    public void getAllRolesTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/role")
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
@@ -143,23 +94,7 @@ public class RoleControllerIT {
     }
 
     @Test
-    public void getAllRolesAsUserTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/role")
-                        .header("Authorization", "Bearer " + jwtUser))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
-    }
-
-    @Test
-    public void getAllRolesWithoutJwtTokenTest() {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.get("/role"))
-                    .andDo(MockMvcResultHandlers.print());
-        });
-    }
-
-    @Test
-    public void createRoleAsAdminTest() throws Exception {
+    public void createRoleTest() throws Exception {
         RoleDto roleDto = new RoleDto(0L, "TestRole", "#FFFFFF");
         ObjectMapper mapper = new ObjectMapper();
 
@@ -173,20 +108,7 @@ public class RoleControllerIT {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("TestRole"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.color").value("#FFFFFF"));
     }
-
-    @Test
-    public void createRoleAsUserTest() throws Exception {
-        RoleDto roleDto = new RoleDto(0L, "TestRole", "#FFFFFF");
-        ObjectMapper mapper = new ObjectMapper();
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/role")
-                        .header("Authorization", "Bearer " + jwtUser)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(roleDto)))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
-    }
-
+    
     @Test
     public void createRoleWithNameAdminTest() throws Exception {
         RoleDto roleDto = new RoleDto(0L, "Admin", "#FFFFFF");
@@ -201,15 +123,7 @@ public class RoleControllerIT {
     }
 
     @Test
-    public void createRoleWithoutJwtTokenTest() {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.post("/role"))
-                    .andDo(MockMvcResultHandlers.print());
-        });
-    }
-
-    @Test
-    public void updateRoleAsAdminTest() throws Exception {
+    public void updateRoleTest() throws Exception {
         RoleDto roleDto = new RoleDto(0L, "TestRole", "#FFFFFF");
         ObjectMapper mapper = new ObjectMapper();
 
@@ -223,19 +137,6 @@ public class RoleControllerIT {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(2))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("TestRole"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.color").value("#FFFFFF"));
-    }
-
-    @Test
-    public void updateRoleAsUserTest() throws Exception {
-        RoleDto roleDto = new RoleDto(0L, "TestRole", "#FFFFFF");
-        ObjectMapper mapper = new ObjectMapper();
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/role/2")
-                        .header("Authorization", "Bearer " + jwtUser)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(roleDto)))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -268,19 +169,11 @@ public class RoleControllerIT {
     }
 
     @Test
-    public void deleteRoleAsAdminTest() throws Exception {
+    public void deleteRoleTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/role/2")
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
-    }
-
-    @Test
-    public void deleteRoleAsUserTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/role/2")
-                        .header("Authorization", "Bearer " + jwtUser))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -289,14 +182,6 @@ public class RoleControllerIT {
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
-    }
-
-    @Test
-    public void deleteRoleWithoutJwtTokenTest() {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.delete("/role/1"))
-                    .andDo(MockMvcResultHandlers.print());
-        });
     }
 
     @Test

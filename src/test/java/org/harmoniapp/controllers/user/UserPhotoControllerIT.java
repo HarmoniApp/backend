@@ -1,7 +1,5 @@
 package org.harmoniapp.controllers.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.harmoniapp.contracts.auth.LoginRequestDto;
 import org.harmoniapp.services.auth.LoginService;
 import org.junit.jupiter.api.BeforeAll;
@@ -26,7 +24,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 /**
- * Test class for {@link UserPhotoController} class
+ * Test class for {@link UserPhotoController} class.
  */
 @SpringBootTest
 @ExtendWith(SpringExtension.class)

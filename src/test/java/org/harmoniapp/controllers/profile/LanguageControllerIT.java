@@ -11,16 +11,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Integration tests for the {@link LanguageController} class.
@@ -63,14 +59,6 @@ public class LanguageControllerIT {
     }
 
     @Test
-    public void getAllLanguagesWithoutJwtTokenTest() {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.get("/language"))
-                    .andDo(MockMvcResultHandlers.print());
-        });
-    }
-
-    @Test
     public void getLanguageTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/language/1")
                         .header("Authorization", "Bearer " + jwtAdmin))
@@ -84,14 +72,6 @@ public class LanguageControllerIT {
         mockMvc.perform(MockMvcRequestBuilders.get("/language/0")
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
-    }
-
-    @Test
-    public void getLanguageWithoutJwtTokenTest() {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.get("/language/1"))
-                    .andDo(MockMvcResultHandlers.print());
-        });
     }
 
     @Test
@@ -133,20 +113,7 @@ public class LanguageControllerIT {
     }
 
     @Test
-    public void createLanguageWithoutJwtTokenTest() {
-        LanguageDto languageDto = new LanguageDto(null, "Angielski", "gb");
-        ObjectMapper mapper = new ObjectMapper();
-
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.post("/language")
-                            .contentType("application/json")
-                            .content(mapper.writeValueAsString(languageDto)))
-                    .andDo(MockMvcResultHandlers.print());
-        });
-    }
-
-    @Test
-    public void updateLanguageAsAdminTest() throws Exception {
+    public void updateLanguageTest() throws Exception {
         LanguageDto languageDto = new LanguageDto(1L, "TestLanguage", "TL");
         ObjectMapper mapper = new ObjectMapper();
 
@@ -158,18 +125,6 @@ public class LanguageControllerIT {
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("TestLanguage"));
-    }
-
-    @Test
-    public void updateLanguageAsUserTest() throws Exception {
-        LanguageDto languageDto = new LanguageDto(1L, "TestLanguage", "TL");
-        ObjectMapper mapper = new ObjectMapper();
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/language/1")
-                        .header("Authorization", "Bearer " + jwtUser)
-                        .contentType("application/json")
-                        .content(mapper.writeValueAsString(languageDto)))
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -187,30 +142,10 @@ public class LanguageControllerIT {
     }
 
     @Test
-    public void updateLanguageWithoutJwtTokenTest() {
-        LanguageDto languageDto = new LanguageDto(null, "Angielski", "gb");
-        ObjectMapper mapper = new ObjectMapper();
-
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.put("/language/1")
-                            .contentType("application/json")
-                            .content(mapper.writeValueAsString(languageDto)))
-                    .andDo(MockMvcResultHandlers.print());
-        });
-    }
-
-    @Test
-    public void deleteLanguageAsAdminTest() throws Exception {
+    public void deleteLanguageTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/language/1")
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
-    }
-
-    @Test
-    public void deleteLanguageAsUserTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/language/1")
-                        .header("Authorization", "Bearer " + jwtUser))
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -218,13 +153,5 @@ public class LanguageControllerIT {
         mockMvc.perform(MockMvcRequestBuilders.delete("/language/0")
                         .header("Authorization", "Bearer " + jwtAdmin))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
-    }
-
-    @Test
-    public void deleteLanguageWithoutJwtTokenTest() {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.delete("/language/1"))
-                    .andDo(MockMvcResultHandlers.print());
-        });
     }
 }

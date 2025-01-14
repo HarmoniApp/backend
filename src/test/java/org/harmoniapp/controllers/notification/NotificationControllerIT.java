@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,7 +18,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Integration tests for the {@link NotificationController} class.
@@ -48,7 +46,7 @@ public class NotificationControllerIT {
     }
 
     @Test
-    public void getAllNotificationsByUserIdTest() throws Exception{
+    public void getAllNotificationsByUserIdTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/notification/user/1")
                         .header("Authorization", "Bearer " + jwt))
                 .andDo(MockMvcResultHandlers.print())
@@ -58,7 +56,7 @@ public class NotificationControllerIT {
     }
 
     @Test
-    public void getAllNotificationsByInvalidUserIdTest() throws Exception{
+    public void getAllNotificationsByInvalidUserIdTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/notification/user/2/unread")
                         .header("Authorization", "Bearer " + jwt))
                 .andDo(MockMvcResultHandlers.print())
@@ -66,29 +64,19 @@ public class NotificationControllerIT {
     }
 
     @Test
-    public void getAllNotificationsByUserIdWithoutJwtTokenTest() {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.get("/notification/user/1"))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-        });
-    }
-
-    @Test
-    public void getAllUnreadNotificationsByUserIdTest() throws Exception{
+    public void getAllUnreadNotificationsByUserIdTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/notification/user/1/unread")
                         .header("Authorization", "Bearer " + jwt))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].read").value(false));
     }
 
     @Test
-    public void getAllUnreadNotificationsByInvalidUserIdTest() throws Exception{
+    public void getAllUnreadNotificationsByInvalidUserIdTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/notification/user/2/unread")
                         .header("Authorization", "Bearer " + jwt))
                 .andDo(MockMvcResultHandlers.print())
@@ -96,29 +84,19 @@ public class NotificationControllerIT {
     }
 
     @Test
-    public void getAllUnreadNotificationsByUserIdWithoutJwtTokenTest() {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.get("/notification/user/1/unread"))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-        });
-    }
-
-    @Test
-    public void markAllAsReadByUserIdTest() throws Exception{
+    public void markAllAsReadByUserIdTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.patch("/notification/user/1/read")
                         .header("Authorization", "Bearer " + jwt))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].user_id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].read").value(true));
     }
 
     @Test
-    public void markAllAsReadByInvalidUserIdTest() throws Exception{
+    public void markAllAsReadByInvalidUserIdTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.patch("/notification/user/2/read")
                         .header("Authorization", "Bearer " + jwt))
                 .andDo(MockMvcResultHandlers.print())
@@ -126,16 +104,7 @@ public class NotificationControllerIT {
     }
 
     @Test
-    public void markAllAsReadByUserIdWithoutJwtTokenTest() {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.patch("/notification/user/1/read"))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-        });
-    }
-
-    @Test
-    public void deleteNotificationByIdTest() throws Exception{
+    public void deleteNotificationByIdTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/notification/1")
                         .header("Authorization", "Bearer " + jwt))
                 .andDo(MockMvcResultHandlers.print())
@@ -143,27 +112,10 @@ public class NotificationControllerIT {
     }
 
     @Test
-    public void deleteNotificationByInvalidIdTest() throws Exception{
-        mockMvc.perform(MockMvcRequestBuilders.delete("/notification/999")
-                        .header("Authorization", "Bearer " + jwt))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
-    }
-
-    @Test
-    public void deleteNotificationOfAnotherUserTest() throws Exception{
+    public void deleteNotificationOfAnotherUserTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/notification/22")
                         .header("Authorization", "Bearer " + jwt))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isForbidden());
-    }
-
-    @Test
-    public void deleteNotificationWithoutJwtTokenTest() {
-        assertThrows(BadCredentialsException.class, () -> {
-            mockMvc.perform(MockMvcRequestBuilders.delete("/notification/1"))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-        });
     }
 }

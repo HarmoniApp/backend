@@ -54,7 +54,7 @@ public class PredefineShiftControllerIT {
     @Test
     public void getPredefineShiftTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/predefine-shift/1")
-                .header("Authorization", "Bearer " + jwtAdmin))
+                        .header("Authorization", "Bearer " + jwtAdmin))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1));
     }
@@ -62,14 +62,14 @@ public class PredefineShiftControllerIT {
     @Test
     public void getPredefineShiftInvalidIdTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/predefine-shift/0")
-                .header("Authorization", "Bearer " + jwtAdmin))
+                        .header("Authorization", "Bearer " + jwtAdmin))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test
     public void getAllPredefineShiftsTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/predefine-shift")
-                .header("Authorization", "Bearer " + jwtAdmin))
+                        .header("Authorization", "Bearer " + jwtAdmin))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray());
     }
@@ -82,9 +82,9 @@ public class PredefineShiftControllerIT {
                 .end(LocalTime.of(16, 0))
                 .build();
         mockMvc.perform(MockMvcRequestBuilders.post("/predefine-shift")
-                .header("Authorization", "Bearer " + jwtAdmin)
-                .contentType("application/json")
-                .content(mapper.writeValueAsString(predefineShiftDto)))
+                        .header("Authorization", "Bearer " + jwtAdmin)
+                        .contentType("application/json")
+                        .content(mapper.writeValueAsString(predefineShiftDto)))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test"))
@@ -112,9 +112,9 @@ public class PredefineShiftControllerIT {
                 .end(LocalTime.of(16, 0))
                 .build();
         mockMvc.perform(MockMvcRequestBuilders.put("/predefine-shift/1")
-                .header("Authorization", "Bearer " + jwtAdmin)
-                .contentType("application/json")
-                .content(mapper.writeValueAsString(predefineShiftDto)))
+                        .header("Authorization", "Bearer " + jwtAdmin)
+                        .contentType("application/json")
+                        .content(mapper.writeValueAsString(predefineShiftDto)))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test"))
@@ -155,14 +155,14 @@ public class PredefineShiftControllerIT {
     @Test
     public void deletePredefineShiftTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/predefine-shift/1")
-                .header("Authorization", "Bearer " + jwtAdmin))
+                        .header("Authorization", "Bearer " + jwtAdmin))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
     @Test
     public void deletePredefineShiftInvalidIdTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/predefine-shift/99")
-                .header("Authorization", "Bearer " + jwtAdmin))
+                        .header("Authorization", "Bearer " + jwtAdmin))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 }
