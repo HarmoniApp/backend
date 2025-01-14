@@ -162,7 +162,7 @@ public class RoleServiceImpl implements RoleService {
      * @throws AdminRoleModificationException if the role is the admin role
      */
     private void checkRoleIsAdmin(Role role) {
-        if (role.getName().equals("admin")) {
+        if (role.getName().equalsIgnoreCase("admin")) {
             throw new AdminRoleModificationException("Nie można edytować roli admin");
         }
     }

@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  * @see UserDetailsService
  */
 @Component
-@Profile("!prod")
+@Profile({"default", "test"})
 @RequiredArgsConstructor
 public class HarmoniUserPasswordAuthenticationProvider implements AuthenticationProvider {
     private final UserDetailsService userDetailsService;

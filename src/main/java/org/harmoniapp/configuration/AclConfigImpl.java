@@ -75,7 +75,7 @@ public class AclConfigImpl implements AclConfig {
      */
     private void configureChatEndpoints(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(request -> request
-                .requestMatchers("/group/chat-partners/**").access(ownerQueryParamAuthorizationManager)
+                .requestMatchers("/message/all-chat-partners/**").access(ownerQueryParamAuthorizationManager)
                 .requestMatchers(new AntPathRequestMatcher("/group", "POST")).hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/group/details/{groupId}/**","/group/{groupId}/**").access(groupMemberAuthorizationManager)
                 .requestMatchers("/group/**").hasAnyRole("USER", "ADMIN")
@@ -117,7 +117,8 @@ public class AclConfigImpl implements AclConfig {
         http.authorizeHttpRequests(request -> request
                 .requestMatchers("/address/**").hasRole("ADMIN")
                 .requestMatchers("/contract-type/**").hasRole("ADMIN")
-                .requestMatchers("/language/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers(new AntPathRequestMatcher("/language/**", "GET")).hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/language/**").hasRole("ADMIN")
                 .requestMatchers("/role/user/{id}/**").access(adminOrOwnerAuthorizationManager)
                 .requestMatchers("/role/**").hasRole("ADMIN"));
     }
@@ -146,8 +147,8 @@ public class AclConfigImpl implements AclConfig {
      */
     private void configureUserEndpoints(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(request -> request
-                .requestMatchers("/user/simple/empId/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/user/simple/**", "/user/supervisor", "/user/search").hasRole("ADMIN")
+                .requestMatchers("/user/simple/empId/**", "/user/simple/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/user/supervisor", "/user/search").hasRole("ADMIN")
                 .requestMatchers("/user/{id}/photo").authenticated()
                 .requestMatchers(new AntPathRequestMatcher("/user/{id}/changePassword"),
                         new AntPathRequestMatcher("/user/{id}/uploadPhoto"),

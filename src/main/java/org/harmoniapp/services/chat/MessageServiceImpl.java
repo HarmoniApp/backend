@@ -69,7 +69,7 @@ public class MessageServiceImpl implements MessageService {
      * @throws InvalidConversationException if the conversation is invalid
      */
     @Override
-    public String getLastMessageByUsersId(ChatRequestDto chatRequestDto) {
+    public String getLastMessage(ChatRequestDto chatRequestDto) {
         Long groupId = chatRequestDto.groupId();
         Long userId1 = chatRequestDto.userId1();
         Long userId2 = chatRequestDto.userId2();
@@ -190,7 +190,8 @@ public class MessageServiceImpl implements MessageService {
      * @return true if the message should be translated, false otherwise
      */
     private boolean shouldTranslate(TranslationRequestDto translationRequestDto) {
-        return translationRequestDto.translate()
+        return translationRequestDto.translate() != null
+                && translationRequestDto.translate()
                 && translationRequestDto.targetLanguage() != null
                 && !translationRequestDto.targetLanguage().isEmpty();
     }

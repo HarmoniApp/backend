@@ -2,6 +2,7 @@ package org.harmoniapp.services.absence;
 
 import org.harmoniapp.contracts.notification.NotificationDto;
 import org.harmoniapp.entities.absence.Absence;
+import org.harmoniapp.entities.user.User;
 import org.harmoniapp.enums.AbsenceNotificationType;
 
 /**
@@ -17,7 +18,12 @@ public class AbsenceNotification {
      * @return a NotificationDto object containing the notification details
      */
     public static NotificationDto createNotification(Absence savedAbsence, AbsenceNotificationType type) {
-        long receiverId = getReceiverId(savedAbsence, type);
+        long receiverId;
+        try {
+            receiverId = getReceiverId(savedAbsence, type);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
         String message = getMessage(savedAbsence, type);
         return createNotification(receiverId, type.getTitle(), message);
     }
@@ -33,7 +39,11 @@ public class AbsenceNotification {
     private static long getReceiverId(Absence absence, AbsenceNotificationType type) {
         switch (type) {
             case NEW_ABSENCE, EMPLOYEE_DELETED -> {
-                return absence.getUser().getSupervisor().getId();
+                User supervisor = absence.getUser().getSupervisor();
+                if (supervisor == null) {
+                   throw new IllegalArgumentException("Nie znaleziono przełożonego");
+                }
+                return supervisor.getId();
             }
             case EMPLOYER_UPDATED -> {
                 return absence.getUser().getId();

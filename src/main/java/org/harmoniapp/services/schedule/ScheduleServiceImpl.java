@@ -8,6 +8,7 @@ import org.harmoniapp.contracts.schedule.UserScheduleDto;
 import org.harmoniapp.entities.absence.Absence;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.exception.EntityNotFoundException;
+import org.harmoniapp.exception.InvalidDateException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,7 @@ public class ScheduleServiceImpl implements ScheduleService {
      */
     public UserScheduleDto getUserWeeklySchedule(Long userId, ScheduleRequestDto scheduleRequestDto) {
         validateUserId(userId);
+        validateDate(scheduleRequestDto);
 
         List<Shift> shifts = getShiftsForUser(userId, scheduleRequestDto);
         List<Absence> absences = getAbsencesForUser(userId, scheduleRequestDto.startDate(), scheduleRequestDto.endDate());
@@ -52,6 +54,18 @@ public class ScheduleServiceImpl implements ScheduleService {
     private void validateUserId(Long userId) {
         if (userId == null || !repositoryCollector.getUsers().existsById(userId)) {
             throw new EntityNotFoundException("Nie znaleziono użytkownika o ID %d".formatted(userId));
+        }
+    }
+
+    /**
+     * Validates the date range in the schedule request.
+     *
+     * @param scheduleRequestDto the schedule request data transfer object containing the date range
+     * @throws InvalidDateException if the start date or end date is null
+     */
+    private void validateDate(ScheduleRequestDto scheduleRequestDto) {
+        if (scheduleRequestDto.startDate() == null || scheduleRequestDto.endDate() == null) {
+            throw new InvalidDateException("Data początkowa i końcowa są wymagane");
         }
     }
 

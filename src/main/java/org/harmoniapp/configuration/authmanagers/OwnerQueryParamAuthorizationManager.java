@@ -28,7 +28,9 @@ public class OwnerQueryParamAuthorizationManager implements AuthorizationManager
     @Override
     public AuthorizationDecision check(Supplier<Authentication> authenticationSupplier, RequestAuthorizationContext ctx) {
         Map<String, String> paramsMap = getQueryParams(ctx);
-
+        if (paramsMap.isEmpty()) {
+            throw new AccessDeniedException("Odmowa dostępu");
+        }
         Long userId = Long.parseLong(paramsMap.get("userId"));
         if (userId == null) {
             throw new AccessDeniedException("Odmowa dostępu");

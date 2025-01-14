@@ -1,5 +1,6 @@
 package org.harmoniapp.controllers.profile;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.harmoniapp.contracts.profile.ContractTypeDto;
 import org.harmoniapp.services.profile.ContractTypeServiceImpl;
@@ -47,7 +48,7 @@ public class ContractTypeController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ContractTypeDto createContractType(@RequestBody ContractTypeDto contractTypeDto) {
+    public ContractTypeDto createContractType(@Valid @RequestBody ContractTypeDto contractTypeDto) {
         return contractTypeService.create(contractTypeDto);
     }
 
@@ -60,7 +61,7 @@ public class ContractTypeController {
      */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ContractTypeDto updateContractType(@PathVariable long id, @RequestBody ContractTypeDto contractTypeDto) {
+    public ContractTypeDto updateContractType(@PathVariable long id, @Valid @RequestBody ContractTypeDto contractTypeDto) {
         return contractTypeService.updateById(id, contractTypeDto);
     }
 

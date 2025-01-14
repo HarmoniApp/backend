@@ -18,7 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * <p>This configuration is active only when the "prod" profile is not active.</p>
  */
 @Configuration
-@Profile("!prod")
+@Profile("default")
 public class ProjectSecurityConfig extends AbstractProjectSecurityConfig {
 
     @Autowired

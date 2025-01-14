@@ -111,7 +111,7 @@ public class UserPdfExport extends PdfExport implements ExportUser {
             table.addCell(new PdfPCell(new Phrase(user.residence().buildingNumber())));
             table.addCell(new PdfPCell(new Phrase(userDataService.getRoles(user))));
             table.addCell(new PdfPCell(new Phrase(userDataService.getLanguages(user))));
-            table.addCell(new PdfPCell(new Phrase(user.contractType().getName())));
+            table.addCell(new PdfPCell(new Phrase(user.contractType().name())));
             table.addCell(new PdfPCell(new Phrase(user.contractSignature().toString())));
             table.addCell(new PdfPCell(new Phrase(user.contractExpiration().toString())));
             table.addCell(new PdfPCell(new Phrase(userDataService.getSupervisorEmployeeId(user))));

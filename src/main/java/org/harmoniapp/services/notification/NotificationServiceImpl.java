@@ -120,18 +120,6 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Marks a single notification as read.
-     *
-     * @param notification the Notification entity to be marked as read
-     * @return a NotificationDto object representing the marked notification
-     */
-    private NotificationDto markAsRead(Notification notification) {
-        List<NotificationDto> notificationDtoList = markAsReadNotifications(List.of(notification));
-        assert notificationDtoList != null;
-        return notificationDtoList.getFirst();
-    }
-
-    /**
      * Marks a list of notifications as read.
      *
      * @param notifications the list of Notification entities to be marked as read

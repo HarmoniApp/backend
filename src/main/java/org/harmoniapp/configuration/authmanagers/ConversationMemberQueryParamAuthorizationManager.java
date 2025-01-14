@@ -35,6 +35,9 @@ public class ConversationMemberQueryParamAuthorizationManager extends GroupAcces
     @Override
     public AuthorizationDecision check(Supplier<Authentication> authenticationSupplier, RequestAuthorizationContext ctx) {
         Map<String, String> paramsMap = getQueryParams(ctx);
+        if (paramsMap.isEmpty()) {
+            throw new AccessDeniedException("Odmowa dostępu");
+        }
         Authentication authentication = authenticationSupplier.get();
 
         if (paramsMap.get("groupId") != null) {
