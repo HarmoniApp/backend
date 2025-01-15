@@ -55,7 +55,7 @@ public class AlgorithmEntityMapperImpl implements AlgorithmEntityMapper {
      * @return the predefined shift with the specified ID
      * @throws EntityNotFoundException if no predefined shift with the specified ID is found
      */
-    private PredefineShift findPredefineShift(List<PredefineShift> predefineShifts, long shiftId) {
+    PredefineShift findPredefineShift(List<PredefineShift> predefineShifts, long shiftId) {
         return predefineShifts.stream()
                 .filter(ps -> ps.getId().equals(shiftId))
                 .findFirst()
@@ -69,7 +69,7 @@ public class AlgorithmEntityMapperImpl implements AlgorithmEntityMapper {
      * @param shiftDay the day of the shift in the year
      * @return the calculated date of the shift
      */
-    private LocalDate calculateShiftDate(LocalDate now, int shiftDay) {
+    LocalDate calculateShiftDate(LocalDate now, int shiftDay) {
         return LocalDate.ofYearDay(
                 (now.getDayOfYear() <= shiftDay) ? now.getYear() : now.getYear() + 1, shiftDay);
     }
@@ -81,7 +81,7 @@ public class AlgorithmEntityMapperImpl implements AlgorithmEntityMapper {
      * @param predShift the predefined shift
      * @return the calculated end time of the shift
      */
-    private LocalDateTime calculateShiftEnd(LocalDate date, PredefineShift predShift) {
+    LocalDateTime calculateShiftEnd(LocalDate date, PredefineShift predShift) {
         return LocalDateTime.of(
                 (predShift.getStart().isBefore(predShift.getEnd())) ? date : date.plusDays(1), predShift.getEnd()
         );
@@ -96,7 +96,7 @@ public class AlgorithmEntityMapperImpl implements AlgorithmEntityMapper {
      * @param data      the aggregated schedule data
      * @return a list of decoded shifts
      */
-    private List<Shift> createDecodedShifts(LocalDateTime start, LocalDateTime end, List<Employee> employees, AggregatedScheduleData data) {
+    List<Shift> createDecodedShifts(LocalDateTime start, LocalDateTime end, List<Employee> employees, AggregatedScheduleData data) {
         List<Shift> decodedShifts = new ArrayList<>();
         for (Employee employee : employees) {
             Shift decodedShift = createDecodedShift(start, end, employee, data);
@@ -114,7 +114,7 @@ public class AlgorithmEntityMapperImpl implements AlgorithmEntityMapper {
      * @param data     the aggregated schedule data
      * @return the created decoded shift
      */
-    private Shift createDecodedShift(LocalDateTime start, LocalDateTime end, Employee employee, AggregatedScheduleData data) {
+    Shift createDecodedShift(LocalDateTime start, LocalDateTime end, Employee employee, AggregatedScheduleData data) {
         Shift decodedShift = new Shift();
         decodedShift.setStart(start);
         decodedShift.setEnd(end);
@@ -132,7 +132,7 @@ public class AlgorithmEntityMapperImpl implements AlgorithmEntityMapper {
      * @return the user with the specified employee ID
      * @throws EntityNotFoundException if no user with the specified employee ID is found
      */
-    private User findUserByEmployeeId(List<User> users, String employeeId) {
+    User findUserByEmployeeId(List<User> users, String employeeId) {
         return users.stream()
                 .filter(u -> u.getEmployeeId().equals(employeeId))
                 .findFirst()
@@ -147,7 +147,7 @@ public class AlgorithmEntityMapperImpl implements AlgorithmEntityMapper {
      * @return the role with the specified name
      * @throws EntityNotFoundException if no role with the specified name is found
      */
-    private Role findRoleByName(List<Role> roles, String roleName) {
+    Role findRoleByName(List<Role> roles, String roleName) {
         return roles.stream()
                 .filter(r -> r.getName().equals(roleName))
                 .findFirst()

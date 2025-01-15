@@ -1,5 +1,6 @@
 package org.harmoniapp.geneticalgorithm;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
  * Represents a chromosome in the genetic algorithm.
  */
 @Data
+@AllArgsConstructor
 public class Chromosome {
     private List<Gen> gens;
     private CheckConstraint checker;

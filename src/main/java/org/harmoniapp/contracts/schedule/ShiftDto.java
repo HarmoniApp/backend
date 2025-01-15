@@ -51,9 +51,9 @@ public record ShiftDto(
                 .id(shift.getId())
                 .start(shift.getStart())
                 .end(shift.getEnd())
-                .userId(shift.getUser().getId())
+                .userId((shift.getUser() != null) ? shift.getUser().getId() : null)
                 .roleName((shift.getRole() != null) ? shift.getRole().getName() : null)
-                .published(shift.getPublished())
+                .published((shift.getPublished() != null) ? shift.getPublished() : false)
                 .build();
     }
 

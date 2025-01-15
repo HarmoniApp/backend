@@ -56,7 +56,7 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param requirementsDto the list of schedule requirements
      * @throws InvalidAiScheduleRequirementsException if there is more than one requirement for a single day
      */
-    private void validAndSortRequirements(List<ScheduleRequirement> requirementsDto) {
+    void validAndSortRequirements(List<ScheduleRequirement> requirementsDto) {
         requirementsDto.sort(Comparator.comparing(ScheduleRequirement::date));
         for (int i = 0; i < requirementsDto.size() - 1; i++) {
             if (requirementsDto.get(i).date().equals(requirementsDto.get(i + 1).date())) {
@@ -72,7 +72,7 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param requirementsDto the list of schedule requirements
      * @return a list of active users without absences in the specified date range
      */
-    private List<User> findActiveUsersWithoutAbsence(List<ScheduleRequirement> requirementsDto) {
+    List<User> findActiveUsersWithoutAbsence(List<ScheduleRequirement> requirementsDto) {
         return repositoryCollector.getUsers().findAllActiveWithoutAbsenceInDateRange(
                 requirementsDto.getFirst().date(), requirementsDto.getLast().date());
     }
@@ -84,7 +84,7 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param users        the list of active users
      * @return a map of employees grouped by role
      */
-    private Map<String, List<Employee>> prepareEmployees(List<ScheduleRequirement> requirements, List<User> users) {
+    Map<String, List<Employee>> prepareEmployees(List<ScheduleRequirement> requirements, List<User> users) {
         Set<Long> validRoles = getValidRoles(requirements);
         List<Employee> employees = getUniqueEmployees(users, validRoles);
         return employees.stream().collect(Collectors.groupingBy(Employee::role));
@@ -96,7 +96,7 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param requirements the list of schedule requirements
      * @return a set of valid role IDs
      */
-    private Set<Long> getValidRoles(List<ScheduleRequirement> requirements) {
+    Set<Long> getValidRoles(List<ScheduleRequirement> requirements) {
         return requirements.stream()
                 .flatMap(scheduleRequirement -> scheduleRequirement.shifts().stream())
                 .flatMap(reqShiftDto -> reqShiftDto.roles().stream())
@@ -111,7 +111,7 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param validRoles the set of valid role IDs
      * @return a list of unique employees
      */
-    private List<Employee> getUniqueEmployees(List<User> users, Set<Long> validRoles) {
+    List<Employee> getUniqueEmployees(List<User> users, Set<Long> validRoles) {
         List<Employee> employees = new ArrayList<>();
         for (User user : users) {
             Set<Role> userRoles = user.getRoles();
@@ -134,8 +134,8 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param roles           the list of roles
      * @throws InvalidAiScheduleRequirementsException if there are not enough employees to generate a schedule
      */
-    private void verifyUserQuantity(List<ScheduleRequirement> requirementsDto, Map<String, List<Employee>> employees,
-                                    List<Role> roles) throws InvalidAiScheduleRequirementsException {
+    void verifyUserQuantity(List<ScheduleRequirement> requirementsDto, Map<String, List<Employee>> employees,
+                            List<Role> roles) throws InvalidAiScheduleRequirementsException {
         Map<String, Integer> required = summarizeRequiredEmployees(requirementsDto, roles);
         Map<String, Integer> available = calculateAvailableEmployees(requirementsDto, employees);
         checkEmployeeAvailability(required, available);
@@ -148,7 +148,7 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param roles           the list of roles
      * @return a map of roles and required employees
      */
-    private Map<String, Integer> summarizeRequiredEmployees(List<ScheduleRequirement> requirementsDto, List<Role> roles) {
+    Map<String, Integer> summarizeRequiredEmployees(List<ScheduleRequirement> requirementsDto, List<Role> roles) {
         return requirementsDto.stream()
                 .flatMap(scheduleRequirement -> scheduleRequirement.shifts().stream())
                 .flatMap(reqShiftDto -> reqShiftDto.roles().stream())
@@ -167,7 +167,7 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @return the name of the role
      * @throws EntityNotFoundException if no role with the given ID is found
      */
-    private String findRoleNameById(List<Role> roles, Long roleId) {
+    String findRoleNameById(List<Role> roles, Long roleId) {
         return roles.stream()
                 .filter(r -> r.getId().equals(roleId))
                 .findFirst()
@@ -182,7 +182,7 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param employees       the map of employees grouped by role
      * @return a map of roles and available employees
      */
-    private Map<String, Integer> calculateAvailableEmployees(List<ScheduleRequirement> requirementsDto, Map<String, List<Employee>> employees) {
+    Map<String, Integer> calculateAvailableEmployees(List<ScheduleRequirement> requirementsDto, Map<String, List<Employee>> employees) {
         return employees.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> {
                     int multiplier = (requirementsDto.size() < 5) ? requirementsDto.size() : (5 * (requirementsDto.size() / 7 + 1));
@@ -198,7 +198,7 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param available a map of roles and the number of available employees for each role
      * @throws InvalidAiScheduleRequirementsException if there are not enough employees available to meet the requirements
      */
-    private void checkEmployeeAvailability(Map<String, Integer> required, Map<String, Integer> available) throws InvalidAiScheduleRequirementsException {
+    void checkEmployeeAvailability(Map<String, Integer> required, Map<String, Integer> available) throws InvalidAiScheduleRequirementsException {
         required.forEach((role, requiredCount) -> {
             int availableCount = available.getOrDefault(role, 0);
             if (availableCount < requiredCount) {
@@ -218,8 +218,8 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param roles                the list of roles
      * @return a list of shifts
      */
-    private List<Gen> prepareShifts(List<ScheduleRequirement> scheduleRequirements, List<PredefineShift> predefineShifts,
-                                    List<Role> roles) {
+    List<Gen> prepareShifts(List<ScheduleRequirement> scheduleRequirements, List<PredefineShift> predefineShifts,
+                            List<Role> roles) {
         List<Gen> shifts = new ArrayList<>();
 
         for (ScheduleRequirement scheduleRequirement : scheduleRequirements) {
@@ -239,7 +239,7 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param scheduleRequirement the schedule requirement containing the shifts to be sorted
      * @param predefineShifts     the list of predefined shifts to determine the start time of each shift
      */
-    private void sortShiftsByStart(ScheduleRequirement scheduleRequirement, List<PredefineShift> predefineShifts) {
+    void sortShiftsByStart(ScheduleRequirement scheduleRequirement, List<PredefineShift> predefineShifts) {
         scheduleRequirement.shifts()
                 .sort(Comparator.comparing(rs -> predefineShifts.stream()
                         .filter(ps -> ps.getId().equals(rs.shiftId()))
@@ -256,7 +256,7 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param roles        the list of roles
      * @return a list of requirements
      */
-    private List<Requirements> prepareRequirements(List<ReqRoleDto> requirements, List<Role> roles) {
+    List<Requirements> prepareRequirements(List<ReqRoleDto> requirements, List<Role> roles) {
         List<Requirements> req = new ArrayList<>(requirements.size());
         for (ReqRoleDto reqRoleDto : requirements) {
             Role role = roles.stream().filter(r -> Objects.equals(r.getId(), reqRoleDto.roleId())).findFirst().orElseThrow();
@@ -274,8 +274,8 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param requirements        the list of requirements
      * @return a Gen object representing the shift
      */
-    private Gen createGen(ReqShiftDto reqShiftDto, ScheduleRequirement scheduleRequirement,
-                          List<PredefineShift> predefineShifts, List<Requirements> requirements) {
+    Gen createGen(ReqShiftDto reqShiftDto, ScheduleRequirement scheduleRequirement,
+                  List<PredefineShift> predefineShifts, List<Requirements> requirements) {
         PredefineShift shift = findShiftStartTime(predefineShifts, reqShiftDto);
         return new Gen(reqShiftDto.shiftId().intValue(),
                 scheduleRequirement.date().getDayOfYear(),
@@ -292,7 +292,7 @@ public class ScheduleDataEncoderImpl implements ScheduleDataEncoder {
      * @param reqShiftDto     the shift requirement DTO
      * @return the start time of the shift
      */
-    private PredefineShift findShiftStartTime(List<PredefineShift> predefineShifts, ReqShiftDto reqShiftDto) {
+    PredefineShift findShiftStartTime(List<PredefineShift> predefineShifts, ReqShiftDto reqShiftDto) {
         return predefineShifts.stream()
                 .filter(ps -> ps.getId().equals(reqShiftDto.shiftId()))
                 .findFirst()
