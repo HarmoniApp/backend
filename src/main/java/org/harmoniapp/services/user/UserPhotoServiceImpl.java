@@ -38,6 +38,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      * @throws IllegalArgumentException if the user with the specified ID is not found.
      * @throws RuntimeException         if there is an error reading the photo file.
      */
+    @Override
     public PhotoDto getUserPhoto(long id) {
         User user = getUserById(id);
         String photo = (user.getPhoto() != null) ? user.getPhoto() : "default.jpg";
@@ -64,6 +65,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      * @throws EntityNotFoundException if the user is not found or the file format is not supported.
      * @throws RuntimeException        if there is an error saving the file.
      */
+    @Override
     public UserDto uploadPhoto(long id, MultipartFile file) {
         validateFileFormat(file);
         User user = getUserById(id);
@@ -90,6 +92,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
      * @throws EntityNotFoundException if the user with the specified ID is not found.
      * @throws RuntimeException        if there is an error deleting the old photo file.
      */
+    @Override
     public UserDto setDefaultPhoto(long id) {
         User user = getUserById(id);
 

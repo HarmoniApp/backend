@@ -149,6 +149,9 @@ public class UserServiceImpl implements UserService {
      * @throws InvalidDateException if the contract expiration date is before the contract signature date.
      */
     private void validateContractDates(UserDto userDto) {
+        if (userDto.contractSignature() == null || userDto.contractExpiration() == null) {
+            throw new InvalidDateException("Data podpisania umowy i/lub data wygaśnięcia umowy nie może być pusta");
+        }
         if (userDto.contractExpiration().isBefore(userDto.contractSignature())) {
             throw new InvalidDateException("Data wygaśnięcia umowy nie może być przed datą podpisania umowy");
         }
@@ -162,6 +165,9 @@ public class UserServiceImpl implements UserService {
      * @throws IllegalArgumentException if the contract type is not found.
      */
     private void setContractType(User user, UserDto userDto) {
+        if (userDto.contractType() == null) {
+            throw new IllegalArgumentException("Typ umowy nie może być pusty");
+        }
         ContractType contractType = repositoryCollector.getContractTypes()
                 .findById(userDto.contractType().id())
                 .orElseThrow(IllegalArgumentException::new);
@@ -186,11 +192,16 @@ public class UserServiceImpl implements UserService {
      * @param userDto The UserDto containing the address information.
      */
     private void setAddresses(User user, UserDto userDto) {
+        if (userDto.residence() == null) {
+            throw new IllegalArgumentException("Adres zamieszkania nie może być pusty");
+        }
         Address residence = addressService.saveAddressEntity(userDto.residence());
         user.setResidence(residence);
 
-        Address workAddress = getDepartment(userDto.workAddress().id());
-        user.setWorkAddress(workAddress);
+        if (userDto.workAddress() != null) {
+            Address workAddress = getDepartment(userDto.workAddress().id());
+            user.setWorkAddress(workAddress);
+        }
     }
 
     /**
@@ -222,6 +233,8 @@ public class UserServiceImpl implements UserService {
      * @throws IllegalArgumentException if a language with the specified ID is not found.
      */
     private void setLanguages(User user, UserDto userDto) {
+        if (userDto.languages() == null) return;
+
         List<Language> languages = repositoryCollector.getLanguages().findAll();
 
         user.setLanguages(
@@ -242,6 +255,8 @@ public class UserServiceImpl implements UserService {
      * @throws IllegalArgumentException if a role with the specified ID is not found.
      */
     private void setRoles(User user, UserDto userDto) {
+        if (userDto.roles() == null) return;
+
         List<Role> roles = repositoryCollector.getRoles().findAll();
 
         user.setRoles(
@@ -297,8 +312,12 @@ public class UserServiceImpl implements UserService {
         Address residence = addressService.update(existingUser.getResidence(), userDto.residence());
         existingUser.setResidence(residence);
 
-        Address newDepartment = getDepartment(userDto.workAddress().id());
-        existingUser.setWorkAddress(newDepartment);
+        if (userDto.workAddress() == null) {
+            existingUser.setWorkAddress(null);
+        } else {
+            Address newDepartment = getDepartment(userDto.workAddress().id());
+            existingUser.setWorkAddress(newDepartment);
+        }
     }
 
     /**
