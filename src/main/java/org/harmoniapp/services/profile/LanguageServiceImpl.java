@@ -85,7 +85,7 @@ public class LanguageServiceImpl implements LanguageService {
      * @throws LanguageExistsException if a language with the same name already exists
      */
     private void languageExists(String name) {
-        if(repositoryCollector.getLanguages().existsByNameIgnoreCase(name)) {
+        if (repositoryCollector.getLanguages().existsByNameIgnoreCase(name)) {
             throw new LanguageExistsException("Język o nazwie %s już istnieje".formatted(name));
         }
     }
@@ -93,7 +93,7 @@ public class LanguageServiceImpl implements LanguageService {
     /**
      * Updates an existing language.
      *
-     * @param id the ID of the language to update
+     * @param id          the ID of the language to update
      * @param languageDto the data transfer object containing the updated language details
      * @return a LanguageDto object representing the updated language
      * @throws LanguageExistsException if a language with the same name already exists
@@ -114,7 +114,7 @@ public class LanguageServiceImpl implements LanguageService {
     /**
      * Updates the given language entity with the details from the provided LanguageDto.
      *
-     * @param language the existing Language entity to update
+     * @param language    the existing Language entity to update
      * @param languageDto the data transfer object containing the updated language details
      * @return the updated Language entity
      */
@@ -145,7 +145,9 @@ public class LanguageServiceImpl implements LanguageService {
     private void removeLanguageFromUsers(Language language) {
         List<User> users = repositoryCollector.getUsers().findByLanguages_Id(language.getId());
         if (!users.isEmpty()) {
-            users.forEach(user -> user.getLanguages().remove(language));
+            users.forEach(user -> {
+                if (user.getLanguages() != null) user.getLanguages().remove(language);
+            });
             repositoryCollector.getUsers().saveAll(users);
         }
     }

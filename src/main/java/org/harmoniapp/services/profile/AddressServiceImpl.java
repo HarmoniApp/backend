@@ -183,10 +183,10 @@ public class AddressServiceImpl implements AddressService {
         List<User> users = repositoryCollector.getUsers().findByResidence_IdOrWorkAddress_Id(id);
         if (!users.isEmpty()) {
             users.forEach(user -> {
-                if (user.getResidence().getId().equals(id)) {
+                if (user.getResidence()== null || user.getResidence().getId().equals(id)) {
                     user.setResidence(null);
                 }
-                if (user.getWorkAddress().getId().equals(id)) {
+                if (user.getWorkAddress()== null || user.getWorkAddress().getId().equals(id)) {
                     user.setWorkAddress(null);
                 }
             });
