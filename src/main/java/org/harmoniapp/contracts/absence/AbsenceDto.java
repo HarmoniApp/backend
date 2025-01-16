@@ -58,7 +58,11 @@ public record AbsenceDto(
 
         @JsonProperty("working_days") Long workingDays,
 
-        @JsonProperty("employee_id") String employeeId) {
+        @JsonProperty("employee_id") String employeeId,
+
+        String firstname,
+
+        String surname) {
 
     /**
      * Converts an Absence entity to an AbsenceDto.
@@ -78,6 +82,8 @@ public record AbsenceDto(
                 .updated(absence.getUpdated())
                 .workingDays(absence.getWorkingDays())
                 .employeeId(absence.getUser().getEmployeeId())
+                .firstname(absence.getUser().getFirstname())
+                .surname(absence.getUser().getSurname())
                 .build();
     }
 
