@@ -87,7 +87,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @param headerRow the row containing the headers.
      * @return a list of header names, or null if the headers are invalid.
      */
-    private List<String> extractHeaders(Row headerRow) {
+    List<String> extractHeaders(Row headerRow) {
         List<String> headers = new ArrayList<>();
         for (Cell cell : headerRow) {
             headers.add(cell.getStringCellValue().toLowerCase().trim());
@@ -105,7 +105,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @return a list of saved user DTOs.
      * @throws InvalidCellException if a user cannot be saved.
      */
-    private List<UserDto> saveUsers(List<UserDto> userDtoList) {
+    List<UserDto> saveUsers(List<UserDto> userDtoList) {
         List<UserDto> savedUsers = new ArrayList<>();
         for (UserDto userDto : userDtoList) {
             try {
@@ -125,7 +125,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @param headers    the list of headers from the Excel sheet.
      * @param savedUsers the list of saved user DTOs.
      */
-    private void updateSupervisors(Sheet sheet, List<String> headers, List<UserDto> savedUsers) {
+    void updateSupervisors(Sheet sheet, List<String> headers, List<UserDto> savedUsers) {
         List<User> supervisors = repositoryCollector.getUsers().findAllActiveSupervisors();
         List<User> usersToUpdate = new ArrayList<>();
         for (int i = 0; i < savedUsers.size(); i++) {
@@ -149,7 +149,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @param savedUsers the list of saved user DTOs.
      * @return an InputStreamResource containing the response data.
      */
-    private InputStreamResource generateResponse(List<UserDto> savedUsers) {
+    InputStreamResource generateResponse(List<UserDto> savedUsers) {
         List<UserDto> response = createResponseList(savedUsers);
 
         byte[] pdfData = generatePdf(response);
@@ -165,7 +165,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @param savedUsers the list of saved UserDto objects
      * @return a list of UserDto objects with limited fields
      */
-    private List<UserDto> createResponseList(List<UserDto> savedUsers) {
+    List<UserDto> createResponseList(List<UserDto> savedUsers) {
         List<UserDto> response = new ArrayList<>();
         for (UserDto savedUser : savedUsers) {
             UserDto dto = UserDto.builder()
@@ -185,7 +185,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @return a byte array representing the generated PDF
      * @throws FileGenerationException if an error occurs while generating the PDF
      */
-    private byte[] generatePdf(List<UserDto> response) {
+    byte[] generatePdf(List<UserDto> response) {
         Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -211,7 +211,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @return a PdfPTable containing the user information
      * @throws DocumentException if there is an error creating the table
      */
-    private PdfPTable createPdfTable(List<UserDto> response, Font font) throws DocumentException {
+    PdfPTable createPdfTable(List<UserDto> response, Font font) throws DocumentException {
         PdfPTable table = new PdfPTable(5);
         table.setWidthPercentage(95);
         table.setWidths(new int[]{2, 1, 4, 1, 4});
@@ -234,7 +234,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @param text  the text to be displayed in the cell
      * @param font  the font to be used for the cell text
      */
-    private void addTableCell(PdfPTable table, String text, Font font) {
+    void addTableCell(PdfPTable table, String text, Font font) {
         PdfPCell cell = new PdfPCell(new Phrase(text, font));
         cell.setPadding(10);
         cell.setNoWrap(true);
@@ -249,7 +249,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @return a list of user DTOs created from the spreadsheet.
      * @throws RuntimeException if a row is invalid.
      */
-    private List<UserDto> createUserDtoListFromSpreadsheet(Iterator<Row> rows, List<String> headers) throws RuntimeException {
+    List<UserDto> createUserDtoListFromSpreadsheet(Iterator<Row> rows, List<String> headers) throws RuntimeException {
         List<Role> roles = repositoryCollector.getRoles().findAll();
         List<Language> languages = repositoryCollector.getLanguages().findAll();
         List<ContractType> contractTypes = repositoryCollector.getContractTypes().findAll();
@@ -273,7 +273,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @param row the row to validate.
      * @throws InvalidCellException if the row is invalid.
      */
-    private void validateRow(Row row) {
+    void validateRow(Row row) {
         if (row.getLastCellNum() != expectedHeaders.size()) {
             throw new InvalidCellException("Nieprawidłowy wiersz: " + (row.getRowNum() + 1));
         }
@@ -292,8 +292,8 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @return a UserDto created from the row data.
      * @throws InvalidCellException if the row contains invalid data.
      */
-    private UserDto createUserDtoFromRow(Row row, List<String> headers, List<Role> roles, List<Language> languages,
-                                         List<ContractType> contractTypes, List<User> supervisors, List<Address> departments) {
+    UserDto createUserDtoFromRow(Row row, List<String> headers, List<Role> roles, List<Language> languages,
+                                 List<ContractType> contractTypes, List<User> supervisors, List<Address> departments) {
         Iterator<Cell> cells = row.cellIterator();
         var userBuilder = UserDto.builder();
         var addressBuilder = AddressDto.builder();
@@ -324,9 +324,9 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @param supervisors    the list of supervisors from the database.
      * @param departments    the list of departments from the database.
      */
-    private void populateUserAndAddressBuilders(Cell cell, String header, UserDto.UserDtoBuilder userBuilder,
-                                                AddressDto.AddressDtoBuilder addressBuilder, List<Role> roles, List<Language> languages,
-                                                List<ContractType> contractTypes, List<User> supervisors, List<Address> departments) {
+    void populateUserAndAddressBuilders(Cell cell, String header, UserDto.UserDtoBuilder userBuilder,
+                                        AddressDto.AddressDtoBuilder addressBuilder, List<Role> roles, List<Language> languages,
+                                        List<ContractType> contractTypes, List<User> supervisors, List<Address> departments) {
         cell.setCellType(CellType.STRING);
         switch (header) {
             case "id pracownika" -> userBuilder.employeeId(cell.getStringCellValue().trim());
