@@ -39,6 +39,12 @@ public final class JwtTokenUtil {
     @Value("${jwt.opt-expiration}")
     private Long OTP_EXPIRATION;
 
+    public JwtTokenUtil(String SECRET_KEY, Long DEFAULT_EXPIRATION, Long OTP_EXPIRATION) {
+        this.SECRET_KEY = SECRET_KEY;
+        this.DEFAULT_EXPIRATION = DEFAULT_EXPIRATION;
+        this.OTP_EXPIRATION = OTP_EXPIRATION;
+    }
+
     /**
      * Generates a JWT token for the authenticated user with extra claims.
      *
