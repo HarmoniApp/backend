@@ -1,6 +1,7 @@
 package org.harmoniapp.geneticalgorithm;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -17,6 +18,7 @@ public class GeneticAlgorithm implements Algorithm {
     private final double crossoverRate;
     private final Random random;
     private final int reportInterval;
+    @Getter
     private List<GenerationObserver> observers;
 
     /**
@@ -228,14 +230,14 @@ public class GeneticAlgorithm implements Algorithm {
      * @return the offspring chromosomes
      */
     private Chromosome crossover(Chromosome parent1, Chromosome parent2) {
-        if (random.nextDouble() > crossoverRate) {
+        if (random.nextDouble() > crossoverRate || parent1.getGens().size() < 2) {
             return parent1;
         }
 
         List<Gen> gens1 = parent1.getGens();
         List<Gen> gens2 = parent2.getGens();
         List<Gen> childGens = new ArrayList<>(gens1.size());
-        int splitPoint = random.nextInt(gens1.size() - 2) + 1;
+        int splitPoint = random.nextInt(gens1.size() - 1) + 1;
         childGens.addAll(gens1.subList(0, splitPoint));
         childGens.addAll(gens2.subList(splitPoint, gens2.size()));
         return new Chromosome(childGens);
