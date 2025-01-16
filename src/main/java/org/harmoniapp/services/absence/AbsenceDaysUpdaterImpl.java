@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @RequiredArgsConstructor
-public class AbsenceDaysUpdateImpl implements AbsenceDaysUpdater {
+public class AbsenceDaysUpdaterImpl implements AbsenceDaysUpdater {
     private final RepositoryCollector repositoryCollector;
 
     /**
@@ -60,7 +60,7 @@ public class AbsenceDaysUpdateImpl implements AbsenceDaysUpdater {
         int bookedDays = absence.getWorkingDays().intValue();
 
         if (availableDays < contractAbsenceDays) {
-            int rest = bookedDays - availableDays;
+            int rest = contractAbsenceDays - availableDays;
             user.setAvailableAbsenceDays(availableDays + rest);
             bookedDays -= rest;
         }
