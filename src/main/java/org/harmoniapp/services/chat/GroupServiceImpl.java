@@ -10,6 +10,7 @@ import org.harmoniapp.exception.EntityNotFoundException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -100,12 +101,14 @@ public class GroupServiceImpl implements GroupService {
     public GroupDto removeMember(long groupId, long userId) {
         Group group = getGroupById(groupId);
         User user = getUserById(userId, false);
-        group.getMembers().remove(user);
-        if (group.getMembers().isEmpty()) {
+        Set<User> members = new HashSet<>(group.getMembers());
+        members.remove(user);
+        if (members.isEmpty()) {
             delete(groupId);
             return null;
         }
-        return saveGroup(group);
+        Group newGroup = new Group(group.getId(), group.getName(), members);
+        return saveGroup(newGroup);
     }
 
     /**
