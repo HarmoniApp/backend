@@ -36,7 +36,7 @@ public abstract class ExcelImport {
             if (sheet == null) {
                 throw new EmptyFileException("Nie znaleziono arkusza w pliku");
             }
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | NullPointerException e) {
             throw new IllegalArgumentException("Plk nie został znaleziony");
         } catch (IOException e) {
             throw new IllegalArgumentException("Błąd odczytu pliku");

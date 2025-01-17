@@ -3,7 +3,6 @@ package org.harmoniapp.services.importexport;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfWriter;
 import org.harmoniapp.contracts.profile.AddressDto;
 import org.harmoniapp.contracts.profile.ContractTypeDto;
 import org.harmoniapp.contracts.profile.LanguageDto;

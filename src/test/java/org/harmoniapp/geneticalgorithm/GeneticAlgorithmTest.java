@@ -55,4 +55,18 @@ public class GeneticAlgorithmTest {
         geneticAlgorithm.notifyObservers(0, bestChromosome);
         verify(observer, times(1)).onGenerationUpdate(anyDouble(), eq(1.0));
     }
+
+    @Test
+    public void selectRandomEmployeesTest() {
+        Requirements req = mock(Requirements.class);
+        when(req.role()).thenReturn("role");
+        when(req.employeesNumber()).thenReturn(2);
+
+        Map<String, List<Employee>> employees = Map.of("role", List.of(employee, employee, employee));
+        List<Employee> selectedEmployees = geneticAlgorithm.selectRandomEmployees(List.of(req), employees);
+
+        assertNotNull(selectedEmployees);
+        assertEquals(2, selectedEmployees.size());
+        assertTrue(employees.get("role").containsAll(selectedEmployees));
+    }
 }

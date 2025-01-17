@@ -90,7 +90,7 @@ public class AiScheduleServiceImpl implements AiScheduleService {
      * @return a list of genes representing the generated schedule
      * @throws RuntimeException if the generated schedule's fitness is below the acceptable threshold
      */
-    private List<Gen> runAlgorithm(AggregatedScheduleData data, User receiver) {
+    protected List<Gen> runAlgorithm(AggregatedScheduleData data, User receiver) {
         Algorithm geneticAlgorithm = new GeneticAlgorithm(1000);
         geneticAlgorithm.addObserver(new WsGenerationObserver(messagingTemplate, receiver.getId()));
         geneticAlgorithm.addObserver(new LogGenerationObserver()); // Observer for logging

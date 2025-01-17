@@ -113,7 +113,7 @@ public class UserSearchServiceImpl implements UserSearchService {
                         ? Sort.Direction.ASC
                         : Sort.Direction.DESC;
 
-        if (pageRequestDto.sortBy() != null) {
+        if (pageRequestDto.sortBy() != null && !pageRequestDto.sortBy().isEmpty()) {
             return PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, pageRequestDto.sortBy()));
         } else {
             return PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, "surname", "firstname"));
@@ -127,7 +127,7 @@ public class UserSearchServiceImpl implements UserSearchService {
      * @param pageable        The pagination and sorting details.
      * @return A Page of User entities that match the search criteria.
      */
-    private Page<User> retrieveUsers(Pageable pageable, @Nullable UserSearchParamsDto searchParamsDto) {
+    protected Page<User> retrieveUsers(Pageable pageable, @Nullable UserSearchParamsDto searchParamsDto) {
         if (searchParamsDto == null ||
                 ((searchParamsDto.roles() == null || searchParamsDto.roles().isEmpty())
                         && (searchParamsDto.contracts() == null || searchParamsDto.contracts().isEmpty())

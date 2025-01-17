@@ -63,7 +63,6 @@ public class ContractTypeServiceImplTest {
 
     @Test
     public void getAllTest() {
-
         ContractType contractType = new ContractType(1L, "name", 0);
         List<ContractType> contractTypes = List.of(contractType);
         when(contractTypeRepository.findAll()).thenReturn(contractTypes);

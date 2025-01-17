@@ -78,11 +78,12 @@ public class NotificationServiceImplTest {
         when(userRepository.existsById(userId)).thenReturn(true);
         when(repositoryCollector.getNotifications()).thenReturn(notificationRepository);
         when(notificationRepository.findAllUnreadByUserIdOrderByCreatedAtDesc(userId)).thenReturn(List.of(notification));
+
+        List<NotificationDto> result;
         try (MockedStatic<NotificationDto> mockedStatic = mockStatic(NotificationDto.class)) {
             mockedStatic.when(() -> NotificationDto.fromEntity(notification)).thenReturn(notificationDto);
+            result = notificationService.getAllUnreadByUserId(userId);
         }
-
-        List<NotificationDto> result = notificationService.getAllUnreadByUserId(userId);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -106,11 +107,12 @@ public class NotificationServiceImplTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(repositoryCollector.getNotifications()).thenReturn(notificationRepository);
         when(notificationRepository.save(notification)).thenReturn(notification);
+
+        NotificationDto result;
         try (MockedStatic<NotificationDto> mockedStatic = mockStatic(NotificationDto.class)) {
             mockedStatic.when(() -> NotificationDto.fromEntity(notification)).thenReturn(notificationDto);
+            result = notificationService.create(notificationDto);
         }
-
-        NotificationDto result = notificationService.create(notificationDto);
 
         assertNotNull(result);
     }
@@ -133,10 +135,12 @@ public class NotificationServiceImplTest {
         when(repositoryCollector.getNotifications()).thenReturn(notificationRepository);
         when(notificationRepository.findAllUnreadByUserIdOrderByCreatedAtDesc(userId)).thenReturn(List.of(notification));
         when(notificationRepository.saveAll(List.of(notification))).thenReturn(List.of(notification));
+
+        List<NotificationDto> result;
         try (MockedStatic<NotificationDto> mockedStatic = mockStatic(NotificationDto.class)) {
             mockedStatic.when(() -> NotificationDto.fromEntity(notification)).thenReturn(notificationDto);
+            result = notificationService.markAllAsReadByUserId(userId);
         }
-        List<NotificationDto> result = notificationService.markAllAsReadByUserId(userId);
 
         assertNotNull(result);
         assertEquals(1, result.size());

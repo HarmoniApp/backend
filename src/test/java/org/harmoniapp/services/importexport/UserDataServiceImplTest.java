@@ -1,6 +1,5 @@
 package org.harmoniapp.services.importexport;
 
-import org.harmoniapp.contracts.notification.NotificationDto;
 import org.harmoniapp.contracts.profile.LanguageDto;
 import org.harmoniapp.contracts.profile.RoleDto;
 import org.harmoniapp.contracts.user.UserDto;
@@ -18,7 +17,8 @@ import org.springframework.data.domain.Sort;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

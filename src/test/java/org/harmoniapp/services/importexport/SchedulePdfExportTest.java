@@ -3,7 +3,6 @@ package org.harmoniapp.services.importexport;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.PdfPTable;
 import org.harmoniapp.entities.profile.Role;
 import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
@@ -19,7 +18,6 @@ import org.springframework.core.io.InputStreamResource;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

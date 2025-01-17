@@ -5,8 +5,10 @@ import org.harmoniapp.contracts.notification.NotificationDto;
 import org.harmoniapp.contracts.schedule.aischedule.AggregatedScheduleData;
 import org.harmoniapp.contracts.schedule.aischedule.AiSchedulerResponseDto;
 import org.harmoniapp.contracts.schedule.aischedule.ScheduleRequirement;
+import org.harmoniapp.entities.schedule.Shift;
 import org.harmoniapp.entities.user.User;
 import org.harmoniapp.repositories.RepositoryCollector;
+import org.harmoniapp.repositories.schedule.ShiftRepository;
 import org.harmoniapp.repositories.user.UserRepository;
 import org.harmoniapp.services.notification.NotificationService;
 import org.junit.jupiter.api.Test;
@@ -34,6 +36,9 @@ public class AiScheduleServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
+    private ShiftRepository shiftRepository;
+
+    @Mock
     private NotificationService notificationService;
 
     @Mock
@@ -54,6 +59,8 @@ public class AiScheduleServiceImplTest {
     @Mock
     private AggregatedScheduleData data;
 
+    @Mock
+    private AlgorithmEntityMapper algorithmEntityMapper;
 
     @Test
     public void generateScheduleTest() {
@@ -63,13 +70,15 @@ public class AiScheduleServiceImplTest {
         when(requirementsEncoder.prepareData(anyList())).thenReturn(data);
         when(notificationService.create(any())).thenReturn(mock(NotificationDto.class));
         doNothing().when(messagingTemplate).convertAndSend(anyString(), Optional.ofNullable(any()));
+        when(algorithmEntityMapper.decodeShifts(anyList(), any())).thenReturn(List.of(mock(Shift.class)));
+        when(repositoryCollector.getShifts()).thenReturn(shiftRepository);
+        when(shiftRepository.saveAll(anyList())).thenReturn(List.of(mock(Shift.class)));
 
         List<ScheduleRequirement> requirementsDto = List.of(mock(ScheduleRequirement.class));
 
         AiSchedulerResponseDto response = aiScheduleService.generateSchedule(requirementsDto, authentication);
 
         assertNotNull(response);
-//        assertTrue(response.success());
     }
 
     @Test
@@ -77,10 +86,14 @@ public class AiScheduleServiceImplTest {
         when(authentication.getPrincipal()).thenReturn(new Principle(1L, "username"));
         when(repositoryCollector.getUsers()).thenReturn(userRepository);
         when(userRepository.findByIdAndIsActiveTrue(1L)).thenReturn(Optional.of(user));
+        when(user.getId()).thenReturn(1L);
         when(requirementsEncoder.prepareData(anyList())).thenReturn(data);
 
         List<ScheduleRequirement> requirementsDto = List.of(mock(ScheduleRequirement.class));
-        AiSchedulerResponseDto response = aiScheduleService.generateSchedule(requirementsDto, authentication);
+        AiScheduleServiceImpl aiScheduleServiceSpy = spy(aiScheduleService);
+        doThrow(new RuntimeException()).when(aiScheduleServiceSpy).runAlgorithm(any(), any());
+
+        AiSchedulerResponseDto response = aiScheduleServiceSpy.generateSchedule(requirementsDto, authentication);
 
         assertNotNull(response);
         assertFalse(response.success());

@@ -5,12 +5,9 @@ import org.harmoniapp.contracts.chat.ChatPartnerDto;
 import org.harmoniapp.contracts.chat.ChatRequestDto;
 import org.harmoniapp.contracts.chat.MessageDto;
 import org.harmoniapp.contracts.chat.TranslationRequestDto;
-import org.harmoniapp.contracts.notification.NotificationDto;
 import org.harmoniapp.entities.chat.Group;
 import org.harmoniapp.entities.chat.Message;
 import org.harmoniapp.entities.user.User;
-import org.harmoniapp.exception.EntityNotFoundException;
-import org.harmoniapp.exception.InvalidConversationException;
 import org.harmoniapp.repositories.RepositoryCollector;
 import org.harmoniapp.repositories.chat.GroupRepository;
 import org.harmoniapp.repositories.chat.MessageRepository;
@@ -27,7 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -99,8 +96,8 @@ public class MessageServiceImplTest {
     public void getAllChatPartnersTest() {
         long userId = 1L;
         List<Object[]> mockResult = new ArrayList<>();
-        mockResult.add(new Object[] {2L, "Alice"});
-        mockResult.add(new Object[] {3L, "Bob"});
+        mockResult.add(new Object[]{2L, "Alice"});
+        mockResult.add(new Object[]{3L, "Bob"});
         when(repositoryCollector.getUsers()).thenReturn(userRepository);
         when(repositoryCollector.getMessages()).thenReturn(messageRepository);
         when(userRepository.existsById(userId)).thenReturn(true);
@@ -182,16 +179,17 @@ public class MessageServiceImplTest {
         MessageDto messageDto = mock(MessageDto.class);
         when(repositoryCollector.getMessages()).thenReturn(messageRepository);
         when(messageRepository.findUnreadByUsersIds(1L, 2L)).thenReturn(List.of(message));
-        when(message.isRead()).thenReturn(false);
-        when(message.getSender()).thenReturn(User.builder().id(1L).build());
-        when(message.getReceiver()).thenReturn(User.builder().id(2L).build());
-        try (MockedStatic<MessageDto> mockedStatic = mockStatic(MessageDto.class)) {
-            mockedStatic.when(() -> MessageDto.fromEntity(message)).thenReturn(messageDto);
-        }
+        when(messageDto.groupId()).thenReturn(null);
+        when(messageDto.senderId()).thenReturn(1L);
+        when(messageDto.receiverId()).thenReturn(2L);
         doNothing().when(websocketMessageService).sendStatusUpdate(anyLong(), anyList());
         when(messageRepository.saveAll(anyList())).thenReturn(List.of(message));
 
-        List<MessageDto> result = messageService.markAllMessagesAsRead(chatRequestDto);
+        List<MessageDto> result;
+        try (MockedStatic<MessageDto> mockedStatic = mockStatic(MessageDto.class)) {
+            mockedStatic.when(() -> MessageDto.fromEntity(message)).thenReturn(messageDto);
+            result = messageService.markAllMessagesAsRead(chatRequestDto);
+        }
 
         assertNotNull(result);
     }

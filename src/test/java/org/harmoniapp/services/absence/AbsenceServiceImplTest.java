@@ -172,16 +172,17 @@ public class AbsenceServiceImplTest {
         when(repositoryCollector.getStatuses()).thenReturn(statusRepository);
         when(statusRepository.findById(AbsenceStatus.AWAITING.getId())).thenReturn(Optional.of(mock(Status.class)));
 
-        try (MockedStatic<AbsenceDto> mockedStatic = mockStatic(AbsenceDto.class)) {
-            mockedStatic.when(() -> AbsenceDto.fromEntity(absence)).thenReturn(absenceDto);
+        AbsenceDto result;
+        try (MockedStatic<AbsenceDto> mockedAbsenceDto = mockStatic(AbsenceDto.class);
+             MockedStatic<HolidayCalculator> mockedHolidayCalculator = mockStatic(HolidayCalculator.class);
+             MockedStatic<AbsenceNotification> mockedAbsenceNotifications = mockStatic(AbsenceNotification.class)) {
+
+            mockedHolidayCalculator.when(() -> HolidayCalculator.calculateWorkingDays(start, end)).thenReturn(5L);
+            mockedAbsenceDto.when(() -> AbsenceDto.fromEntity(absence)).thenReturn(absenceDto);
+            mockedAbsenceNotifications.when(() -> AbsenceNotification.createNotification(any(Absence.class), any(AbsenceNotificationType.class))).thenReturn(mock(NotificationDto.class));
+            result = absenceService.create(absenceDto);
         }
-        try (MockedStatic<HolidayCalculator> mockedStatic = mockStatic(HolidayCalculator.class)) {
-            mockedStatic.when(() -> HolidayCalculator.calculateWorkingDays(start, end)).thenReturn(5L);
-        }
-        try (MockedStatic<AbsenceNotification> mockedStatic = mockStatic(AbsenceNotification.class)) {
-            mockedStatic.when(() -> AbsenceNotification.createNotification(any(Absence.class), any(AbsenceNotificationType.class))).thenReturn(mock(NotificationDto.class));
-        }
-        AbsenceDto result = absenceService.create(absenceDto);
+
 
         assertNotNull(result);
         assertEquals(1L, result.id());
@@ -208,11 +209,11 @@ public class AbsenceServiceImplTest {
         when(absenceRepository.findById(1L)).thenReturn(Optional.of(absence));
         when(statusRepository.findById(AbsenceStatus.APPROVED.getId())).thenReturn(Optional.of(status));
         when(absenceRepository.save(absence)).thenReturn(absence);
+        AbsenceDto result;
         try (MockedStatic<AbsenceDto> mockedStatic = mockStatic(AbsenceDto.class)) {
             mockedStatic.when(() -> AbsenceDto.fromEntity(absence)).thenReturn(absenceDto);
+            result = absenceService.updateStatus(1L, AbsenceStatus.APPROVED.getId());
         }
-
-        AbsenceDto result = absenceService.updateStatus(1L, AbsenceStatus.APPROVED.getId());
 
         assertNotNull(result);
         verify(notificationService).create(any());

@@ -186,7 +186,6 @@ public class GeneticAlgorithm implements Algorithm {
      */
     private void addBestChromosomes(List<Chromosome> newPopulation, Chromosome best) {
         newPopulation.add(best);
-//        newPopulation.add(best);
     }
 
     /**
@@ -279,7 +278,7 @@ public class GeneticAlgorithm implements Algorithm {
      * @param employees    the list of employees to select from
      * @return the selected employees
      */
-    private List<Employee> selectRandomEmployees(List<Requirements> requirements, Map<String, List<Employee>> employees) {
+    protected List<Employee> selectRandomEmployees(List<Requirements> requirements, Map<String, List<Employee>> employees) {
         List<Employee> employeesForShift = new ArrayList<>();
         requirements.forEach(req -> {
             validateEmployeesAvailability(req, employees);

@@ -150,8 +150,8 @@ public class ScheduleDataEncoderImplTest {
     public void findRoleNameByIdTest() {
         List<Role> roles = List.of(mock(Role.class));
         Long roleId = 1L;
-        when(roles.get(0).getId()).thenReturn(roleId);
-        when(roles.get(0).getName()).thenReturn("roleName");
+        when(roles.getFirst().getId()).thenReturn(roleId);
+        when(roles.getFirst().getName()).thenReturn("roleName");
 
         String result = scheduleDataEncoder.findRoleNameById(roles, roleId);
 

@@ -49,11 +49,12 @@ public class GroupServiceImplTest {
         Group group = mock(Group.class);
         when(repositoryCollector.getGroups()).thenReturn(groupRepository);
         when(groupRepository.findById(1L)).thenReturn(java.util.Optional.of(group));
+
+        GroupDto result;
         try (MockedStatic<GroupDto> mockedStatic = mockStatic(GroupDto.class)) {
             mockedStatic.when(() -> GroupDto.fromEntity(group)).thenReturn(mock(GroupDto.class));
+            result = groupService.getById(1L);
         }
-
-        GroupDto result = groupService.getById(1L);
 
         assertNotNull(result);
     }
@@ -65,11 +66,12 @@ public class GroupServiceImplTest {
         when(repositoryCollector.getGroups()).thenReturn(groupRepository);
         when(groupRepository.findById(1L)).thenReturn(java.util.Optional.of(group));
         when(group.getMembers()).thenReturn(Set.of(user));
+
+        List<PartialUserDto> result;
         try (MockedStatic<GroupDto> mockedStatic = mockStatic(GroupDto.class)) {
             mockedStatic.when(() -> GroupDto.fromEntity(group)).thenReturn(mock(GroupDto.class));
+            result = groupService.getMembersById(1L);
         }
-
-        List<PartialUserDto> result = groupService.getMembersById(1L);
 
         assertNotNull(result);
     }
@@ -86,11 +88,12 @@ public class GroupServiceImplTest {
         when(groupDto.toEntity(anySet())).thenReturn(group);
         when(repositoryCollector.getGroups()).thenReturn(groupRepository);
         when(groupRepository.save(group)).thenReturn(group);
+
+        GroupDto result;
         try (MockedStatic<GroupDto> mockedStatic = mockStatic(GroupDto.class)) {
             mockedStatic.when(() -> GroupDto.fromEntity(group)).thenReturn(mock(GroupDto.class));
+            result = groupService.create(groupDto);
         }
-
-        GroupDto result = groupService.create(groupDto);
 
         assertNotNull(result);
     }
@@ -105,11 +108,12 @@ public class GroupServiceImplTest {
         when(groupRepository.findById(1L)).thenReturn(Optional.of(group));
         when(userRepository.findByIdAndIsActiveTrue(1L)).thenReturn(Optional.of(user));
         when(groupRepository.save(group)).thenReturn(group);
+
+        GroupDto result;
         try (MockedStatic<GroupDto> mockedStatic = mockStatic(GroupDto.class)) {
             mockedStatic.when(() -> GroupDto.fromEntity(group)).thenReturn(mock(GroupDto.class));
+            result = groupService.addMember(1L, 1L);
         }
-
-        GroupDto result = groupService.addMember(1L, 1L);
 
         assertNotNull(result);
     }
@@ -126,12 +130,13 @@ public class GroupServiceImplTest {
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
         when(group.getMembers()).thenReturn(Set.of(user));
         doNothing().when(messageRepository).deleteByGroupId(1L);
-//        when(groupRepository.save(group)).thenReturn(group);
+
+        GroupDto result;
         try (MockedStatic<GroupDto> mockedStatic = mockStatic(GroupDto.class)) {
             mockedStatic.when(() -> GroupDto.fromEntity(group)).thenReturn(mock(GroupDto.class));
+            result = groupService.removeMember(1L, 1L);
         }
 
-        GroupDto result = groupService.removeMember(1L, 1L);
 
         assertNull(result);
     }
