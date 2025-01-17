@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,16 +31,15 @@ public final class JwtTokenUtil {
     private final String AUTH_HEADER = "Authorization";
     private final String JWT_ISSUER = "HarmoniApp";
 
-    @Value("${jwt.secret-key}")
-    private String SECRET_KEY;
+    private final String SECRET_KEY;
 
-    @Value("${jwt.default-expiration}")
-    private Long DEFAULT_EXPIRATION;
+    private final Long DEFAULT_EXPIRATION;
 
-    @Value("${jwt.opt-expiration}")
-    private Long OTP_EXPIRATION;
+    private final Long OTP_EXPIRATION;
 
-    public JwtTokenUtil(String SECRET_KEY, Long DEFAULT_EXPIRATION, Long OTP_EXPIRATION) {
+    public JwtTokenUtil(@Value("${jwt.secret-key}") String SECRET_KEY,
+                        @Value("${jwt.default-expiration}") Long DEFAULT_EXPIRATION,
+                        @Value("${jwt.opt-expiration}") Long OTP_EXPIRATION) {
         this.SECRET_KEY = SECRET_KEY;
         this.DEFAULT_EXPIRATION = DEFAULT_EXPIRATION;
         this.OTP_EXPIRATION = OTP_EXPIRATION;
