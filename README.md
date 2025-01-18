@@ -62,6 +62,10 @@ mvn clean install
 ```bash
 mvn spring-boot:run
 ```
+6. Run test
+```bash
+mvn test 
+```
 
 The backend will run on http://localhost:8080 by default.
 
