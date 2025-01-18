@@ -34,7 +34,7 @@ public record AddressDto(
 
         @NotEmpty(message = "Ulica nie może być pusta")
         @Size(max = 100, message = "Ulica musi zawierać mniej niż 100 znaków")
-        @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ',\\-\\s]+$", message = "Ulica musi zawierać tylko litery, spacje, apostrofy i myślniki")
+        @Pattern(regexp = "^[0-9A-Za-zĀ-ɏØ-öø-ÿ',\\-\\s]+$", message = "Ulica musi zawierać tylko litery, liczby, spacje, apostrofy i myślniki")
         String street,
 
         @NotEmpty(message = "Numer budynku nie może być pusty")

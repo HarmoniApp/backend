@@ -37,7 +37,7 @@ public class Address {
     @Column(length = 100)
     @NotEmpty(message = "Ulica nie może być pusta")
     @Size(max = 100, message = "Ulica musi mieć mniej niż 100 znaków")
-    @Pattern(regexp = "^[A-Za-zĀ-ɏØ-öø-ÿ',\\-\\s]+$", message = "Ulica musi zawierać tylko litery, spacje, myślniki, przecinki i apostrofy")
+    @Pattern(regexp = "^[0-9A-Za-zĀ-ɏØ-öø-ÿ',\\-\\s]+$", message = "Ulica musi zawierać tylko litery, liczby, spacje, myślniki, przecinki i apostrofy")
     private String street;
 
     @Column(name = "building_number", length = 10)
