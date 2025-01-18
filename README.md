@@ -77,25 +77,25 @@ backend/
 │   │   │   └── org
 │   │   │       └── harmoniapp
 │   │   │           ├── HarmoniWebApiApplication.java  # Main class
-│   │   │           ├── configuration                 # App configuration (security, WebSocket)
-│   │   │           ├── contracts                    # DTOs and contracts
-│   │   │           ├── controllers                 # REST controllers
-│   │   │           ├── entities                   # JPA entities
-│   │   │           ├── enums                      # Enum definitions
-│   │   │           ├── exception                 # Custom exceptions
-│   │   │           ├── exceptionhandling        # Global exception handling
-│   │   │           ├── filter                   # Security filters (JWT, CSRF)
-│   │   │           ├── geneticalgorithm        # AI-based scheduling logic
-│   │   │           ├── repositories            # JPA repositories
-│   │   │           ├── services               # Business logic
-│   │   │           └── utils                  # Utility classes
+│   │   │           ├── configuration                  # App configuration (security, WebSocket)
+│   │   │           ├── contracts                      # DTOs and contracts
+│   │   │           ├── controllers                    # REST controllers
+│   │   │           ├── entities                       # JPA entities
+│   │   │           ├── enums                          # Enum definitions
+│   │   │           ├── exception                      # Custom exceptions
+│   │   │           ├── exceptionhandling              # Global exception handling
+│   │   │           ├── filter                         # Security filters (JWT, CSRF)
+│   │   │           ├── geneticalgorithm               # AI-based scheduling logic
+│   │   │           ├── repositories                   # JPA repositories
+│   │   │           ├── services                       # Business logic
+│   │   │           └── utils                          # Utility classes
 │   │   └── resources
 │   │       ├── application.properties         # Default configuration
-│   │       ├── application_prod.properties   # Production configuration
-│   │       └── static/userPhoto              # Default user images
+│   │       ├── application_prod.properties    # Production configuration
+│   │       └── static/userPhoto               # Default user images
 │   └── test
-│       └── java/org/harmoniapp              # Unit and integration tests
-└── target                                   # Compiled classes and packaged app
+│       └── java/org/harmoniapp                # Unit and integration tests
+└── target                                     # Compiled classes and packaged app
 ```
 
 ### Key Functionalities
