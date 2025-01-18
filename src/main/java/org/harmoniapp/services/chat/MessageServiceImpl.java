@@ -98,7 +98,7 @@ public class MessageServiceImpl implements MessageService {
 
         Long receiverId = messageDto.receiverId();
         Long groupId = messageDto.groupId();
-        if (receiverId != null) {
+        if (receiverId != null && receiverId != 0) {
             return createDirectMessage(message, receiverId);
         } else if (groupId != null) {
             return createGroupMessage(message, groupId);
@@ -152,7 +152,7 @@ public class MessageServiceImpl implements MessageService {
      * @return a list of Message objects representing the chat history
      * @throws InvalidConversationException if the conversation is invalid
      */
-    private List<Message> getMessages(ChatRequestDto chatRequestDto) {
+    List<Message> getMessages(ChatRequestDto chatRequestDto) {
         Long groupId = chatRequestDto.groupId();
         Long userId1 = chatRequestDto.userId1();
         Long userId2 = chatRequestDto.userId2();
@@ -172,7 +172,7 @@ public class MessageServiceImpl implements MessageService {
      * @param translationRequestDto the translation request containing translation preferences
      * @return a MessageDto object representing the mapped message
      */
-    private MessageDto mapMessage(Message message, TranslationRequestDto translationRequestDto) {
+    MessageDto mapMessage(Message message, TranslationRequestDto translationRequestDto) {
         if (shouldTranslate(translationRequestDto)) {
             try {
                 String content = translationService.translate(message.getContent(), translationRequestDto.targetLanguage());

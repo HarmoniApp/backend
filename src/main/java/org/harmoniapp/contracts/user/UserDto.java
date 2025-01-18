@@ -9,10 +9,13 @@ import org.harmoniapp.contracts.profile.ContractTypeDto;
 import org.harmoniapp.contracts.profile.LanguageDto;
 import org.harmoniapp.contracts.profile.RoleDto;
 import org.harmoniapp.entities.profile.ContractType;
+import org.harmoniapp.entities.profile.Language;
+import org.harmoniapp.entities.profile.Role;
 import org.harmoniapp.entities.user.User;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Data Transfer Object (DTO) for User.
@@ -129,8 +132,8 @@ public record UserDto(
                 .isActive(user.getIsActive())
                 .availableAbsenceDays(user.getAvailableAbsenceDays())
                 .unusedAbsenceDays(user.getUnusedAbsenceDays())
-                .roles(user.getRoles().stream().map(RoleDto::fromEntity).toList())
-                .languages(user.getLanguages().stream().map(LanguageDto::fromEntity).toList())
+                .roles(getRoleDtos(user.getRoles()))
+                .languages(getLanguageDtos(user.getLanguages()))
                 .build();
     }
 
@@ -146,7 +149,7 @@ public record UserDto(
                 .surname(this.surname)
                 .email(this.email)
                 .password(this.password)
-                .contractType(this.contractType.toEntity())
+                .contractType(this.contractType != null ? this.contractType.toEntity() : null)
                 .contractSignature(this.contractSignature)
                 .contractExpiration(this.contractExpiration)
                 .phoneNumber(this.phoneNumber)
@@ -157,5 +160,19 @@ public record UserDto(
                 .isActive(this.isActive)
                 .availableAbsenceDays(this.availableAbsenceDays)
                 .build();
+    }
+
+    private static List<RoleDto> getRoleDtos(Set<Role> role) {
+        if (role == null) {
+            return null;
+        }
+        return role.stream().map(RoleDto::fromEntity).toList();
+    }
+
+    private static List<LanguageDto> getLanguageDtos(Set<Language> languages) {
+        if (languages == null) {
+            return null;
+        }
+        return languages.stream().map(LanguageDto::fromEntity).toList();
     }
 }

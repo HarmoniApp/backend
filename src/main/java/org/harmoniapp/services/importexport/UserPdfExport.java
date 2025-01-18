@@ -50,7 +50,7 @@ public class UserPdfExport extends PdfExport implements ExportUser {
      * @param out      the output stream to write to
      * @param users    the list of users to include in the document
      */
-    private void writeDocument(Document document, ByteArrayOutputStream out, List<UserDto> users) {
+    void writeDocument(Document document, ByteArrayOutputStream out, List<UserDto> users) {
         try {
             PdfWriter.getInstance(document, out);
             document.open();
@@ -68,7 +68,7 @@ public class UserPdfExport extends PdfExport implements ExportUser {
      * @param document the document to add the title to
      * @throws DocumentException if there is an error adding the title
      */
-    private void addTitle(Document document) throws DocumentException {
+    void addTitle(Document document) throws DocumentException {
         Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, Color.BLACK);
         Paragraph title = new Paragraph("Pracownicy: ", titleFont);
         title.setAlignment(Element.ALIGN_CENTER);
@@ -83,7 +83,7 @@ public class UserPdfExport extends PdfExport implements ExportUser {
      * @param users    the list of users to include in the table
      * @throws DocumentException if there is an error adding the table
      */
-    private void addTable(Document document, List<UserDto> users) throws DocumentException {
+    void addTable(Document document, List<UserDto> users) throws DocumentException {
         PdfPTable table = new PdfPTable(headersCell.size());
         table.setWidthPercentage(100);
         addTableHeader(headersCell, table);
@@ -97,7 +97,7 @@ public class UserPdfExport extends PdfExport implements ExportUser {
      * @param table the table to add rows to
      * @param users the list of users to include in the rows
      */
-    private void addRows(PdfPTable table, List<UserDto> users) {
+    void addRows(PdfPTable table, List<UserDto> users) {
         for (UserDto user : users) {
             table.addCell(new PdfPCell(new Phrase(user.employeeId())));
             table.addCell(new PdfPCell(new Phrase(user.firstname())));

@@ -58,7 +58,7 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
      * @param dateHeaders the list of date headers
      * @return a list of created shifts
      */
-    private List<Shift> processShiftRows(Iterator<Row> rows, List<User> users, List<LocalDateTime> dateHeaders) {
+    protected List<Shift> processShiftRows(Iterator<Row> rows, List<User> users, List<LocalDateTime> dateHeaders) {
         List<Shift> shiftList = new ArrayList<>();
         while (rows.hasNext()) {
             Row row = rows.next();
@@ -77,7 +77,7 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
      * @return the User object corresponding to the employee ID
      * @throws InvalidCellException if the employee ID is not found in the list of users
      */
-    private User getUser(List<User> users, Cell cell) {
+    protected User getUser(List<User> users, Cell cell) {
         if (cell == null) {
             return null;
         }
@@ -97,7 +97,7 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
      * @param user      the user associated with the row
      * @param shiftList the list to add the created shifts to
      */
-    private void processRow(Row row, List<LocalDateTime> header, User user, List<Shift> shiftList) {
+    void processRow(Row row, List<LocalDateTime> header, User user, List<Shift> shiftList) {
         for (int i = 0; i < header.size(); i++) {
             Cell cell = row.getCell(i + 1);
             String cellValue = getCellValueAsString(cell);
@@ -174,7 +174,7 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
     private LocalDateTime parseTime(String time, LocalDateTime day, Cell cell) {
         try {
             LocalTime localTime = LocalTime.parse(time.trim());
-            return day.plusHours(localTime.getHour()).plusMinutes(localTime.getMinute());
+            return day.toLocalDate().atTime(localTime.getHour(), localTime.getMinute());
         } catch (Exception e) {
             throw new InvalidCellException("Nieprawidłowa kmórka: " + cell.getAddress().formatAsString() + " - oczekiwany format: HH:mm-HH:mm");
         }
@@ -188,7 +188,7 @@ public class ScheduleExcelImport extends ExcelImport implements ImportSchedule {
      * @throws EmptyFileException   if no headers are found in the Excel file
      * @throws InvalidCellException if the "id pracownika" column is not found or if a date cell has an invalid format
      */
-    private List<LocalDateTime> extractHeaders(Row headerRow) {
+    List<LocalDateTime> extractHeaders(Row headerRow) {
         List<LocalDateTime> headers = new ArrayList<>();
         short dataFormat = headerRow.getSheet().getWorkbook().getCreationHelper().createDataFormat().getFormat("yyyy-mm-dd");
 

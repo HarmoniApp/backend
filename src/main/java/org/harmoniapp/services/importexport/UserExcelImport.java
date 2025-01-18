@@ -87,7 +87,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @param headerRow the row containing the headers.
      * @return a list of header names, or null if the headers are invalid.
      */
-    private List<String> extractHeaders(Row headerRow) {
+    protected List<String> extractHeaders(Row headerRow) {
         List<String> headers = new ArrayList<>();
         for (Cell cell : headerRow) {
             headers.add(cell.getStringCellValue().toLowerCase().trim());
@@ -105,7 +105,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @return a list of saved user DTOs.
      * @throws InvalidCellException if a user cannot be saved.
      */
-    private List<UserDto> saveUsers(List<UserDto> userDtoList) {
+    protected List<UserDto> saveUsers(List<UserDto> userDtoList) {
         List<UserDto> savedUsers = new ArrayList<>();
         for (UserDto userDto : userDtoList) {
             try {
@@ -125,7 +125,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @param headers    the list of headers from the Excel sheet.
      * @param savedUsers the list of saved user DTOs.
      */
-    private void updateSupervisors(Sheet sheet, List<String> headers, List<UserDto> savedUsers) {
+    protected void updateSupervisors(Sheet sheet, List<String> headers, List<UserDto> savedUsers) {
         List<User> supervisors = repositoryCollector.getUsers().findAllActiveSupervisors();
         List<User> usersToUpdate = new ArrayList<>();
         for (int i = 0; i < savedUsers.size(); i++) {
@@ -149,7 +149,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @param savedUsers the list of saved user DTOs.
      * @return an InputStreamResource containing the response data.
      */
-    private InputStreamResource generateResponse(List<UserDto> savedUsers) {
+    protected InputStreamResource generateResponse(List<UserDto> savedUsers) {
         List<UserDto> response = createResponseList(savedUsers);
 
         byte[] pdfData = generatePdf(response);
@@ -249,7 +249,7 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @return a list of user DTOs created from the spreadsheet.
      * @throws RuntimeException if a row is invalid.
      */
-    private List<UserDto> createUserDtoListFromSpreadsheet(Iterator<Row> rows, List<String> headers) throws RuntimeException {
+    protected List<UserDto> createUserDtoListFromSpreadsheet(Iterator<Row> rows, List<String> headers) throws RuntimeException {
         List<Role> roles = repositoryCollector.getRoles().findAll();
         List<Language> languages = repositoryCollector.getLanguages().findAll();
         List<ContractType> contractTypes = repositoryCollector.getContractTypes().findAll();
@@ -292,8 +292,8 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @return a UserDto created from the row data.
      * @throws InvalidCellException if the row contains invalid data.
      */
-    private UserDto createUserDtoFromRow(Row row, List<String> headers, List<Role> roles, List<Language> languages,
-                                         List<ContractType> contractTypes, List<User> supervisors, List<Address> departments) {
+    protected UserDto createUserDtoFromRow(Row row, List<String> headers, List<Role> roles, List<Language> languages,
+                                           List<ContractType> contractTypes, List<User> supervisors, List<Address> departments) {
         Iterator<Cell> cells = row.cellIterator();
         var userBuilder = UserDto.builder();
         var addressBuilder = AddressDto.builder();
@@ -325,8 +325,8 @@ public class UserExcelImport extends ExcelImport implements ImportUser {
      * @param departments    the list of departments from the database.
      */
     private void populateUserAndAddressBuilders(Cell cell, String header, UserDto.UserDtoBuilder userBuilder,
-                                                AddressDto.AddressDtoBuilder addressBuilder, List<Role> roles, List<Language> languages,
-                                                List<ContractType> contractTypes, List<User> supervisors, List<Address> departments) {
+                                        AddressDto.AddressDtoBuilder addressBuilder, List<Role> roles, List<Language> languages,
+                                        List<ContractType> contractTypes, List<User> supervisors, List<Address> departments) {
         cell.setCellType(CellType.STRING);
         switch (header) {
             case "id pracownika" -> userBuilder.employeeId(cell.getStringCellValue().trim());

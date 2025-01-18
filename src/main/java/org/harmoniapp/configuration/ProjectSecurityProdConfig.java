@@ -37,7 +37,8 @@ public class ProjectSecurityProdConfig extends AbstractProjectSecurityConfig {
      */
     @Override
     protected void configureRequiresChannel(HttpSecurity http) throws Exception {
-        http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure());
+//        http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure());
+        http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure());
     }
 
     /**

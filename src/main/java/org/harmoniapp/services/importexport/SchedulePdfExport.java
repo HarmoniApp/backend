@@ -57,7 +57,7 @@ public class SchedulePdfExport extends PdfExport implements ExportSchedule {
      *                              if the start date is after the end date,
      *                              or if the date range is longer than 7 days
      */
-    private void validateDate(LocalDate startDate, LocalDate endDate) {
+    void validateDate(LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
             throw new InvalidDateException("Data początkowa i końcowa nie mogą być puste.");
         }
@@ -78,7 +78,7 @@ public class SchedulePdfExport extends PdfExport implements ExportSchedule {
      * @param endDate   the end date of the range
      * @throws FileGenerationException if there is an error generating the PDF file
      */
-    private void writeDocument(Document document, ByteArrayOutputStream out, LocalDate startDate, LocalDate endDate) {
+    void writeDocument(Document document, ByteArrayOutputStream out, LocalDate startDate, LocalDate endDate) {
         try {
             PdfWriter.getInstance(document, out);
             document.open();

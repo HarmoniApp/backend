@@ -103,6 +103,7 @@ public class UserSearchServiceImpl implements UserSearchService {
      * @param pageRequestDto The PageRequestDto containing pagination and sorting details.
      * @return A Pageable object with the specified page number, page size, and sorting direction.
      */
+    @Override
     public Pageable createPageable(PageRequestDto pageRequestDto) {
         int pageNumber = (pageRequestDto.pageNumber() == null || pageRequestDto.pageNumber() < 1) ? 0 : pageRequestDto.pageNumber() - 1;
         int pageSize = (pageRequestDto.pageSize() == null || pageRequestDto.pageSize() < 1) ? 10 : pageRequestDto.pageSize();
@@ -112,7 +113,7 @@ public class UserSearchServiceImpl implements UserSearchService {
                         ? Sort.Direction.ASC
                         : Sort.Direction.DESC;
 
-        if (pageRequestDto.sortBy() != null) {
+        if (pageRequestDto.sortBy() != null && !pageRequestDto.sortBy().isEmpty()) {
             return PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, pageRequestDto.sortBy()));
         } else {
             return PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, "surname", "firstname"));
@@ -126,7 +127,7 @@ public class UserSearchServiceImpl implements UserSearchService {
      * @param pageable        The pagination and sorting details.
      * @return A Page of User entities that match the search criteria.
      */
-    private Page<User> retrieveUsers(Pageable pageable, @Nullable UserSearchParamsDto searchParamsDto) {
+    protected Page<User> retrieveUsers(Pageable pageable, @Nullable UserSearchParamsDto searchParamsDto) {
         if (searchParamsDto == null ||
                 ((searchParamsDto.roles() == null || searchParamsDto.roles().isEmpty())
                         && (searchParamsDto.contracts() == null || searchParamsDto.contracts().isEmpty())

@@ -164,11 +164,11 @@ public class ShiftServiceImpl implements ShiftService {
      *
      * @param id                  the ID of the user to retrieve
      * @return the User entity with the specified ID
-     * @throws IllegalArgumentException if the user with the specified ID does not exist
+     * @throws EntityNotFoundException if the user with the specified ID does not exist
      */
     private User getUserById(long id) {
         return repositoryCollector.getUsers().findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika"));
+                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono użytkownika"));
     }
 
     /**

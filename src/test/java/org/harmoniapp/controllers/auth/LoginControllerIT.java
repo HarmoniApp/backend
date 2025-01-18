@@ -84,4 +84,14 @@ public class LoginControllerIT {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.jwtToken").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.path").exists());
     }
+
+    @Test
+    public void loginAsInactiveUserTest() throws Exception {
+        String body = "{\"username\": \"adam.piotrowski5@example.com\", \"password\": \"StrongPassword!2137\"}";
+        mockMvc.perform(MockMvcRequestBuilders.post("/login")
+                        .contentType("application/json")
+                        .content(body))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    }
 }

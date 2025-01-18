@@ -57,6 +57,10 @@ public record AddressDto(
      * @return An AddressDto representing the Address entity.
      */
     public static AddressDto fromEntity(Address address) {
+        if (address == null) {
+            return null;
+        }
+
         return AddressDto.builder()
                 .id(address.getId())
                 .zipCode(address.getZipCode())

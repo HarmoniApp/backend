@@ -51,7 +51,7 @@ public class ScheduleExcelExport extends ExcelExport implements ExportSchedule {
      * @return a map where the key is the user ID and the value is another map
      * with dates as keys and shift times as values
      */
-    private Map<Long, Map<LocalDate, String>> createUserShiftMap(List<Shift> shifts) {
+    protected Map<Long, Map<LocalDate, String>> createUserShiftMap(List<Shift> shifts) {
         Map<Long, Map<LocalDate, String>> userShiftMap = new HashMap<>();
         for (Shift shift : shifts) {
             userShiftMap.computeIfAbsent(shift.getUser().getId(), k -> new HashMap<>())
@@ -68,7 +68,7 @@ public class ScheduleExcelExport extends ExcelExport implements ExportSchedule {
      * @param endDate   the end date of the range
      * @return the created sheet
      */
-    private Sheet createSheetWithHeader(Workbook workbook, LocalDate startDate, LocalDate endDate) {
+    protected Sheet createSheetWithHeader(Workbook workbook, LocalDate startDate, LocalDate endDate) {
         Sheet sheet = workbook.createSheet("Grafik");
         Row headerRow = sheet.createRow(0);
         headerRow.createCell(0).setCellValue("ID Pracownika");
@@ -91,8 +91,8 @@ public class ScheduleExcelExport extends ExcelExport implements ExportSchedule {
      * @param startDate    the start date of the range
      * @param endDate      the end date of the range
      */
-    private void populateSheetWithData(Sheet sheet, List<User> users, Map<Long, Map<LocalDate, String>> userShiftMap,
-                                       LocalDate startDate, LocalDate endDate) {
+    protected void populateSheetWithData(Sheet sheet, List<User> users, Map<Long, Map<LocalDate, String>> userShiftMap,
+                                         LocalDate startDate, LocalDate endDate) {
         int rowIdx = 1;
         for (User user : users) {
             Row row = sheet.createRow(rowIdx++);
@@ -101,9 +101,9 @@ public class ScheduleExcelExport extends ExcelExport implements ExportSchedule {
             populateRowWithUserData(row, shiftsForUser, startDate, endDate);
         }
 
-        for (int i = 0; i < sheet.getRow(0).getLastCellNum(); i++) {
-            sheet.autoSizeColumn(i);
-        }
+//        for (int i = 0; i < sheet.getRow(0).getLastCellNum(); i++) {
+//            sheet.autoSizeColumn(i);
+//        }
     }
 
     /**
@@ -114,8 +114,8 @@ public class ScheduleExcelExport extends ExcelExport implements ExportSchedule {
      * @param startDate     the start date of the range
      * @param endDate       the end date of the range
      */
-    private void populateRowWithUserData(Row row, Map<LocalDate, String> shiftsForUser,
-                                         LocalDate startDate, LocalDate endDate) {
+    protected void populateRowWithUserData(Row row, Map<LocalDate, String> shiftsForUser,
+                                           LocalDate startDate, LocalDate endDate) {
         LocalDate current = startDate;
         int colIdx = 1;
         while (!current.isAfter(endDate)) {

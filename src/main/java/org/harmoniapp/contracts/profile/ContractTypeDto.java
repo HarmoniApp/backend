@@ -29,6 +29,10 @@ public record ContractTypeDto(
      * @return the resulting ContractTypeDto
      */
     public static ContractTypeDto fromEntity(ContractType contractType) {
+        if (contractType == null) {
+            return null;
+        }
+
         return new ContractTypeDto(
                 contractType.getId(),
                 contractType.getName(),
